@@ -1,0 +1,18 @@
+# Biên dịch và thực thi
+*.exe
+*.o
+*.obj
+*.out
+
+# Dev-C++ / Code::Blocks artifacts
+*.layout
+*.bak
+*.orig
+Makefile.win
+
+# VS Code / Visual Studio
+.vscode/
+.vs/
+
+# Dữ liệu xuất ra tạm thời (nếu muốn)
+data/ketqua_xettuyen.txt
