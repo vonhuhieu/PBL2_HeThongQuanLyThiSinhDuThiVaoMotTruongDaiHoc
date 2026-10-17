@@ -45,6 +45,10 @@ pause
 exit /b 1
 
 :COMPILE
+:: Trich xuat thu muc bin va them vao PATH de trinh bien dich tim thay cac DLL nhu libiconv-2.dll
+for %%F in ("%CXX%") do set "COMPILER_BIN=%%~dpF"
+set "PATH=%COMPILER_BIN%;%PATH%"
+
 echo [*] Dang su dung trinh bien dich: %CXX%
 echo [*] Dang bien dich cac file nguon...
 
