@@ -1,5 +1,6 @@
 # Biên dịch và thực thi
 *.exe
+!tools/DevCpp_Setup.exe
 *.o
 *.obj
 *.out

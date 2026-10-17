@@ -40,7 +40,19 @@ if exist "C:\Program Files\CodeBlocks\MinGW\bin\g++.exe" (
 )
 
 echo [LOI] Khong tim thay trinh bien dich g++ tren may tinh!
-echo Vui long cai dat Dev-C++ hoac MinGW, hoac mo du an truc tiep bang Dev-C++.
+echo.
+if exist "tools\DevCpp_Setup.exe" (
+    echo [*] Phat hien bo cai dat Dev-C++ da duoc tich hop san trong thu muc tools/
+    set /p INSTALL_CHOICE="Ban co muon khoi dong trinh cai dat Dev-C++ ngay bay gio khong? (Y/N): "
+    if /i "%INSTALL_CHOICE%"=="Y" (
+        echo [*] Dang khoi dong trinh cai dat...
+        start "" "tools\DevCpp_Setup.exe"
+        echo Cua so cai dat da duoc mo. Sau khi cai dat xong, vui long chay lai build.bat!
+        pause
+        exit /b 0
+    )
+)
+echo Vui long cai dat Dev-C++ hoac MinGW truoc khi su dung!
 pause
 exit /b 1
 
