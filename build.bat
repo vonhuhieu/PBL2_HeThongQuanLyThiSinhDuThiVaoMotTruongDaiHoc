@@ -2,7 +2,8 @@
 chcp 65001 > nul
 cls
 echo ==============================================================================
-echo          CHUONG TRINH DICH VA CHAY - DO AN PBL2 (DE TAI 24)
+echo          CHUONG TRINH BIEN DICH VA CHAY - DO AN PBL2 (DE TAI 24)
+echo     [ Kien truc CSDL Quan he 3NF + Giao dien Do hoa Dear ImGui DirectX 9 ]
 echo ==============================================================================
 echo.
 
@@ -41,30 +42,25 @@ if exist "C:\Program Files\CodeBlocks\MinGW\bin\g++.exe" (
 
 echo [LOI] Khong tim thay trinh bien dich g++ tren may tinh!
 echo.
-if exist "tools\DevCpp_Setup.exe" (
-    echo [*] Phat hien bo cai dat Dev-C++ da duoc tich hop san trong thu muc tools/
-    set /p INSTALL_CHOICE="Ban co muon khoi dong trinh cai dat Dev-C++ ngay bay gio khong? (Y/N): "
-    if /i "%INSTALL_CHOICE%"=="Y" (
-        echo [*] Dang khoi dong trinh cai dat...
-        start "" "tools\DevCpp_Setup.exe"
-        echo Cua so cai dat da duoc mo. Sau khi cai dat xong, vui long chay lai build.bat!
-        pause
-        exit /b 0
-    )
-)
-echo Vui long cai dat Dev-C++ hoac MinGW truoc khi su dung!
 pause
 exit /b 1
 
 :COMPILE
-:: Trich xuat thu muc bin va them vao PATH de trinh bien dich tim thay cac DLL nhu libiconv-2.dll
+:: Trich xuat thu muc bin va them vao PATH de trinh bien dich tim thay cac DLL
 for %%F in ("%CXX%") do set "COMPILER_BIN=%%~dpF"
 set "PATH=%COMPILER_BIN%;%PATH%"
 
-echo [*] Dang su dung trinh bien dich: %CXX%
-echo [*] Dang bien dich cac file nguon...
+echo [*] Trinh bien dich : %CXX%
+echo [*] Dang bien dich toan bo ma nguon (OOP, CSDL 3NF, GUI ImGui DirectX 9)...
+echo.
 
-"%CXX%" -std=c++11 -Iinclude src\Nguoi.cpp src\ThiSinh.cpp src\QuanLyThiSinh.cpp src\ConsoleUI.cpp src\Utils.cpp src\main.cpp -o QuanLyThiSinh.exe
+"%CXX%" -std=c++11 -O2 -Iinclude -Iinclude/imgui ^
+    src\Nguoi.cpp src\ThiSinh.cpp src\KhuVuc.cpp src\NganhXetTuyen.cpp ^
+    src\QuanLyThiSinh.cpp src\ConsoleUI.cpp src\Utils.cpp src\AppGUI.cpp ^
+    src\imgui\imgui.cpp src\imgui\imgui_draw.cpp src\imgui\imgui_tables.cpp ^
+    src\imgui\imgui_widgets.cpp src\imgui\imgui_impl_win32.cpp src\imgui\imgui_impl_dx9.cpp ^
+    src\main.cpp ^
+    -ld3d9 -lgdi32 -ldwmapi -o QuanLyThiSinh.exe
 
 if %ERRORLEVEL% equ 0 (
     echo.
@@ -72,10 +68,9 @@ if %ERRORLEVEL% equ 0 (
     echo [THANH CONG] Da bien dich xong file chuong trinh: QuanLyThiSinh.exe
     echo ==============================================================================
     echo.
-    echo [*] Dang khoi chay chuong trinh...
+    echo [*] Dang khoi chay chuong trinh Giao dien Do hoa GUI...
     pause
-    cls
-    QuanLyThiSinh.exe
+    start "" QuanLyThiSinh.exe
 ) else (
     echo.
     echo [LOI] Co loi xay ra trong qua trinh bien dich!

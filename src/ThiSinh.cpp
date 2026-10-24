@@ -3,31 +3,42 @@
 
 // 1. Constructor mặc định
 ThiSinh::ThiSinh() 
-    : Nguoi(), soBaoDanh(""), diemToan(0.0), diemLy(0.0), diemHoa(0.0), diemUuTien(0.0) {}
+    : Nguoi(), maThiSinh(""), soBaoDanh(""), maKhuVuc("KV3"), maNganh("7480201"),
+      diemToan(0.0), diemLy(0.0), diemHoa(0.0), diemUuTien(0.0) {}
 
 // 2. Constructor có tham số đầy đủ
-ThiSinh::ThiSinh(const string& cmnd, const string& ten, const string& ns, const string& que, const string& gt,
-                 const string& sbd, double toan, double ly, double hoa, double uuTien)
-    : Nguoi(cmnd, ten, ns, que, gt), soBaoDanh(sbd), 
+ThiSinh::ThiSinh(const string& maTS, const string& cmnd, const string& ten, const string& ns,
+                 const string& que, const string& gt, const string& sbd,
+                 const string& maKV, const string& maNg,
+                 double toan, double ly, double hoa, double uuTien)
+    : Nguoi(cmnd, ten, ns, que, gt), maThiSinh(maTS), soBaoDanh(sbd),
+      maKhuVuc(maKV), maNganh(maNg),
       diemToan(toan), diemLy(ly), diemHoa(hoa), diemUuTien(uuTien) {}
 
 // 3. Copy constructor
 ThiSinh::ThiSinh(const ThiSinh& other)
-    : Nguoi(other), soBaoDanh(other.soBaoDanh),
+    : Nguoi(other), maThiSinh(other.maThiSinh), soBaoDanh(other.soBaoDanh),
+      maKhuVuc(other.maKhuVuc), maNganh(other.maNganh),
       diemToan(other.diemToan), diemLy(other.diemLy), diemHoa(other.diemHoa), diemUuTien(other.diemUuTien) {}
 
 // 4. Destructor
 ThiSinh::~ThiSinh() {}
 
 // Getters
+string ThiSinh::getMaThiSinh() const { return maThiSinh; }
 string ThiSinh::getSoBaoDanh() const { return soBaoDanh; }
+string ThiSinh::getMaKhuVuc() const { return maKhuVuc; }
+string ThiSinh::getMaNganh() const { return maNganh; }
 double ThiSinh::getDiemToan() const { return diemToan; }
 double ThiSinh::getDiemLy() const { return diemLy; }
 double ThiSinh::getDiemHoa() const { return diemHoa; }
 double ThiSinh::getDiemUuTien() const { return diemUuTien; }
 
 // Setters
+void ThiSinh::setMaThiSinh(const string& maTS) { maThiSinh = maTS; }
 void ThiSinh::setSoBaoDanh(const string& sbd) { soBaoDanh = sbd; }
+void ThiSinh::setMaKhuVuc(const string& maKV) { maKhuVuc = maKV; }
+void ThiSinh::setMaNganh(const string& maNg) { maNganh = maNg; }
 void ThiSinh::setDiemToan(double toan) { diemToan = toan; }
 void ThiSinh::setDiemLy(double ly) { diemLy = ly; }
 void ThiSinh::setDiemHoa(double hoa) { diemHoa = hoa; }
@@ -58,20 +69,24 @@ string ThiSinh::xepLoaiHocLuc() const {
     return "Yeu";
 }
 
-// Xét tuyển trúng tuyển vào ngành/trường
-bool ThiSinh::xetTrungTuyen(double diemChuan) const {
+// Xét tuyển trúng tuyển vào ngành đăng ký
+bool ThiSinh::xetTrungTuyen(double diemChuanNganh) const {
     if (kiemTraDiemLiet()) return false;
-    return tinhTongDiem() >= diemChuan;
+    return tinhTongDiem() >= diemChuanNganh;
 }
 
 // Nhập thông tin thí sinh
 void ThiSinh::nhap(istream& in) {
     if (&in == &cin) {
-        cout << "--- NHAP THONG TIN CA NHAN ---" << endl;
+        cout << "Nhap Ma Thi Sinh (PK): ";
+        getline(in, maThiSinh);
         Nguoi::nhap(in);
-        cout << "--- NHAP THONG TIN DU THI ---" << endl;
         cout << "Nhap so bao danh (SBD): ";
         getline(in, soBaoDanh);
+        cout << "Nhap Ma Khu Vuc (KV1/KV2NT/KV2/KV3): ";
+        getline(in, maKhuVuc);
+        cout << "Nhap Ma Nganh dang ky: ";
+        getline(in, maNganh);
 
         cout << "Nhap diem Toan (0 - 10): ";
         in >> diemToan;
@@ -79,34 +94,42 @@ void ThiSinh::nhap(istream& in) {
         in >> diemLy;
         cout << "Nhap diem Hoa  (0 - 10): ";
         in >> diemHoa;
-        cout << "Nhap diem uu tien (0 - 2.5): ";
+        cout << "Nhap diem uu tien (0 - 0.75): ";
         in >> diemUuTien;
-        in.ignore(); // Xoa ky tu xuong dong con sót lại trong bo dem
+        in.ignore();
     } else {
-        // Đọc từ file
+        // Đọc từ luồng tệp
+        getline(in, maThiSinh);
         Nguoi::nhap(in);
         getline(in, soBaoDanh);
+        getline(in, maKhuVuc);
+        getline(in, maNganh);
         in >> diemToan >> diemLy >> diemHoa >> diemUuTien;
-        in.ignore(); // Bỏ qua ký tự newline
+        in.ignore();
     }
 }
 
-// Xuất thông tin thí sinh ra bảng hoặc ra luồng tệp
+// Xuất thông tin thí sinh
 void ThiSinh::xuat(ostream& out) const {
     if (&out == &cout) {
-        out << left << setw(10) << soBaoDanh;
+        out << left << setw(8) << maThiSinh
+            << setw(9) << soBaoDanh;
         Nguoi::xuat(out);
-        out << right << fixed << setprecision(2)
-            << setw(7) << diemToan 
-            << setw(7) << diemLy 
-            << setw(7) << diemHoa 
-            << setw(7) << diemUuTien
-            << setw(8) << tinhTongDiem() 
-            << "  " << left << setw(12) << xepLoaiHocLuc();
+        out << " " << left << setw(6) << maKhuVuc
+            << setw(9) << maNganh
+            << right << fixed << setprecision(2)
+            << setw(6) << diemToan 
+            << setw(6) << diemLy 
+            << setw(6) << diemHoa 
+            << setw(6) << diemUuTien
+            << setw(7) << tinhTongDiem() 
+            << "  " << left << setw(11) << xepLoaiHocLuc();
     } else {
-        // Ghi ra file định dạng dòng văn bản
+        out << maThiSinh << endl;
         Nguoi::xuat(out);
         out << soBaoDanh << endl
+            << maKhuVuc << endl
+            << maNganh << endl
             << fixed << setprecision(2)
             << diemToan << " " << diemLy << " " << diemHoa << " " << diemUuTien << endl;
     }
@@ -128,7 +151,10 @@ ostream& operator<<(ostream& out, const ThiSinh& ts) {
 ThiSinh& ThiSinh::operator=(const ThiSinh& other) {
     if (this != &other) {
         Nguoi::operator=(other);
+        maThiSinh = other.maThiSinh;
         soBaoDanh = other.soBaoDanh;
+        maKhuVuc = other.maKhuVuc;
+        maNganh = other.maNganh;
         diemToan = other.diemToan;
         diemLy = other.diemLy;
         diemHoa = other.diemHoa;
@@ -137,9 +163,9 @@ ThiSinh& ThiSinh::operator=(const ThiSinh& other) {
     return *this;
 }
 
-// So sánh bằng theo Số báo danh
+// So sánh bằng theo Mã Thí Sinh hoặc Số báo danh
 bool ThiSinh::operator==(const ThiSinh& other) const {
-    return (soBaoDanh == other.soBaoDanh);
+    return (maThiSinh == other.maThiSinh || soBaoDanh == other.soBaoDanh);
 }
 
 // So sánh theo Tổng điểm để sắp xếp

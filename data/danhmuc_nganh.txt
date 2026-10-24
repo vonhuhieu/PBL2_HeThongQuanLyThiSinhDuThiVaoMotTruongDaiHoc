@@ -1,0 +1,6 @@
+5
+7480201|Cong nghe Thong tin|A00|150|26.25
+7520207|Ky thuat Dieu khien & Tu dong hoa|A00|120|24.50
+7520114|Ky thuat Co dien tu|A00|100|23.75
+7510301|Ky thuat Dien - Dien tu|A00|80|22.00
+7580201|Ky thuat Xay dung|A00|90|19.50

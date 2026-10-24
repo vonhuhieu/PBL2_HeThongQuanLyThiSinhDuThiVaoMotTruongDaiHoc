@@ -1,175 +1,117 @@
-#include <iostream>
-#include <string>
-#include "../include/ConsoleUI.h"
 #include "../include/QuanLyThiSinh.h"
-#include "../include/Utils.h"
+#include "../include/AppGUI.h"
+#include "../include/ConsoleUI.h"
+#include <iostream>
+#include <iomanip>
+#include <string>
 
 using namespace std;
 
-// Menu tìm kiếm
-void menuTimKiem(QuanLyThiSinh& ql) {
+// Menu tìm kiếm Console (Fallback)
+static void menuTimKiemConsole(QuanLyThiSinh& ql) {
     const string options[] = {
-        "Tim kiem theo So Bao Danh (Chinh xac)",
-        "Tim kiem theo Ho va Ten thi sinh (Gan dung)",
+        "Tim kiem theo So Bao Danh",
+        "Tim kiem theo Ho va Ten thi sinh",
         "Tim kiem theo Que quan / Tinh thanh",
-        "Tim kiem theo Khoang Tong Diem",
         "Quay lai Menu chinh"
     };
-    const int numOptions = sizeof(options) / sizeof(options[0]);
-
     while (true) {
-        int choice = ConsoleUI::showInteractiveMenu("MENU TIM KIEM THI SINH", options, numOptions);
-        switch (choice) {
-            case 0: ql.timKiemTheoSBD(); break;
-            case 1: ql.timKiemTheoTen(); break;
-            case 2: ql.timKiemTheoQueQuan(); break;
-            case 3: ql.timKiemTheoKhoangDiem(); break;
-            case 4: return;
+        int choice = ConsoleUI::showInteractiveMenu("MENU TIM KIEM THI SINH", options, 4);
+        if (choice == 0) {
+            ConsoleUI::clearScreen();
+            cout << "  Nhap SBD can tim: ";
+            string sbd;
+            getline(cin, sbd);
+            int idx = ql.timViTriTheoSBD(sbd);
+            if (idx != -1) {
+                cout << "  Tim thay: " << ql.getDanhSachThiSinh()[idx].getHoTen() 
+                     << " | Nganh: " << ql.getTenNganh(ql.getDanhSachThiSinh()[idx].getMaNganh())
+                     << " | Tong: " << ql.getDanhSachThiSinh()[idx].tinhTongDiem() << "\n";
+            } else {
+                cout << "  Khong tim thay!\n";
+            }
+            ConsoleUI::pauseScreen();
+        } else if (choice == 3) {
+            return;
         }
     }
 }
 
-// Menu sắp xếp
-void menuSapXep(QuanLyThiSinh& ql) {
-    const string options[] = {
-        "Sap xep theo Tong Diem giam dan (Bang xep hang)",
-        "Sap xep theo Thu tu Ten A - Z",
-        "Sap xep theo So Bao Danh tang dan",
-        "Quay lai Menu chinh"
-    };
-    const int numOptions = sizeof(options) / sizeof(options[0]);
-
-    while (true) {
-        int choice = ConsoleUI::showInteractiveMenu("MENU SAP XEP DANH SACH", options, numOptions);
-        switch (choice) {
-            case 0: ql.sapXepTheoTongDiemGiamDan(); break;
-            case 1: ql.sapXepTheoTenAZ(); break;
-            case 2: ql.sapXepTheoSBDTangDan(); break;
-            case 3: return;
-        }
-    }
-}
-
-// Menu thống kê và xét tuyển
-void menuThongKe(QuanLyThiSinh& ql) {
-    const string options[] = {
-        "Vinh danh Thu Khoa ky thi (Diem cao nhat)",
-        "Danh sach thi sinh Trung Tuyen (Theo diem chuan)",
-        "Thong ke Pho Diem xet tuyen (Ty le % hoc luc)",
-        "Thong ke So luong thi sinh theo Que quan",
-        "Thiet lap / Thay doi Diem chuan xet tuyen",
-        "Quay lai Menu chinh"
-    };
-    const int numOptions = sizeof(options) / sizeof(options[0]);
-
-    while (true) {
-        int choice = ConsoleUI::showInteractiveMenu("MENU THONG KE & XET TUYEN", options, numOptions);
-        switch (choice) {
-            case 0: ql.vinhDanhThuKhoa(); break;
-            case 1: ql.danhSachTrungTuyen(); break;
-            case 2: ql.thongKePhoDiem(); break;
-            case 3: ql.thongKeTheoQueQuan(); break;
-            case 4: ql.thietLapDiemChuan(); break;
-            case 5: return;
-        }
-    }
-}
-
-int main() {
-    // Khởi tạo cài đặt Console Windows
+// Chế độ Console dự phòng
+static int runConsoleMode(QuanLyThiSinh& ql) {
     ConsoleUI::setupConsole();
-
-    // Khởi tạo đối tượng quản lý
-    QuanLyThiSinh ql("data/thisinh.txt");
-
     const string mainOptions[] = {
-        "Xem toan bo danh sach thi sinh",
-        "Them thi sinh moi vao he thong",
-        "Tim kiem thi sinh (SBD, Ten, Que quan, Diem)",
-        "Cap nhat / Chinh sua thong tin thi sinh",
-        "Xoa thi sinh khoi he thong (Theo SBD)",
-        "Sap xep danh sach thi sinh",
-        "Thong ke, Vinh danh Thu Khoa & Ket qua xet tuyen",
-        "Xuat bao cao ket qua xet tuyen ra tap tin",
-        "Thoat chuong trinh & Luu toan bo du lieu"
+        "Xem toan bo danh sach thi sinh (CSDL 3NF)",
+        "Tim kiem thi sinh",
+        "Sap xep danh sach theo Tong Diem giam dan",
+        "Vinh danh Thu Khoa ky thi",
+        "Xuat bao cao ket qua xet tuyen ra tep",
+        "Thoat chuong trinh"
     };
-    const int numMainOptions = sizeof(mainOptions) / sizeof(mainOptions[0]);
 
-    bool running = true;
-    while (running) {
-        int choice = ConsoleUI::showInteractiveMenu("HE THONG QUAN LY THI SINH TUYEN SINH DAI HOC", 
-                                                    mainOptions, numMainOptions);
-
+    while (true) {
+        int choice = ConsoleUI::showInteractiveMenu("HE THONG QUAN LY THI SINH (CHE DO CONSOLE)", mainOptions, 6);
         switch (choice) {
-            case 0: // Xem toàn bộ
-                ql.hienThiTatCa();
-                break;
-
-            case 1: // Thêm mới
-                ql.themMoiThiSinh();
-                break;
-
-            case 2: // Tìm kiếm
-                menuTimKiem(ql);
-                break;
-
-            case 3: { // Sửa
+            case 0: {
                 ConsoleUI::clearScreen();
-                ConsoleUI::printTitle("CAP NHAT THONG TIN THI SINH");
-                cout << "  Nhap So Bao Danh cua thi sinh can sua: ";
-                string sbd;
-                getline(cin, sbd);
-                ql.suaThongTinThiSinh(sbd);
-                break;
-            }
-
-            case 4: { // Xóa
-                ConsoleUI::clearScreen();
-                ConsoleUI::printTitle("XOA THI SINH");
-                cout << "  Nhap So Bao Danh cua thi sinh can xoa: ";
-                string sbd;
-                getline(cin, sbd);
-                ql.xoaThiSinh(sbd);
-                ConsoleUI::pauseScreen();
-                break;
-            }
-
-            case 5: // Sắp xếp
-                menuSapXep(ql);
-                break;
-
-            case 6: // Thống kê
-                menuThongKe(ql);
-                break;
-
-            case 7: { // Xuất file báo cáo
-                ConsoleUI::clearScreen();
-                ConsoleUI::printTitle("XUAT BAO CAO KET QUA XET TUYEN");
-                string path = "data/ketqua_xettuyen.txt";
-                if (ql.xuatBaoCaoXetTuyen(path)) {
-                    ConsoleUI::printSuccess("Xuat bao cao thanh cong ra tep: " + path);
-                } else {
-                    ConsoleUI::printError("Khong the tao file bao cao!");
+                ConsoleUI::printTitle("DANH SACH THI SINH DANG KY");
+                cout << left << setw(8) << "Ma TS" << setw(9) << "SBD" << setw(20) << "Ho va Ten" 
+                     << setw(14) << "Que Quan" << setw(26) << "Nganh" << setw(8) << "Tong" << "Ket qua\n";
+                cout << string(95, '-') << "\n";
+                for (int i = 0; i < ql.getDanhSachThiSinh().size(); ++i) {
+                    const ThiSinh& ts = ql.getDanhSachThiSinh()[i];
+                    double dc = ql.getDiemChuanNganh(ts.getMaNganh());
+                    cout << left << setw(8) << ts.getMaThiSinh()
+                         << setw(9) << ts.getSoBaoDanh()
+                         << setw(20) << ts.getHoTen().substr(0, 18)
+                         << setw(14) << ts.getQueQuan().substr(0, 12)
+                         << setw(26) << ql.getTenNganh(ts.getMaNganh()).substr(0, 24)
+                         << right << fixed << setprecision(2) << setw(6) << ts.tinhTongDiem()
+                         << "   " << left << (ts.xetTrungTuyen(dc) ? "TRUNG TUYEN" : "Khong dat") << "\n";
                 }
                 ConsoleUI::pauseScreen();
                 break;
             }
-
-            case 8: // Thoát
-                ql.luuDuLieuVaoFile();
+            case 1:
+                menuTimKiemConsole(ql);
+                break;
+            case 2:
+                ql.sapXepTheoTongDiemGiamDan();
+                ConsoleUI::printSuccess("Da sap xep danh sach theo tong diem giam dan!");
+                ConsoleUI::pauseScreen();
+                break;
+            case 3: {
                 ConsoleUI::clearScreen();
-                ConsoleUI::printTitle("KET THUC CHUONG TRINH");
-                ConsoleUI::setColor(COLOR_GREEN);
-                cout << "\n  [THONG BAO] Du lieu da duoc luu an toan vao 'data/thisinh.txt'.\n";
-                cout << "  Cam on ban da su dung chuong trinh! Tam biet!\n\n";
-                ConsoleUI::resetColor();
-                running = false;
+                ConsoleUI::printTitle("VINH DANH THU KHOA");
+                Vector<ThiSinh> dsTK = ql.getDanhSachThuKhoa();
+                for (int i = 0; i < dsTK.size(); ++i) {
+                    cout << "  ★ Thu khoa: " << dsTK[i].getHoTen() << " (SBD: " << dsTK[i].getSoBaoDanh() 
+                         << ") - Tong diem: " << dsTK[i].tinhTongDiem() << "\n";
+                }
+                ConsoleUI::pauseScreen();
                 break;
-
-            default:
+            }
+            case 4:
+                ql.xuatBaoCaoXetTuyen("data/ketqua_xettuyen.txt");
+                ConsoleUI::printSuccess("Da xuat bao cao ket qua ra data/ketqua_xettuyen.txt!");
+                ConsoleUI::pauseScreen();
                 break;
+            case 5:
+                ql.luuTatCaDuLieu();
+                return 0;
         }
     }
+}
 
-    return 0;
+int main(int argc, char* argv[]) {
+    // Khởi tạo hệ quản trị cơ sở dữ liệu và nghiệp vụ tuyển sinh
+    QuanLyThiSinh ql("data");
+
+    // Nếu người dùng chạy với tham số --console, chuyển sang Console
+    if (argc > 1 && string(argv[1]) == "--console") {
+        return runConsoleMode(ql);
+    }
+
+    // Mặc định: Khởi chạy Giao diện Đồ họa Hiện đại (Dear ImGui DirectX 9)
+    return AppGUI::run(ql);
 }

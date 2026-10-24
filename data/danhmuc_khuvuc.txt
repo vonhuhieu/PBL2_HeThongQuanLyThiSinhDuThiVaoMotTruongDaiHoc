@@ -1,0 +1,5 @@
+4
+KV1|Khu vuc 1|0.75
+KV2NT|Khu vuc 2 Nong thon|0.50
+KV2|Khu vuc 2|0.25
+KV3|Khu vuc 3 (Khong uu tien)|0.00

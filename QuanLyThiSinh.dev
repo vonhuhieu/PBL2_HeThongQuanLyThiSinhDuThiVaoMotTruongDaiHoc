@@ -4,14 +4,14 @@ Name=QuanLyThiSinh
 Type=1
 Ver=2
 ObjFiles=
-Includes=include
+Includes=include;include\imgui
 Libs=
 PrivateResource=
 ResourceIncludes=
 MakeIncludes=
 Compiler=
-CppCompiler=-std=c++11_@@_
-Linker=
+CppCompiler=-std=c++11 -O2_@@_
+Linker=-ld3d9 -lgdi32 -ldwmapi_@@_
 IsCpp=1
 Icon=
 ExeOutput=
@@ -24,12 +24,12 @@ HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
 CommandLine=
-Folders=include,src
+Folders=include,include\imgui,src,src\imgui
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000001000000
-UnitCount=12
+UnitCount=22
 
 [Unit1]
 FileName=include\Vector.h
@@ -62,7 +62,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit4]
-FileName=include\QuanLyThiSinh.h
+FileName=include\KhuVuc.h
 CompileCpp=1
 Folder=include
 Compile=1
@@ -72,7 +72,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit5]
-FileName=include\ConsoleUI.h
+FileName=include\NganhXetTuyen.h
 CompileCpp=1
 Folder=include
 Compile=1
@@ -82,7 +82,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit6]
-FileName=include\Utils.h
+FileName=include\QuanLyThiSinh.h
 CompileCpp=1
 Folder=include
 Compile=1
@@ -92,6 +92,36 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit7]
+FileName=include\AppGUI.h
+CompileCpp=1
+Folder=include
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit8]
+FileName=include\ConsoleUI.h
+CompileCpp=1
+Folder=include
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit9]
+FileName=include\Utils.h
+CompileCpp=1
+Folder=include
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit10]
 FileName=src\Nguoi.cpp
 CompileCpp=1
 Folder=src
@@ -101,7 +131,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit8]
+[Unit11]
 FileName=src\ThiSinh.cpp
 CompileCpp=1
 Folder=src
@@ -111,7 +141,27 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit9]
+[Unit12]
+FileName=src\KhuVuc.cpp
+CompileCpp=1
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit13]
+FileName=src\NganhXetTuyen.cpp
+CompileCpp=1
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit14]
 FileName=src\QuanLyThiSinh.cpp
 CompileCpp=1
 Folder=src
@@ -121,7 +171,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit10]
+[Unit15]
+FileName=src\AppGUI.cpp
+CompileCpp=1
+Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit16]
 FileName=src\ConsoleUI.cpp
 CompileCpp=1
 Folder=src
@@ -131,7 +191,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit11]
+[Unit17]
 FileName=src\Utils.cpp
 CompileCpp=1
 Folder=src
@@ -141,10 +201,50 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit12]
+[Unit18]
 FileName=src\main.cpp
 CompileCpp=1
 Folder=src
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit19]
+FileName=src\imgui\imgui.cpp
+CompileCpp=1
+Folder=src\imgui
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit20]
+FileName=src\imgui\imgui_draw.cpp
+CompileCpp=1
+Folder=src\imgui
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit21]
+FileName=src\imgui\imgui_impl_win32.cpp
+CompileCpp=1
+Folder=src\imgui
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit22]
+FileName=src\imgui\imgui_impl_dx9.cpp
+CompileCpp=1
+Folder=src\imgui
 Compile=1
 Link=1
 Priority=1000
