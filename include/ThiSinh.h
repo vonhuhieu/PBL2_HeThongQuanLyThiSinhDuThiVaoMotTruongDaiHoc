@@ -6,74 +6,57 @@
 
 /**
  * @brief Lớp đối tượng THÍ SINH (Kế thừa từ lớp NGƯỜI)
- * Đại diện cho một thí sinh tham gia kỳ thi tuyển sinh đại học
- * Áp dụng kiến thức Cơ sở dữ liệu:
- * - Khóa chính (PK): maThiSinh (giải quyết triệt để trường hợp nhiều thí sinh trùng họ tên)
- * - Khóa ngoại (FK): maKhuVuc (liên kết bảng KhuVuc), maNganh (liên kết bảng NganhXetTuyen)
+ * Đáp ứng chính xác đề bài Đề tài 24 - PBL2
+ * Kế thừa: Số CCCD, Họ tên, Ngày sinh, Quê quán, Giới tính từ lớp NGƯỜI
+ * Bổ sung các thuộc tính dự thi: Số báo danh, Điểm toán, Điểm lý, Điểm hóa
  */
 class ThiSinh : public Nguoi {
 private:
-    string maThiSinh;   // Khóa chính (PK): TS001, TS002...
-    string soBaoDanh;   // Số báo danh dự thi (SBD): DUT001, DUT002...
-    string maKhuVuc;    // Khóa ngoại (FK): KV1, KV2NT, KV2, KV3
-    string maNganh;     // Khóa ngoại (FK): Mã ngành đăng ký xét tuyển (ví dụ: 7480201)
-    double diemToan;    // Điểm thi môn Toán (0 - 10)
-    double diemLy;      // Điểm thi môn Vật lý (0 - 10)
-    double diemHoa;     // Điểm thi môn Hóa học (0 - 10)
-    double diemUuTien;  // Điểm cộng ưu tiên suy ra từ Khu vực (0.0 - 0.75)
+    string soBaoDanh;   // Số báo danh dự thi (SBD: DUT001, DUT002...) - Khóa chính dự thi
+    double diemToan;    // Điểm thi môn Toán (0.00 - 10.00)
+    double diemLy;      // Điểm thi môn Vật lý (0.00 - 10.00)
+    double diemHoa;     // Điểm thi môn Hóa học (0.00 - 10.00)
 
 public:
     // Các hàm tạo (Constructors)
     ThiSinh();
-    ThiSinh(const string& maTS, const string& cmnd, const string& ten, const string& ns,
-            const string& que, const string& gt, const string& sbd,
-            const string& maKV, const string& maNg,
-            double toan, double ly, double hoa, double uuTien = 0.0);
+    ThiSinh(const string& cccd, const string& ten, const string& ns, const string& que, const string& gt,
+            const string& sbd, double toan, double ly, double hoa);
     ThiSinh(const ThiSinh& other);
 
     // Hàm hủy ảo (Destructor)
     virtual ~ThiSinh();
 
     // Getters
-    string getMaThiSinh() const;
     string getSoBaoDanh() const;
-    string getMaKhuVuc() const;
-    string getMaNganh() const;
     double getDiemToan() const;
     double getDiemLy() const;
     double getDiemHoa() const;
-    double getDiemUuTien() const;
 
     // Setters
-    void setMaThiSinh(const string& maTS);
     void setSoBaoDanh(const string& sbd);
-    void setMaKhuVuc(const string& maKV);
-    void setMaNganh(const string& maNg);
     void setDiemToan(double toan);
     void setDiemLy(double ly);
     void setDiemHoa(double hoa);
-    void setDiemUuTien(double uuTien);
 
-    // Các phương thức tính toán nghiệp vụ tuyển sinh
-    double tinhTongDiem() const;       // Toán + Lý + Hóa + Ưu tiên
-    double tinhDiemBaMon() const;      // Toán + Lý + Hóa
-    bool kiemTraDiemLiet() const;      // Kiểm tra có môn nào <= 1.0 điểm không
-    string xepLoaiHocLuc() const;      // Xuất sắc, Giỏi, Khá, Trung bình, Yếu
-    bool xetTrungTuyen(double diemChuanNganh) const; // Đạt điểm chuẩn ngành và không bị điểm liệt
+    // Các phương thức tính toán nghiệp vụ tuyển sinh Đại học
+    double tinhTongDiem() const;                     // Tổng điểm = Toán + Lý + Hóa
+    bool kiemTraDiemLiet() const;                    // Có môn nào <= 1.00 điểm không
+    bool xetTrungTuyen(double diemChuan) const;       // Đạt điểm chuẩn và không bị điểm liệt
 
-    // Ghi đè phương thức nhập xuất (Polymorphism)
+    // Ghi đè phương thức nhập xuất đa hình (Polymorphism)
     virtual void nhap(istream& in = cin) override;
     virtual void xuat(ostream& out = cout) const override;
 
-    // Nạp chồng toán tử nhập xuất luồng
-    friend istream& operator>>(istream& in, ThiSinh& ts);
-    friend ostream& operator<<(ostream& out, const ThiSinh& ts);
-
     // Nạp chồng toán tử gán và so sánh
     ThiSinh& operator=(const ThiSinh& other);
-    bool operator==(const ThiSinh& other) const;
-    bool operator<(const ThiSinh& other) const;
+    bool operator==(const ThiSinh& other) const;     // So sánh bằng theo SBD hoặc CCCD
+    bool operator<(const ThiSinh& other) const;      // So sánh theo Tổng điểm để sắp xếp
     bool operator>(const ThiSinh& other) const;
+
+    // Nạp chồng toán tử nhập / xuất luồng
+    friend istream& operator>>(istream& in, ThiSinh& ts);
+    friend ostream& operator<<(ostream& out, const ThiSinh& ts);
 };
 
 #endif // THISINH_H

@@ -11,9 +11,7 @@
 *.orig
 Makefile.win
 
-# VS Code / Visual Studio
+# VS Code / Visual Studio / CLion / JetBrains
 .vscode/
 .vs/
-
-# Dữ liệu xuất ra tạm thời (nếu muốn)
-data/ketqua_xettuyen.txt
+.idea/

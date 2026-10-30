@@ -3,84 +3,80 @@
 
 #include "Vector.h"
 #include "ThiSinh.h"
-#include "KhuVuc.h"
-#include "NganhXetTuyen.h"
 #include <string>
 
 using namespace std;
 
 /**
- * @brief Lớp quản trị toàn bộ hệ thống cơ sở dữ liệu và nghiệp vụ tuyển sinh
- * Áp dụng mô hình Cơ sở dữ liệu quan hệ (Relational Database) chuẩn 3NF:
- * - Bảng 1: KhuVuc (danhmuc_khuvuc.txt)
- * - Bảng 2: NganhXetTuyen (danhmuc_nganh.txt)
- * - Bảng 3: HoSoThiSinh (hoso_thisinh.txt)
- * - Bảng 4: DangKyThi (dangky_thi.txt)
+ * @brief Lớp Quản trị hệ thống Cơ sở dữ liệu và Nghiệp vụ tuyển sinh Đại học
+ * Áp dụng mô hình Cơ sở dữ liệu quan hệ Class Table Inheritance:
+ * - data/nguoi.txt: Bảng thực thể cha NGƯỜI (PK: soCCCD)
+ * - data/thisinh.txt: Bảng thực thể con THÍ SINH (PK: soBaoDanh, FK: soCCCD)
+ * - data/system.txt: Tệp cấu hình hệ thống (Điểm chuẩn, Năm tuyển sinh, Trường)
+ * - data/ketqua_xettuyen.txt: Báo cáo kết quả trúng tuyển dạng bảng
+ * - data/thukhoa.txt: Báo cáo vinh danh thủ khoa
+ * - data/thongke_phodiem.txt: Báo cáo phân tích phổ điểm
  */
 class QuanLyThiSinh {
 private:
-    Vector<KhuVuc> dsKhuVuc;           // Bảng danh mục Khu vực
-    Vector<NganhXetTuyen> dsNganh;     // Bảng danh mục Ngành đào tạo
-    Vector<ThiSinh> dsThiSinh;         // Bảng dữ liệu Thí sinh hợp nhất
+    Vector<ThiSinh> dsThiSinh;   // Danh sách thí sinh hợp nhất in-memory
+    string pathNguoi;            // Đường dẫn tệp bảng NGƯỜI
+    string pathThiSinh;          // Đường dẫn tệp bảng THÍ SINH
+    string pathSystem;           // Đường dẫn tệp cấu hình hệ thống
+    double diemChuanHienTai;     // Điểm chuẩn xét tuyển đại học hiện hành
+    string namTuyenSinh;         // Năm tuyển sinh (vd: 2026)
+    string tenTruong;            // Tên trường đại học
 
-    string pathKhuVuc;
-    string pathNganh;
-    string pathHoSo;
-    string pathDangKy;
-    string pathLegacy;                 // File thisinh.txt để duy trì tương thích cũ
+    // Hàm hỗ trợ nạp dữ liệu mẫu ban đầu nếu tệp chưa tồn tại
+    void taoDuLieuMauNeuTrong();
 
 public:
     QuanLyThiSinh(const string& dirData = "data");
     ~QuanLyThiSinh();
 
-    // 1. Quản lý đọc / ghi CSDL đa bảng
-    bool docTatCaDuLieu();
-    bool luuTatCaDuLieu() const;
-    bool xuatBaoCaoXetTuyen(const string& path = "data/ketqua_xettuyen.txt") const;
+    // 1. Quản lý đọc / ghi CSDL quan hệ đa tệp (Key - Value)
+    bool docDuLieu();
+    bool luuDuLieu() const;
+    bool docCauHinhHeThong(const string& path = "data/system.txt");
+    bool luuCauHinhHeThong(const string& path = "data/system.txt") const;
 
-    // 2. Tra cứu khóa ngoại (Foreign Key Lookup)
-    double getDiemUuTienTheoKhuVuc(const string& maKV) const;
-    string getTenKhuVuc(const string& maKV) const;
-    string getTenNganh(const string& maNganh) const;
-    double getDiemChuanNganh(const string& maNganh) const;
-    int timViTriKhuVuc(const string& maKV) const;
-    int timViTriNganh(const string& maNganh) const;
-
-    // 3. Nghiệp vụ Thí sinh (Kiểm tra ràng buộc toàn vẹn CSDL)
+    // 2. Tra cứu & Sinh mã tự động
+    string sinhSoBaoDanhMoi() const; // Tự động tăng SBD (DUT001 -> DUT015...)
     int timViTriTheoSBD(const string& sbd) const;
-    int timViTriTheoMaTS(const string& maTS) const;
-    int timViTriTheoCMND(const string& cmnd) const;
-    string sinhMaThiSinhMoi() const;
+    int timViTriTheoCCCD(const string& cccd) const;
+    Vector<ThiSinh> timTheoTen(const string& ten) const;
+    Vector<ThiSinh> timTheoQueQuan(const string& que) const;
 
+    // 3. Nghiệp vụ CRUD
     bool themThiSinh(const ThiSinh& ts);
     bool capNhatThiSinh(const ThiSinh& ts);
-    bool xoaThiSinh(const string& maTSHoacSBD);
+    bool xoaThiSinh(const string& sbdHoacCCCD);
 
-    // 4. Quản lý Ngành xét tuyển (Cập nhật điểm chuẩn / chỉ tiêu)
-    bool capNhatDiemChuanNganh(const string& maNganh, double diemChuanMoi);
-    bool capNhatChiTieuNganh(const string& maNganh, int chiTieuMoi);
-
-    // 5. Giải thuật Sắp xếp (Dùng QuickSort trong Vector)
+    // 4. Giải thuật Sắp xếp (Dùng QuickSort nội bộ trong Vector)
     void sapXepTheoTongDiemGiamDan();
-    void sapXepTheoSBDTangDan();
     void sapXepTheoTenAZ();
-    void sapXepTheoNganh();
+    void sapXepTheoSBDTangDan();
 
-    // 6. Nghiệp vụ Thống kê & Xét tuyển Đại học
-    Vector<ThiSinh> getDanhSachTrungTuyen(const string& maNganh = "") const;
+    // 5. Nghiệp vụ Xét tuyển & Thống kê
+    double getDiemChuan() const;
+    void setDiemChuan(double dc);
+    string getNamTuyenSinh() const;
+    void setNamTuyenSinh(const string& nam);
+    string getTenTruong() const;
+
+    Vector<ThiSinh> getDanhSachTrungTuyen(double diemChuan) const;
     Vector<ThiSinh> getDanhSachThuKhoa() const;
-    ThiSinh getThuKhoaCuaNganh(const string& maNganh) const;
-    void tinhThongKePhoDiem(int& kem, int& tb, int& kha, int& gioi, int& xuatSac) const;
-    int demSoLuongDangKyTheoNganh(const string& maNganh) const;
-    int demSoLuongTrungTuyenTheoNganh(const string& maNganh) const;
+    void tinhThongKePhoDiem(int& mucThap, int& mucTB, int& mucKha, int& mucCao, int& mucRatCao) const;
+
+    // 6. Xuất các báo cáo dạng bảng kẻ khung chuyên biệt (như đồ án mẫu)
+    bool xuatBaoCaoXetTuyen(const string& path = "data/ketqua_xettuyen.txt", double diemChuan = 22.0, const string& keyword = "") const;
+    bool xuatBaoCaoThuKhoa(const string& path = "data/thukhoa.txt") const;
+    bool xuatBaoCaoPhoDiem(const string& path = "data/thongke_phodiem.txt") const;
+    bool xuatTatCaBaoCao() const;
 
     // 7. Getters danh sách
-    Vector<ThiSinh>& getDanhSachThiSinh();
-    const Vector<ThiSinh>& getDanhSachThiSinh() const;
-    Vector<KhuVuc>& getDanhSachKhuVuc();
-    const Vector<KhuVuc>& getDanhSachKhuVuc() const;
-    Vector<NganhXetTuyen>& getDanhSachNganh();
-    const Vector<NganhXetTuyen>& getDanhSachNganh() const;
+    Vector<ThiSinh>& getDanhSach();
+    const Vector<ThiSinh>& getDanhSach() const;
 };
 
 #endif // QUAN_LY_THI_SINH_H

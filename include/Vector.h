@@ -3,27 +3,31 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <utility>
 
 /**
  * @brief Cấu trúc dữ liệu Vector (Template mảng động tự cài đặt)
- * Đáp ứng yêu cầu chuẩn mực của Đồ án cơ sở lập trình PBL2
+ * Đáp ứng chuẩn mực đồ án cơ sở lập trình PBL2
+ * Tự quản lý bộ nhớ động theo chuẩn Big-5 (Rule of Five)
+ * Tích hợp giải thuật sắp xếp nhanh QuickSort nội bộ
  */
 template <typename T>
 class Vector {
 private:
-    T* data;            // Vùng nhớ động lưu các phần tử
-    int m_size;         // Số lượng phần tử thực tế
-    int m_capacity;     // Dung lượng bộ nhớ được cấp phát
+    T* data;            // Vùng nhớ động lưu trữ các phần tử
+    size_t m_size;      // Số lượng phần tử thực tế hiện có
+    size_t m_capacity;  // Dung lượng bộ nhớ được cấp phát tối đa
 
-    void reallocate(int newCapacity) {
+    // Tái cấp phát bộ nhớ khi đầy
+    void reallocate(size_t newCapacity) {
         if (newCapacity < m_size) {
             newCapacity = m_size;
         }
         if (newCapacity == 0) newCapacity = 1;
 
         T* newData = new T[newCapacity];
-        for (int i = 0; i < m_size; ++i) {
-            newData[i] = data[i];
+        for (size_t i = 0; i < m_size; ++i) {
+            newData[i] = std::move(data[i]);
         }
 
         delete[] data;
@@ -31,7 +35,7 @@ private:
         m_capacity = newCapacity;
     }
 
-    // Thuật toán QuickSort nội bộ sử dụng con trỏ hàm so sánh
+    // Thuật toán QuickSort nội bộ nhận con trỏ hàm so sánh
     void quickSort(int left, int right, bool (*compare)(const T&, const T&)) {
         if (left >= right) return;
 
@@ -44,9 +48,9 @@ private:
             while (compare(pivot, data[j])) j--;
 
             if (i <= j) {
-                T temp = data[i];
-                data[i] = data[j];
-                data[j] = temp;
+                T temp = std::move(data[i]);
+                data[i] = std::move(data[j]);
+                data[j] = std::move(temp);
                 i++;
                 j--;
             }
@@ -63,34 +67,61 @@ public:
     }
 
     // 2. Constructor với dung lượng ban đầu
-    explicit Vector(int initialCapacity) : data(nullptr), m_size(0), m_capacity(0) {
+    explicit Vector(size_t initialCapacity) : data(nullptr), m_size(0), m_capacity(0) {
         if (initialCapacity < 1) initialCapacity = 10;
         reallocate(initialCapacity);
     }
 
-    // 3. Copy Constructor (Deep copy)
+    // 3. Copy Constructor (Deep Copy)
     Vector(const Vector<T>& other) : data(nullptr), m_size(other.m_size), m_capacity(other.m_capacity) {
-        data = new T[m_capacity];
-        for (int i = 0; i < m_size; ++i) {
-            data[i] = other.data[i];
+        if (m_capacity > 0) {
+            data = new T[m_capacity];
+            for (size_t i = 0; i < m_size; ++i) {
+                data[i] = other.data[i];
+            }
         }
     }
 
-    // 4. Copy Assignment Operator
+    // 4. Move Constructor (C++11) - Chuyển giao quyền sở hữu vùng nhớ
+    Vector(Vector<T>&& other) noexcept : data(other.data), m_size(other.m_size), m_capacity(other.m_capacity) {
+        other.data = nullptr;
+        other.m_size = 0;
+        other.m_capacity = 0;
+    }
+
+    // 5. Copy Assignment Operator
     Vector<T>& operator=(const Vector<T>& other) {
         if (this != &other) {
             delete[] data;
             m_size = other.m_size;
             m_capacity = other.m_capacity;
-            data = new T[m_capacity];
-            for (int i = 0; i < m_size; ++i) {
-                data[i] = other.data[i];
+            data = nullptr;
+            if (m_capacity > 0) {
+                data = new T[m_capacity];
+                for (size_t i = 0; i < m_size; ++i) {
+                    data[i] = other.data[i];
+                }
             }
         }
         return *this;
     }
 
-    // 5. Destructor
+    // 6. Move Assignment Operator
+    Vector<T>& operator=(Vector<T>&& other) noexcept {
+        if (this != &other) {
+            delete[] data;
+            data = other.data;
+            m_size = other.m_size;
+            m_capacity = other.m_capacity;
+
+            other.data = nullptr;
+            other.m_size = 0;
+            other.m_capacity = 0;
+        }
+        return *this;
+    }
+
+    // 7. Destructor - Giải phóng an toàn bộ nhớ động
     ~Vector() {
         delete[] data;
         data = nullptr;
@@ -98,27 +129,35 @@ public:
         m_capacity = 0;
     }
 
-    // Lấy số lượng phần tử
-    int size() const {
+    // Lấy số lượng phần tử thực tế
+    size_t size() const {
         return m_size;
     }
 
     // Lấy dung lượng tối đa hiện tại
-    int capacity() const {
+    size_t capacity() const {
         return m_capacity;
     }
 
-    // Kiểm tra rỗng
+    // Kiểm tra danh sách có rỗng không
     bool empty() const {
         return m_size == 0;
     }
 
-    // Thêm phần tử vào cuối danh sách
+    // Thêm phần tử vào cuối
     void push_back(const T& element) {
         if (m_size >= m_capacity) {
             reallocate(m_capacity == 0 ? 10 : m_capacity * 2);
         }
         data[m_size++] = element;
+    }
+
+    // Thêm phần tử chuyển giao (Move push_back)
+    void push_back(T&& element) {
+        if (m_size >= m_capacity) {
+            reallocate(m_capacity == 0 ? 10 : m_capacity * 2);
+        }
+        data[m_size++] = std::move(element);
     }
 
     // Xóa phần tử cuối cùng
@@ -128,72 +167,57 @@ public:
         }
     }
 
-    // Chèn phần tử tại vị trí index
-    void insert(int index, const T& element) {
-        if (index < 0 || index > m_size) {
-            throw std::out_of_range("Vi tri chen nam ngoai pham vi hop le!");
-        }
-        if (m_size >= m_capacity) {
-            reallocate(m_capacity == 0 ? 10 : m_capacity * 2);
-        }
-        for (int i = m_size; i > index; --i) {
-            data[i] = data[i - 1];
-        }
-        data[index] = element;
-        m_size++;
-    }
-
     // Xóa phần tử tại vị trí index
-    void erase(int index) {
-        if (index < 0 || index >= m_size) {
-            throw std::out_of_range("Vi tri xoa nam ngoai pham vi hop le!");
+    void erase(size_t index) {
+        if (index >= m_size) {
+            throw std::out_of_range("Chi so xoa nam ngoai pham vi hop le!");
         }
-        for (int i = index; i < m_size - 1; ++i) {
-            data[i] = data[i + 1];
+        for (size_t i = index; i + 1 < m_size; ++i) {
+            data[i] = std::move(data[i + 1]);
         }
         m_size--;
     }
 
-    // Truy cập phần tử qua toán tử []
-    T& operator[](int index) {
+    // Truy cập phần tử bằng toán tử []
+    T& operator[](size_t index) {
         return data[index];
     }
 
-    const T& operator[](int index) const {
+    const T& operator[](size_t index) const {
         return data[index];
     }
 
-    // Truy cập phần tử an toàn có kiểm tra biên
-    T& at(int index) {
-        if (index < 0 || index >= m_size) {
+    // Truy cập phần tử có kiểm tra biên an toàn (at)
+    T& at(size_t index) {
+        if (index >= m_size) {
             throw std::out_of_range("Chi so vuot qua gioi han cua Vector!");
         }
         return data[index];
     }
 
-    const T& at(int index) const {
-        if (index < 0 || index >= m_size) {
+    const T& at(size_t index) const {
+        if (index >= m_size) {
             throw std::out_of_range("Chi so vuot qua gioi han cua Vector!");
         }
         return data[index];
     }
 
-    // Xóa toàn bộ phần tử
+    // Xóa trắng toàn bộ phần tử
     void clear() {
         m_size = 0;
     }
 
-    // Dự trữ trước dung lượng bộ nhớ
-    void reserve(int newCapacity) {
+    // Dự trữ dung lượng bộ nhớ
+    void reserve(size_t newCapacity) {
         if (newCapacity > m_capacity) {
             reallocate(newCapacity);
         }
     }
 
-    // Sắp xếp các phần tử bằng thuật toán QuickSort
+    // Sắp xếp các phần tử bằng QuickSort nội bộ với con trỏ hàm so sánh
     void sort(bool (*compare)(const T&, const T&)) {
         if (m_size > 1) {
-            quickSort(0, m_size - 1, compare);
+            quickSort(0, (int)m_size - 1, compare);
         }
     }
 };

@@ -1,0 +1,137 @@
+#TINHTHANH
+Ma: 01
+Ten: TP. Ha Noi
+Loai: Thanh pho truc thuoc Trung uong
+---
+Ma: 04
+Ten: Cao Bang
+Loai: Tinh
+---
+Ma: 08
+Ten: Tuyen Quang
+Loai: Tinh
+---
+Ma: 10
+Ten: Lao Cai
+Loai: Tinh
+---
+Ma: 11
+Ten: Dien Bien
+Loai: Tinh
+---
+Ma: 12
+Ten: Lai Chau
+Loai: Tinh
+---
+Ma: 14
+Ten: Son La
+Loai: Tinh
+---
+Ma: 19
+Ten: Thai Nguyen
+Loai: Tinh
+---
+Ma: 20
+Ten: Lang Son
+Loai: Tinh
+---
+Ma: 22
+Ten: Quang Ninh
+Loai: Tinh
+---
+Ma: 25
+Ten: Phu Tho
+Loai: Tinh
+---
+Ma: 27
+Ten: Bac Ninh
+Loai: Tinh
+---
+Ma: 31
+Ten: TP. Hai Phong
+Loai: Thanh pho truc thuoc Trung uong
+---
+Ma: 33
+Ten: Hung Yen
+Loai: Tinh
+---
+Ma: 37
+Ten: Ninh Binh
+Loai: Tinh
+---
+Ma: 38
+Ten: Thanh Hoa
+Loai: Tinh
+---
+Ma: 40
+Ten: Nghe An
+Loai: Tinh
+---
+Ma: 42
+Ten: Ha Tinh
+Loai: Tinh
+---
+Ma: 45
+Ten: Quang Tri
+Loai: Tinh
+---
+Ma: 46
+Ten: TP. Hue
+Loai: Thanh pho truc thuoc Trung uong
+---
+Ma: 48
+Ten: TP. Da Nang
+Loai: Thanh pho truc thuoc Trung uong
+---
+Ma: 51
+Ten: Quang Ngai
+Loai: Tinh
+---
+Ma: 56
+Ten: Khanh Hoa
+Loai: Tinh
+---
+Ma: 64
+Ten: Gia Lai
+Loai: Tinh
+---
+Ma: 66
+Ten: Dak Lak
+Loai: Tinh
+---
+Ma: 68
+Ten: Lam Dong
+Loai: Tinh
+---
+Ma: 72
+Ten: Tay Ninh
+Loai: Tinh
+---
+Ma: 75
+Ten: Dong Nai
+Loai: Tinh
+---
+Ma: 79
+Ten: TP. Ho Chi Minh
+Loai: Thanh pho truc thuoc Trung uong
+---
+Ma: 86
+Ten: Vinh Long
+Loai: Tinh
+---
+Ma: 87
+Ten: Dong Thap
+Loai: Tinh
+---
+Ma: 89
+Ten: An Giang
+Loai: Tinh
+---
+Ma: 92
+Ten: TP. Can Tho
+Loai: Thanh pho truc thuoc Trung uong
+---
+Ma: 96
+Ten: Ca Mau
+Loai: Tinh
+====

@@ -1,0 +1,5 @@
+#SYSTEM_CONFIG
+Truong: TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG
+Nam Tuyen Sinh: 2026
+Diem Chuan: 25.00
+====

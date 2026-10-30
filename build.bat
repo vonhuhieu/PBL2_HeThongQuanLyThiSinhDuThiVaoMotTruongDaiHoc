@@ -3,7 +3,7 @@ chcp 65001 > nul
 cls
 echo ==============================================================================
 echo          CHUONG TRINH BIEN DICH VA CHAY - DO AN PBL2 (DE TAI 24)
-echo     [ Kien truc CSDL Quan he 3NF + Giao dien Do hoa Dear ImGui DirectX 9 ]
+echo     [ Kien truc CSDL Quan he 2 Bang (Class Table) + Giao dien Dear ImGui / Console ]
 echo ==============================================================================
 echo.
 
@@ -51,26 +51,33 @@ for %%F in ("%CXX%") do set "COMPILER_BIN=%%~dpF"
 set "PATH=%COMPILER_BIN%;%PATH%"
 
 echo [*] Trinh bien dich : %CXX%
-echo [*] Dang bien dich toan bo ma nguon (OOP, CSDL 3NF, GUI ImGui DirectX 9)...
+echo [*] Dang bien dich toan bo ma nguon (OOP, CSDL 2 Bang, GUI ImGui DirectX 9 / Console)...
 echo.
 
 "%CXX%" -std=c++11 -O2 -Iinclude -Iinclude/imgui ^
-    src\Nguoi.cpp src\ThiSinh.cpp src\KhuVuc.cpp src\NganhXetTuyen.cpp ^
+    src\Nguoi.cpp src\ThiSinh.cpp ^
     src\QuanLyThiSinh.cpp src\ConsoleUI.cpp src\Utils.cpp src\AppGUI.cpp ^
     src\imgui\imgui.cpp src\imgui\imgui_draw.cpp src\imgui\imgui_tables.cpp ^
     src\imgui\imgui_widgets.cpp src\imgui\imgui_impl_win32.cpp src\imgui\imgui_impl_dx9.cpp ^
     src\main.cpp ^
-    -ld3d9 -lgdi32 -ldwmapi -o QuanLyThiSinh.exe
+    -ld3d9 -lgdi32 -ldwmapi -o QuanLyThiSinh_PBL2.exe
 
 if %ERRORLEVEL% equ 0 (
     echo.
     echo ==============================================================================
-    echo [THANH CONG] Da bien dich xong file chuong trinh: QuanLyThiSinh.exe
+    echo [THANH CONG] Da bien dich xong file chuong trinh: QuanLyThiSinh_PBL2.exe
     echo ==============================================================================
     echo.
-    echo [*] Dang khoi chay chuong trinh Giao dien Do hoa GUI...
-    pause
-    start "" QuanLyThiSinh.exe
+    echo [1] Chay che do Giao dien Do hoa (Dear ImGui DirectX 9)
+    echo [2] Chay che do Console UTF-8 dieu huong bang phim mui ten
+    echo.
+    set /p choice="Nhap lua chon cua ban (1 hoac 2, mac dinh 1): "
+    if "%choice%"=="2" (
+        cls
+        QuanLyThiSinh_PBL2.exe --console
+    ) else (
+        start "" QuanLyThiSinh_PBL2.exe
+    )
 ) else (
     echo.
     echo [LOI] Co loi xay ra trong qua trinh bien dich!

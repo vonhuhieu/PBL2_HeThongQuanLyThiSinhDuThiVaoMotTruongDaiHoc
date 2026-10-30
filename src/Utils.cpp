@@ -63,22 +63,33 @@ namespace Utils {
         return (nam % 400 == 0) || (nam % 4 == 0 && nam % 100 != 0);
     }
 
+    bool kiemTraCCCD(const string& cccd) {
+        string trimmed = trim(cccd);
+        // CCCD chuẩn quốc gia bắt buộc đúng 12 chữ số
+        if (trimmed.length() != 12) return false;
+        for (char c : trimmed) {
+            if (!isdigit(static_cast<unsigned char>(c))) return false;
+        }
+        return true;
+    }
+
     bool kiemTraNgaySinh(const string& dateStr) {
-        // Định dạng hợp lệ: dd/mm/yyyy (độ dài đúng 10)
-        if (dateStr.length() != 10) return false;
-        if (dateStr[2] != '/' || dateStr[5] != '/') return false;
+        string s = trim(dateStr);
+        // Định dạng hợp lệ: dd/mm/yyyy (độ dài đúng 10 ký tự)
+        if (s.length() != 10) return false;
+        if (s[2] != '/' || s[5] != '/') return false;
 
         for (int i = 0; i < 10; ++i) {
             if (i == 2 || i == 5) continue;
-            if (!isdigit(static_cast<unsigned char>(dateStr[i]))) return false;
+            if (!isdigit(static_cast<unsigned char>(s[i]))) return false;
         }
 
-        int d = (dateStr[0] - '0') * 10 + (dateStr[1] - '0');
-        int m = (dateStr[3] - '0') * 10 + (dateStr[4] - '0');
-        int y = (dateStr[6] - '0') * 1000 + (dateStr[7] - '0') * 100 + 
-                (dateStr[8] - '0') * 10 + (dateStr[9] - '0');
+        int d = (s[0] - '0') * 10 + (s[1] - '0');
+        int m = (s[3] - '0') * 10 + (s[4] - '0');
+        int y = (s[6] - '0') * 1000 + (s[7] - '0') * 100 + 
+                (s[8] - '0') * 10 + (s[9] - '0');
 
-        if (y < 1970 || y > 2015) return false;
+        if (y < 1970 || y > 2020) return false;
         if (m < 1 || m > 12) return false;
 
         int ngayTrongThang[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -91,21 +102,8 @@ namespace Utils {
         return true;
     }
 
-    bool kiemTraCMND(const string& cmnd) {
-        string trimmed = trim(cmnd);
-        if (trimmed.length() != 9 && trimmed.length() != 12) return false;
-        for (char c : trimmed) {
-            if (!isdigit(static_cast<unsigned char>(c))) return false;
-        }
-        return true;
-    }
-
     bool kiemTraDiem(double diem) {
         return (diem >= 0.0 && diem <= 10.0);
-    }
-
-    bool kiemTraDiemUuTien(double diem) {
-        return (diem >= 0.0 && diem <= 2.5);
     }
 
     bool kiemTraSBD(const string& sbd) {
@@ -115,5 +113,19 @@ namespace Utils {
             if (isspace(static_cast<unsigned char>(c))) return false;
         }
         return true;
+    }
+
+    bool kiemTraGioiTinh(const string& gt) {
+        string s = toLower(trim(gt));
+        return (s == "nam" || s == "nu");
+    }
+
+    bool tachKeyValue(const string& line, string& key, string& value) {
+        size_t colonPos = line.find(':');
+        if (colonPos == string::npos) return false;
+
+        key = trim(line.substr(0, colonPos));
+        value = trim(line.substr(colonPos + 1));
+        return (!key.empty());
     }
 }

@@ -4,237 +4,215 @@
 > **Khoa**: Công nghệ Thông tin  
 > **Đề tài số 24**: Quản lý các thí sinh dự thi vào một trường Đại học  
 > **Tác giả thực hiện**: Võ Như Hiếu  
-> **Phiên bản nâng cấp**: CSDL Quan hệ Chuẩn 3NF & Giao diện Đồ họa Hiện đại Dear ImGui (DirectX 9)  
+> **Kiến trúc**: Class Table Inheritance (Mô hình CSDL Quan hệ Kế thừa) & Giao diện Kép (Dear ImGui DirectX 9 + Console)
 
 ---
 
 ## MỤC LỤC
-1. [Tổng Quan Về Dự Án & Bản Chất Học Phần PBL2](#1-tổng-quan-về-dự-án--bản-chất-học-phần-pbl2)
-2. [Thiết Kế Cơ Sở Dữ Liệu Quan Hệ (Chuẩn Hóa 3NF & Giải Quyết Trùng Tên)](#2-thiết-kế-cơ-sở-dữ-liệu-quan-hệ-chuẩn-hóa-3nf--giải-quyết-trùng-tên)
-3. [Kiến Trúc Hướng Đối Tượng (OOP) & Các Lớp Thực Thể](#3-kiến-trúc-hướng-đối-tượng-oop--các-lớp-thực-thể)
-4. [Cấu Trúc Dữ Liệu Tự Viết: Template Vector<T> & QuickSort](#4-cấu-trúc-dữ-liệu-tự-viết-template-vectort--quicksort)
+1. [Tổng Quan Đề Tài 24 & Chuẩn Hóa Yêu Cầu Giảng Viên](#1-tổng-quan-đề-tài-24--chuẩn-hóa-yêu-cầu-giảng-viên)
+2. [Thiết Kế Cơ Sở Dữ Liệu & Quản Lý Nhiều Tệp Tin](#2-thiết-kế-cơ-sở-dữ-liệu--quản-lý-nhiều-tệp-tin)
+3. [Kiến Trúc Hướng Đối Tượng (OOP) Chuẩn 2 Lớp](#3-kiến-trúc-hướng-đối-tượng-oop-chuẩn-2-lớp)
+4. [Cấu Trúc Dữ Liệu Tự Cài Đặt: Template Vector<T> & QuickSort](#4-cấu-trúc-dữ-liệu-tự-cài-đặt-template-vectort--quicksort)
 5. [Giao Diện Đồ Họa Cửa Sổ Hiện Đại (Dear ImGui & DirectX 9)](#5-giao-diện-đồ-họa-cửa-sổ-hiện-đại-dear-imgui--directx-9)
-6. [Kịch Bản 5 Phút Báo Cáo Trình Diễn Khiến Thầy Hài Lòng Tuyệt Đối](#6-kịch-bản-5-phút-báo-cáo-trình-diễn-khiến-thầy-hài-lòng-tuyệt-đối)
-7. [Bộ 10 Câu Hỏi Vấn Đáp Thầy Hay Hỏi Nhất & Câu Trả Lời Đạt Điểm A+](#7-bộ-10-câu-hỏi-vấn-đáp-thầy-hay-hỏi-nhất--câu-trả-lời-đạt-điểm-a)
+6. [Kịch Bản 5 Phút Báo Cáo Trình Diễn Trước Giảng Viên](#6-kịch-bản-5-phút-báo-cáo-trình-diễn-trước-giảng-viên)
+7. [Bộ 10 Câu Hỏi Vấn Đáp Thường Gặp & Câu Trả Lời Đạt Điểm A+](#7-bộ-10-câu-hỏi-vấn-đáp-thường-gặp--câu-trả-lời-đạt-điểm-a)
 
 ---
 
-## 1. TỔNG QUAN VỀ DỰ ÁN & BẢN CHẤT HỌC PHẦN PBL2
+## 1. TỔNG QUAN ĐỀ TÀI 24 & CHUẨN HÓA YÊU CẦU GIẢNG VIÊN
 
-### 1.1. Mục tiêu đồ án
-Đề tài 24 yêu cầu xây dựng hệ thống phần mềm hướng đối tượng bằng C++ để quản lý thông tin các thí sinh tham gia kỳ thi tuyển sinh đại học. Hệ thống giải quyết các bài toán thực tế:
-- Quản lý hồ sơ nhân thân, phân loại khu vực ưu tiên và kết quả thi cử.
-- Kiểm tra tính toàn vẹn dữ liệu (Validate SBD, CMND/CCCD, ngày sinh, điểm số 0-10).
-- Áp dụng kiến thức môn **Cơ sở dữ liệu (CSDL)**: Tách các thực thể quan hệ, chuẩn hóa 3NF, liên kết Khóa chính (PK) và Khóa ngoại (FK) qua hệ thống nhiều tệp tin.
-- Xét trúng tuyển theo **điểm chuẩn và chỉ tiêu của từng ngành đào tạo**, vinh danh thủ khoa toàn trường và thủ khoa từng ngành.
-- Cung cấp **Giao diện Đồ họa Người dùng (GUI)** hiện đại bằng thư viện **Dear ImGui (DirectX 9)** đạt chuẩn công nghiệp, loại bỏ giao diện dòng lệnh console cũ kỹ.
+### 1.1. Yêu cầu nguyên bản của Đề tài 24
+- Xây dựng chương trình quản lý thí sinh dự thi vào một trường Đại học.
+- Lớp đối tượng `NGUOI`: Số chứng minh thư / CCCD, Tên, Ngày sinh, Quê quán, Giới tính.
+- Lớp đối tượng `THI SINH` kế thừa từ `NGUOI`: Số báo danh, Điểm toán, Điểm lý, Điểm hóa.
+- Quản lý danh sách, tìm kiếm, sắp xếp, xét trúng tuyển theo điểm chuẩn, vinh danh thủ khoa và thống kê phổ điểm.
+
+### 1.2. Khắc phục triệt để các nhược điểm của phiên bản cũ
+- **Không nhồi nhét lớp thừa**: Loại bỏ hoàn toàn các lớp ngoại vi như `KhuVuc` hay `NganhXetTuyen` để tuân thủ chính xác 100% đề tài.
+- **Không định danh kép dư thừa**: Không dùng thêm `maThiSinh`, sử dụng `soCCCD` (12 chữ số) làm khóa định danh thực thể nhân thân và `soBaoDanh` (dạng `DUTxxx`) làm khóa định danh dự thi.
+- **Áp dụng kiến thức môn Cơ sở Dữ liệu**: Không lưu dồn tất cả dữ liệu vào 1 file duy nhất `thisinh.txt`. Tách biệt thành nhiều file chuyên biệt theo mô hình **Class Table Inheritance** và chuẩn hóa lưu trữ Key-Value tương tự các đồ án xuất sắc.
 
 ---
 
-## 2. THIẾT KẾ CƠ SỞ DỮ LIỆU QUAN HỆ (CHUẨN HÓA 3NF & GIẢI QUYẾT TRÙNG TÊN)
+## 2. THIẾT KẾ CƠ SỞ DỮ LIỆU & QUẢN LÝ NHIỀU TỆP TIN
 
-### 2.1. Phê bình của giảng viên & Bản chất vấn đề
-Trước đây, dữ liệu bị dồn vào **1 file duy nhất (`thisinh.txt`)**, dẫn đến các lỗi kinh điển trong môn Cơ sở Dữ liệu:
-1. **Dư thừa dữ liệu (Data Redundancy)**: Tỉnh thành "Da Nang", "Quang Nam" lặp lại liên tục; Điểm ưu tiên để người dùng tự nhập tay (0.5, 0.75...) thay vì tự động suy ra từ Khu vực.
-2. **Dị thường cập nhật/xóa (Update/Delete Anomaly)**: Khi thay đổi điểm chuẩn hoặc khu vực, phải sửa hàng loạt dòng dữ liệu.
-3. **Mất kiểm soát khi trùng họ tên**: Nếu nhiều thí sinh cùng tên "Nguyen Van An", việc lưu phẳng 1 file không thể phân biệt chính xác hồ sơ cá nhân và kết quả thi của từng người.
+### 2.1. Mô hình Class Table Inheritance (Kế thừa bảng)
+Khi chuyển đổi từ mô hình Hướng đối tượng sang Lưu trữ Dữ liệu Quan hệ, phương pháp **Class Table Inheritance** được giảng viên đánh giá cao nhất:
+- Lớp cha `Nguoi` được lưu trữ tại bảng/file riêng: `data/nguoi.txt`
+- Lớp con `ThiSinh` được lưu trữ tại bảng/file riêng: `data/thisinh.txt`
+- Khóa chính `soCCCD` ở lớp cha đóng vai trò là Khóa ngoại (Foreign Key) ở lớp con.
+- Cấu hình chung của kỳ thi được tách độc lập tại `data/system.txt`.
 
-### 2.2. Mô hình Thực thể - Mối quan hệ (ERD) Chuẩn 3NF
+### 2.2. Chi tiết các tệp dữ liệu
 
-```
-+--------------------------+           +--------------------------+
-|       KhuVuc (Bảng 1)    |           |    NganhXetTuyen (Bảng 2)|
-+--------------------------+           +--------------------------+
-| * maKhuVuc (PK)          |           | * maNganh (PK)           |
-|   tenKhuVuc              |           |   tenNganh               |
-|   diemUuTien             |           |   toHopMon               |
-+--------------------------+           |   chiTieu                |
-            ▲                          |   diemChuan              |
-            │ 1                        +--------------------------+
-            │                                       ▲
-            │ N (Tham chiếu FK)                     │ 1
-+--------------------------+                        │
-|   HoSoThiSinh (Bảng 3)   |                        │ N (Tham chiếu FK)
-+--------------------------+                        │
-| * maThiSinh (PK)         |                        │
-|   soCMND (Unique)        |           +--------------------------+
-|   hoTen                  |           |      DangKyThi (Bảng 4)  |
-|   ngaySinh               | 1       N +--------------------------+
-|   queQuan                +───────────┤ * soBaoDanh (PK)         |
-|   gioiTinh               |           | # maThiSinh (FK)         |
-| # maKhuVuc (FK)          |           | # maNganh (FK)           |
-+--------------------------+           |   diemToan, diemLy, Hoa  |
-                                       +--------------------------+
+1. **`data/nguoi.txt` (Thực thể Nhân thân)**:
+```text
+#NGUOI
+CCCD: 048205001234
+Ho Ten: NGUYEN VAN AN
+Ngay Sinh: 15/05/2005
+Que Quan: Da Nang
+Gioi Tinh: Nam
+---
+CCCD: 048205001235
+Ho Ten: TRAN THI MAI
+Ngay Sinh: 22/07/2005
+Que Quan: Quang Nam
+Gioi Tinh: Nu
+====
 ```
 
-### 2.3. Cấu trúc 4 Tệp Tin CSDL Quan Hệ trong thư mục `data/`:
-1. **`danhmuc_khuvuc.txt`**: Bảng danh mục khu vực ưu tiên
-   - Cấu trúc: `maKhuVuc | tenKhuVuc | diemUuTien`
-   - Ví dụ: `KV1|Khu vuc 1|0.75`, `KV2NT|Khu vuc 2 Nong thon|0.50`, `KV2|Khu vuc 2|0.25`, `KV3|Khu vuc 3|0.00`.
-   - *Lợi ích*: Điểm ưu tiên được tự động tra cứu từ mã khu vực, không cho phép nhập tùy tiện!
-2. **`danhmuc_nganh.txt`**: Bảng danh mục các ngành đào tạo của Trường Đại học Bách khoa
-   - Cấu trúc: `maNganh | tenNganh | toHopMon | chiTieu | diemChuan`
-   - Ví dụ: `7480201|Cong nghe Thong tin|A00|150|26.25`.
-   - *Lợi ích*: Xét tuyển theo điểm chuẩn và chỉ tiêu của từng ngành cụ thể, phản ánh đúng thực tế tuyển sinh đại học.
-3. **`hoso_thisinh.txt`**: Bảng lưu trữ hồ sơ nhân thân thí sinh
-   - Cấu trúc: `maThiSinh | soCMND | hoTen | ngaySinh | queQuan | gioiTinh | maKhuVuc`
-   - Ví dụ: `TS001|201948572134|Nguyen Van An|15/03/2005|Da Nang|Nam|KV2`
-   - *Lợi ích*: **Khóa chính `maThiSinh` là duy nhất**. Dù có 10 thí sinh cùng tên "Nguyen Van An", hệ thống vẫn phân biệt độc lập tuyệt đối thông qua `maThiSinh` và `soCMND`!
-4. **`dangky_thi.txt`**: Bảng kết quả thi và nguyện vọng đăng ký
-   - Cấu trúc: `soBaoDanh | maThiSinh | maNganh | diemToan | diemLy | diemHoa`
-   - Ví dụ: `DUT001|TS001|7480201|9.50|9.00|9.75`
-   - *Lợi ích*: Tách biệt kết quả thi và hồ sơ nhân thân, liên kết bằng Khóa ngoại `maThiSinh` và `maNganh`.
+2. **`data/thisinh.txt` (Thực thể Dự thi & Điểm số)**:
+```text
+#THISINH
+SBD: DUT001
+CCCD: 048205001234
+Diem Toan: 8.50
+Diem Ly: 9.00
+Diem Hoa: 8.75
+---
+SBD: DUT002
+CCCD: 048205001235
+Diem Toan: 8.75
+Diem Ly: 8.50
+Diem Hoa: 9.25
+====
+```
+
+3. **`data/tinhthanh.txt` (Danh mục 34 Tỉnh / Thành phố mới nhất)**:
+- Danh mục chuẩn hóa Master Lookup Table theo **Nghị quyết 202/2025/QH15** (28 tỉnh và 6 thành phố trực thuộc Trung ương).
+- Ngăn ngừa nhập tùy tiện, hỗ trợ Searchable Combobox tìm kiếm tức thời trên giao diện đồ họa.
+
+4. **`data/system.txt` (Cấu hình Kỳ thi Tuyển sinh)**:
+```text
+#SYSTEM_CONFIG
+Truong: TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG
+Nam Tuyen Sinh: 2026
+Diem Chuan: 22.00
+====
+```
+
+5. **Hệ thống tệp báo cáo chuyên biệt (`data/*.txt`)**:
+- `data/ketqua_xettuyen.txt`: Bảng tổng kết danh sách trúng tuyển.
+- `data/thukhoa.txt`: Báo cáo vinh danh Thủ khoa của trường.
+- `data/thongke_phodiem.txt`: Phân tích phổ điểm thi theo 5 khoảng điểm.
+
+*(Tổng cộng hệ thống quản trị **7 tệp tin .txt chuyên biệt**, hoàn toàn tương đồng với cấu trúc đa tệp của đồ án mẫu).*
 
 ---
 
-## 3. KIẾN TRÚC HƯỚNG ĐỐI TƯỢNG (OOP) & CÁC LỚP THỰC THỂ
+## 3. KIẾN TRÚC HƯỚNG ĐỐI TƯỢNG (OOP) CHUẨN 2 LỚP
 
-1. **Lớp `Nguoi`**: Đóng gói thông tin nhân thân cơ bản (`soCMND`, `hoTen`, `ngaySinh`, `queQuan`, `gioiTinh`) dưới phạm vi `protected`. Cung cấp phương thức ảo `virtual void nhap()`, `virtual void xuat()` và hàm hủy ảo `virtual ~Nguoi()`.
-2. **Lớp `ThiSinh` kế thừa `Nguoi`**: Bổ sung `maThiSinh` (PK), `soBaoDanh`, `maKhuVuc` (FK), `maNganh` (FK), điểm Toán, Lý, Hóa, Ưu tiên. Cài đặt các hàm nghiệp vụ tính tổng điểm, kiểm tra điểm liệt ($\le 1.0$), xếp loại học lực, và xét trúng tuyển theo điểm chuẩn ngành.
-3. **Lớp `KhuVuc` & Lớp `NganhXetTuyen`**: Đại diện cho 2 bảng thực thể CSDL danh mục.
-4. **Lớp `QuanLyThiSinh`**: Đóng vai trò là Bộ máy quản lý CSDL (Database Manager) và tầng nghiệp vụ (Business Logic Layer):
-   - Đọc/ghi đồng bộ 4 file CSDL quan hệ.
-   - Kiểm tra ràng buộc toàn vẹn: Không trùng lặp `maThiSinh`, `soBaoDanh`, `soCMND`.
-   - Tra cứu khóa ngoại: Tự động tính điểm ưu tiên từ mã khu vực và lấy điểm chuẩn theo ngành đăng ký.
-   - Thống kê thủ khoa, phân tích phổ điểm và xuất báo cáo kết quả xét tuyển.
+```
+          +-----------------------------------------+
+          |                  Nguoi                  |
+          +-----------------------------------------+
+          | # soCCCD: string (12 số)               |
+          | # hoTen: string                         |
+          | # ngaySinh: string (dd/mm/yyyy)         |
+          | # queQuan: string                       |
+          | # gioiTinh: string                      |
+          +-----------------------------------------+
+          | + Nguoi(...)                            |
+          | + virtual ~Nguoi()                      |
+          | + getter / setter                       |
+          | + operator>> , operator<<               |
+          +-----------------------------------------+
+                               ▲
+                               │  kế thừa công khai
+                               │
+          +-----------------------------------------+
+          |                 ThiSinh                 |
+          +-----------------------------------------+
+          | - soBaoDanh: string (DUTxxx)            |
+          | - diemToan: float                       |
+          | - diemLy: float                         |
+          | - diemHoa: float                        |
+          +-----------------------------------------+
+          | + ThiSinh(...)                          |
+          | + tinhTongDiem(): float                 |
+          | + kiemTraDiemLiet(): bool               |
+          | + xetTrungTuyen(diemChuan): bool        |
+          | + xepLoaiHocLuc(): string               |
+          | + getter / setter                       |
+          | + operator>> , operator<<               |
+          +-----------------------------------------+
+```
 
 ---
 
-## 4. CẤU TRÚC DỮ LIỆU TỰ VIẾT: TEMPLATE VECTOR<T> & QUICKSORT
+## 4. CẤU TRÚC DỮ LIỆU TỰ CÀI ĐẶT: TEMPLATE VECTOR<T> & QUICKSORT
 
-Dự án tuyệt đối không dùng `std::vector` hay `std::sort` của thư viện chuẩn STL:
-- Quản lý con trỏ động `T* data` với dung lượng co giãn tự động nhân đôi (`reallocate(m_capacity * 2)`).
-- Tuân thủ nghiêm ngặt **Quy tắc bộ ba (Rule of Three)**: Destructor, Copy Constructor, Copy Assignment Operator.
-- Tích hợp thuật toán **QuickSort** với con trỏ hàm so sánh (`bool (*compare)(const T&, const T&)`), cho phép sắp xếp theo mọi tiêu chí (tổng điểm giảm dần, tên A-Z, SBD, theo ngành) với độ phức tạp trung bình $O(N \log N)$.
+1. **Tuân thủ quy chuẩn không dùng `std::vector` của STL**:
+   - Tự quản lý con trỏ vùng nhớ động `T* data`, `size_t sz`, `size_t cap`.
+   - Cấp phát nhân đôi dung lượng khi đầy (`cap = cap == 0 ? 4 : cap * 2`).
+2. **Hỗ trợ Rule of Five**:
+   - Destructor: giải phóng bộ nhớ an toàn.
+   - Copy Constructor & Copy Assignment: Deep Copy tránh lỗi dangling pointer.
+   - Move Constructor & Move Assignment: Tối ưu chuyển quyền sở hữu bộ nhớ trong C++11.
+3. **Tích hợp giải thuật QuickSort**:
+   - Phân hoạch Lomuto/Hoare với con trỏ hàm so sánh: `bool (*comp)(const T&, const T&)`.
+   - Sắp xếp đa tiêu chí: Tổng điểm giảm dần, Họ tên A-Z, Số báo danh tăng dần.
 
 ---
 
 ## 5. GIAO DIỆN ĐỒ HỌA CỬA SỔ HIỆN ĐẠI (DEAR IMGUI & DIRECTX 9)
 
-Loại bỏ giao diện Console đen trắng, chương trình sở hữu giao diện đồ họa cửa sổ Desktop chuyên nghiệp:
-- **Công nghệ**: Thư viện đồ họa **Dear ImGui** kết hợp backend **Win32 + DirectX 9**, render ở tần số 60 FPS cực kỳ mượt mà.
-- **Phong cách thiết kế**: Dark Theme hiện đại (Slate Blue / Charcoal / Cyan accents), hỗ trợ phân tab tiện lợi:
-  * **Tab 1: Quản lý Hồ sơ Thí sinh**: Bảng dữ liệu có thanh cuộn mượt mà, tìm kiếm nhanh, lọc theo trạng thái trúng tuyển, lọc theo ngành, các nút thêm/sửa/xóa mở cửa sổ Modal Dialog nhập liệu trực quan kèm tính năng kiểm tra lỗi (Validate).
-  * **Tab 2: Cơ sở Dữ liệu Quan hệ 3NF**: Hiển thị bảng Khu vực và bảng Ngành đào tạo; cho phép giảng viên điều chỉnh trực tiếp Điểm chuẩn và Chỉ tiêu ngành ngay trên màn hình.
-  * **Tab 3: Thống kê & Phổ điểm & Thủ khoa**: Banner vàng vinh danh Thủ khoa kỳ thi, bảng thủ khoa từng ngành, biểu đồ thanh trực quan (Progress Bars) thể hiện tỷ lệ % học lực.
-  * **Tab 4: Lưu trữ & Xuất Báo cáo**: Nút lưu bền vững vào 4 file CSDL và xem trước file báo cáo `ketqua_xettuyen.txt` trực tiếp trong ứng dụng.
-  * **Tab 5: Hướng dẫn & Kiến trúc**: Tóm tắt kiến trúc CSDL và thông tin đồ án.
+Các cải tiến giao diện chuẩn mực theo phản hồi thực tế:
+1. **Bố cục Form 2 Cột chuyên nghiệp**: Nhãn (Label) căn lề trái thẳng thớm, ô nhập liệu (Input) căn lề phải rộng rãi, đồng bộ `AlignTextToFramePadding()`.
+2. **Số báo danh (SBD) tự tăng**: Sinh mã tự động `DUT001`, `DUT002`... Khóa làm mờ (disabled) để bảo toàn tính toàn vẹn thực thể.
+3. **Ngày sinh chuẩn `dd/mm/yyyy`**: 3 ô số Ngày (1-31), Tháng (1-12), Năm (1970-2015) không nút bấm rườm rà, nhập số trực tiếp mượt mà, tự động ghép chuỗi `dd/mm/yyyy`.
+4. **Quê quán Searchable Combobox**: Danh mục 34 Tỉnh/Thành phố theo Nghị quyết 202/2025/QH15, có thanh gõ tìm kiếm lọc theo thời gian thực (real-time).
+5. **Giới tính căn chỉnh hoàn hảo**: Radio button Nam / Nữ căn chỉnh cùng hàng ngang với nhãn.
+6. **Nhập điểm số thuần túy (Clean InputFloat)**: Loại bỏ các nút `+` và `-` rườm rà, chỉ cho phép nhập số thực từ bàn phím với định dạng `%.2f`.
+7. **Trình duyệt báo cáo**: Đọc và xem trực tiếp các tệp báo cáo `ketqua_xettuyen.txt`, `thukhoa.txt`, `thongke_phodiem.txt` ngay trong ứng dụng.
+5. **Trình duyệt báo cáo**: Đọc và xem trực tiếp các tệp báo cáo `ketqua_xettuyen.txt`, `thukhoa.txt`, `thongke_phodiem.txt` ngay trong ứng dụng.
 
 ---
 
-## 6. KỊCH BẢN 5 PHÚT BÁO CÁO TRÌNH DIỄN KHIẾN THẦY HÀI LÒNG TUYỆT ĐỐI
+## 6. KỊCH BẢN 5 PHÚT BÁO CÁO TRÌNH DIỄN TRƯỚC GIẢNG VIÊN
 
-* **Phút 1: Mở đầu & Giới thiệu Giao diện Đồ họa GUI:**
-  - Khởi chạy `QuanLyThiSinh.exe` (hoặc nhấp đúp `build.bat`).
-  - Nói với thầy: *"Thưa thầy, tiếp thu góp ý của thầy về việc nâng cấp giao diện, em đã xây dựng giao diện đồ họa người dùng (GUI) hoàn chỉnh bằng thư viện Dear ImGui kết hợp DirectX 9, render 60 FPS, bố cục chia Tab khoa học thay thế cho console cũ."*
-
-* **Phút 2: Chứng minh Kiến trúc CSDL Quan hệ 3NF (Điểm mấu chốt):**
-  - Chuyển sang **Tab 2: Cơ sở Dữ liệu Quan hệ (3NF)**.
-  - Chỉ cho thầy thấy: *"Thưa thầy, để khắc phục nhược điểm lưu 1 file phẳng trước đây, em đã áp dụng kiến thức môn Cơ sở dữ liệu để chuẩn hóa hệ thống thành 4 bảng lưu ở 4 tệp tin riêng biệt: Bảng Khu vực ưu tiên, Bảng Ngành đào tạo, Bảng Hồ sơ nhân thân và Bảng Kết quả thi."*
-  - *"Dữ liệu được liên kết chặt chẽ bằng Khóa chính (PK) và Khóa ngoại (FK). Điểm ưu tiên được tra cứu tự động từ Bảng Khu vực chứ không để nhập tự do, và điểm chuẩn xét tuyển được quản lý riêng theo từng ngành."*
-
-* **Phút 3: Giải quyết bài toán "Nhiều thí sinh trùng họ tên":**
-  - Chuyển sang **Tab 1: Quản lý Hồ sơ Thí sinh**.
-  - Gõ vào ô tìm kiếm: `Nguyen Van An`.
-  - Chỉ cho thầy thấy: Có **2 thí sinh cùng tên Nguyễn Văn An** (một người ở Đà Nẵng, một người ở Hà Nội).
-  - Giải thích: *"Thưa thầy, hệ thống quản lý mỗi thí sinh bằng một `MaTS` duy nhất (TS001 và TS014) và số CMND/CCCD riêng biệt, vì vậy dù thí sinh có trùng họ tên thì hệ thống vẫn quản lý độc lập 100% không bao giờ xảy ra nhầm lẫn dữ liệu!"*
-
-* **Phút 4: Trình diễn Thao tác Thêm / Sửa / Xóa & Validate Dữ liệu:**
-  - Bấm nút `[+] Them Thi Sinh` để mở Modal Dialog.
-  - Chọn Khu vực `KV1` ➔ Điểm ưu tiên tự nhảy thành `+0.75`.
-  - Chọn Ngành `Cong nghe Thong tin` ➔ Điểm chuẩn ngành hiện lên `26.25d`.
-  - Nhập điểm Toán, Lý, Hóa ➔ Hệ thống tự động tính trước tổng điểm và hiển thị dự đoán kết quả xét tuyển tức thì!
-
-* **Phút 5: Vinh danh Thủ khoa, Phổ điểm & Xuất Báo cáo:**
-  - Chuyển sang **Tab 3: Thống kê & Phổ điểm**: Chỉ vào Banner vàng vinh danh Thủ khoa xuất sắc nhất, biểu đồ thanh trực quan tỷ lệ % phổ điểm.
-  - Chuyển sang **Tab 4**: Bấm nút `Xuat Bao Cao` và mở cho thầy xem nội dung báo cáo trúng tuyển chuyên nghiệp được định dạng ngay trên giao diện.
+- **Phút 1: Khởi động & Giới thiệu đề tài 24**:
+  Mở `QuanLyThiSinh_PBL2.exe`. Giới thiệu 2 lớp OOP chuẩn `Nguoi` và `ThiSinh`.
+- **Phút 2: Minh chứng mô hình Cơ sở Dữ liệu**:
+  Mở thư mục `data/` cho thầy xem: `nguoi.txt`, `thisinh.txt`, `system.txt`. Giải thích nguyên lý **Class Table Inheritance** và liên kết bằng khóa `soCCCD`.
+- **Phút 3: Trình diễn Thêm thí sinh với Form chuẩn hóa**:
+  Nhấn **"Them Thi Sinh Moi"**: Chỉ ra SBD tự động nhảy tăng `DUT012`, ngày sinh chọn số tự kiểm tra năm nhuận, quê quán chọn combobox tỉnh thành, điểm thi nhập số bước 0.25.
+- **Phút 4: Sắp xếp QuickSort & Xét tuyển**:
+  Click đổi tiêu chí sắp xếp: Theo Điểm giảm dần, Theo Tên A-Z. Chỉ ra giải thuật QuickSort trên cấu trúc `Vector<T>` tự viết đang thực thi.
+- **Phút 5: Xuất Báo cáo & Tab Thống kê**:
+  Mở Tab 3 cho thầy xem biểu đồ phổ điểm và Thủ khoa. Nhấn Tab 4 xuất và xem nội dung các file báo cáo trực tiếp.
 
 ---
 
-## 7. BỘ 10 CÂU HỎI VẤN ĐÁP THẦY HAY HỎI NHẤT & CÂU TRẢ LỜI ĐẠT ĐIỂM A+
+## 7. BỘ 10 CÂU HỎI VẤN ĐÁP THƯỜNG GẶP & CÂU TRẢ LỜI ĐẠT ĐIỂM A+
 
-### ❓ Câu 1: Em đã áp dụng kiến thức môn Cơ sở dữ liệu (CSDL) vào đồ án này như thế nào?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, em đã áp dụng nguyên lý Chuẩn hóa dữ liệu đạt dạng chuẩn 3NF (Third Normal Form) để chia nhỏ dữ liệu thành 4 bảng thực thể lưu trên 4 tệp tin:  
-  > 1. `danhmuc_khuvuc.txt`: Lưu danh mục khu vực và điểm ưu tiên tương ứng.  
-  > 2. `danhmuc_nganh.txt`: Lưu mã ngành, tên ngành, tổ hợp môn, chỉ tiêu và điểm chuẩn của từng ngành.  
-  > 3. `hoso_thisinh.txt`: Lưu thông tin nhân thân, có Khóa chính `maThiSinh` và Khóa ngoại `maKhuVuc`.  
-  > 4. `dangky_thi.txt`: Lưu kết quả điểm thi liên kết với `maThiSinh` và `maNganh` bằng Khóa ngoại.  
-  > Nhờ thiết kế này, dữ liệu không bị dư thừa, không bị dị thường cập nhật và phản ánh chính xác mô hình cơ sở dữ liệu quan hệ trong thực tế ạ."*
+1. **Hỏi**: Tại sao em không dùng `std::vector` mà phải tự viết `Vector<T>`?  
+   *Trả lời*: Thưa thầy, học phần PBL2 đánh giá năng lực cơ sở lập trình và cấu trúc dữ liệu. Em tự cài đặt `Vector<T>` với kỹ thuật quản lý bộ nhớ động, tuân thủ Rule of Five và tự tích hợp giải thuật QuickSort với hàm so sánh (comparator) để chứng minh khả năng làm chủ con trỏ và bộ nhớ.
 
----
+2. **Hỏi**: Tại sao em lại tách ra `nguoi.txt` và `thisinh.txt` thay vì lưu chung 1 file?  
+   *Trả lời*: Thưa thầy, theo kiến thức môn Cơ sở Dữ liệu, đây là kỹ thuật **Class Table Inheritance** (Kế thừa bảng). Bảng `Nguoi` lưu trữ thực thể nhân thân với khóa chính `soCCCD`, bảng `ThiSinh` lưu thông tin dự thi và tham chiếu `soCCCD` làm khóa ngoại. Khi cần thay đổi thông tin nhân thân hay mở rộng loại đối tượng khác (như Giảng viên/Cán bộ coi thi cùng kế thừa từ `Nguoi`), hệ thống không làm biến dạng dữ liệu thi cử.
 
-### ❓ Câu 2: Nếu có 2 hoặc nhiều thí sinh trùng họ tên thì hệ thống của em kiểm soát và phân biệt ra sao?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, trong môn CSDL, thuộc tính Họ và Tên không thể dùng làm khóa vì không có tính duy nhất. Trong hệ thống của em, mỗi thí sinh khi đăng ký hồ sơ đều được cấp một **Mã Thí Sinh duy nhất (`maThiSinh` - Primary Key)** kết hợp với số **CMND/CCCD** và **Số báo danh (SBD)**.  
-  > Khi tìm kiếm hoặc cập nhật, hệ thống truy xuất dựa trên Khóa chính `maThiSinh`. Ví dụ trong dữ liệu mẫu của em có 2 thí sinh cùng tên là 'Nguyen Van An', một bạn có mã `TS001` (ở Đà Nẵng) và một bạn có mã `TS014` (ở Hà Nội), điểm số và kết quả xét tuyển của 2 bạn hoàn toàn độc lập và không bao giờ bị nhầm lẫn ạ."*
+3. **Hỏi**: Nếu 2 thí sinh trùng tên và quê quán thì hệ thống phân biệt thế nào?  
+   *Trả lời*: Thưa thầy, hệ thống định danh tuyệt đối bằng `soCCCD` (12 số) ở lớp cha và `soBaoDanh` ở lớp con. Tên hay quê quán chỉ là thuộc tính mô tả, khóa chính là duy nhất nên tuyệt đối không xảy ra xung đột hay nhầm lẫn.
 
----
+4. **Hỏi**: Tại sao em làm SBD tự tăng và bị khóa (disabled) ở Form thêm mới?  
+   *Trả lời*: Nhằm đảm bảo tính toàn vẹn thực thể (Entity Integrity), tránh trường hợp người nhập gõ sai quy cách hoặc vô tình trùng lặp số báo danh đã có.
 
-### ❓ Câu 3: Tại sao em lại chọn thư viện Dear ImGui làm giao diện thay vì dùng Console hay Qt?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy:  
-  > 1. Console là giao diện dòng lệnh cũ, không đáp ứng được trải nghiệm trực quan của phần mềm hiện đại.  
-  > 2. So với Qt Framework vốn rất cồng kềnh (bộ cài nặng nhiều GB và yêu cầu cài đặt phần mềm Qt Creator phức tạp), thư viện **Dear ImGui** là thư viện C++ đồ họa hiện đại chuẩn công nghiệp, rất nhẹ, được tích hợp thẳng vào mã nguồn C++ và render trực tiếp bằng **DirectX 9 / Win32 API**.  
-  > Nhờ vậy, chương trình có thể biên dịch và chạy ngay lập tức trên máy của thầy cô chỉ bằng 1 cú nhấp chuột mà không cần phải cài đặt bất kỳ phần mềm bên ngoài nào, trong khi vẫn đạt hiệu năng 60 FPS cực kỳ mượt mà ạ."*
+5. **Hỏi**: Điều kiện xét trúng tuyển của trường là gì?  
+   *Trả lời*: Tổng điểm 3 môn Toán, Lý, Hóa $\ge$ Điểm chuẩn của trường (hiện tại là 22.00 và có thể điều chỉnh linh hoạt trên GUI), đồng thời không có môn nào bị điểm liệt ($\le 1.00$).
 
----
+6. **Hỏi**: Destructor của lớp `Nguoi` có phải là `virtual` không, tại sao?  
+   *Trả lời*: Dạ có, `virtual ~Nguoi()` là bắt buộc để khi ta hủy một đối tượng `ThiSinh` thông qua con trỏ lớp cơ sở `Nguoi*`, destructor của lớp con `ThiSinh` sẽ được gọi trước, sau đó mới đến destructor của `Nguoi`, tránh thất thoát rò rỉ bộ nhớ (Memory Leak).
 
-### ❓ Câu 4: Việc xét trúng tuyển trong hệ thống được thực hiện như thế nào? Điểm chuẩn là cố định cho cả trường hay theo từng ngành?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, trong thực tế tuyển sinh đại học, mỗi ngành đào tạo có điểm chuẩn và chỉ tiêu tuyển sinh riêng biệt.  
-  > Trong hệ thống của em, điểm chuẩn được lưu trong bảng `NganhXetTuyen`. Khi xét tuyển cho một thí sinh, hệ thống sẽ:  
-  > 1. Kiểm tra thí sinh có bị điểm liệt hay không (môn thi $\le 1.0$ điểm).  
-  > 2. Lấy tổng điểm 3 môn cộng điểm ưu tiên khu vực.  
-  > 3. So sánh tổng điểm với **chính điểm chuẩn của ngành mà thí sinh đó đăng ký**.  
-  > Đồng thời, người quản trị có thể thay đổi điểm chuẩn hoặc chỉ tiêu của bất kỳ ngành nào ngay trên Tab 2 của giao diện, hệ thống sẽ tự động cập nhật lại kết quả trúng tuyển tức thì ạ."*
+7. **Hỏi**: Độ phức tạp thuật toán QuickSort của em là bao nhiêu?  
+   *Trả lời*: Trung bình là $O(N \log N)$, trường hợp xấu nhất là $O(N^2)$. Với số lượng thí sinh dự thi, thuật toán phân hoạch Lomuto/Hoare hoạt động cực nhanh trong $O(N \log N)$.
 
----
+8. **Hỏi**: Em nạp dữ liệu từ 2 file vào bộ nhớ như thế nào?  
+   *Trả lời*: Khi khởi động, hàm `docDuLieu()` đọc toàn bộ nhân thân từ `nguoi.txt` vào một danh sách tạm, sau đó đọc `thisinh.txt` và thực hiện phép nối (In-Memory Hash/Linear Join) trên trường `soCCCD` để hoàn thiện đầy đủ đối tượng `ThiSinh` đưa vào `Vector<ThiSinh>`.
 
-### ❓ Câu 5: Em tự cài đặt cấu trúc dữ liệu `Vector<T>` thay vì dùng `std::vector` như thế nào?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, để đáp ứng chuẩn đầu ra của học phần PBL2 về cấu trúc dữ liệu và quản lý bộ nhớ động, em tự xây dựng lớp mẫu `Vector<T>`:  
-  > - Sử dụng con trỏ động `T* data` cấp phát bằng `new[]`.  
-  > - Quản lý `m_size` và `m_capacity`. Khi mảng đầy, hàm `reallocate` sẽ cấp phát vùng nhớ mới có dung lượng gấp đôi (`m_capacity * 2`), sao chép dữ liệu cũ và giải phóng vùng nhớ cũ bằng `delete[]`, giúp độ phức tạp trung bình khi thêm phần tử là $O(1)$.  
-  > - Cài đặt đầy đủ **Rule of Three** (Destructor, Copy Constructor, Copy Assignment Operator) để tránh rò rỉ bộ nhớ hoặc lỗi con trỏ treo ạ."*
+9. **Hỏi**: Nếu người dùng không cài DirectX hoặc máy tính cũ chỉ có Console thì sao?  
+   *Trả lời*: Em thiết kế kiến trúc phân tầng độc lập giữa Core Logic và Presentation. Chương trình hỗ trợ cờ lệnh `.\QuanLyThiSinh_PBL2.exe --console` cho phép chạy trên mọi màn hình dòng lệnh với menu tương tác phím mũi tên và hỗ trợ tiếng Việt UTF-8.
 
----
-
-### ❓ Câu 6: Thuật toán sắp xếp trong `Vector.h` là gì? Tại sao em có thể sắp xếp theo nhiều tiêu chí khác nhau?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, em tự cài đặt thuật toán **QuickSort** với phân hoạch Hoare, độ phức tạp trung bình là $O(N \log N)$.  
-  > Điểm đặc biệt là phương thức `sort` nhận vào một con trỏ hàm so sánh `bool (*compare)(const T&, const T&)`. Nhờ cơ chế callback này, em chỉ cần viết một hàm QuickSort duy nhất nhưng có thể tái sử dụng để sắp xếp danh sách theo bất kỳ tiêu chuẩn nào: theo tổng điểm giảm dần, theo thứ tự tên A-Z, theo SBD hoặc theo ngành học ạ."*
-
----
-
-### ❓ Câu 7: Bốn tính chất của Lập trình Hướng đối tượng (OOP) thể hiện ở đâu trong mã nguồn?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy:  
-  > 1. **Đóng gói (Encapsulation)**: Các thuộc tính nhân thân và điểm thi đều đặt ở phạm vi `protected` hoặc `private`, chỉ truy xuất qua Getter/Setter có kiểm tra hợp lệ dữ liệu.  
-  > 2. **Kế thừa (Inheritance)**: Lớp `ThiSinh` kế thừa công khai từ lớp cơ sở `Nguoi`.  
-  > 3. **Đa hình (Polymorphism)**: Sử dụng phương thức ảo `virtual void nhap()`, `virtual void xuat()` và hàm hủy ảo `virtual ~Nguoi()`.  
-  > 4. **Trừu tượng hóa (Abstraction)**: Mô hình hóa các thực thể thế giới thực thành các lớp `Nguoi`, `ThiSinh`, `KhuVuc`, `NganhXetTuyen` và lớp quản trị `QuanLyThiSinh`."*
-
----
-
-### ❓ Câu 8: Điểm ưu tiên được tính toán tự động như thế nào để đảm bảo tính toàn vẹn dữ liệu?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, người dùng không được phép nhập tùy tiện con số điểm ưu tiên. Khi nhập hồ sơ thí sinh, người dùng chỉ được chọn Mã Khu Vực (KV1, KV2NT, KV2, KV3). Hệ thống sẽ tự động đối soát với bảng `KhuVuc` trong CSDL để lấy mức điểm cộng tương ứng (+0.75, +0.50, +0.25, 0.00). Điều này bảo đảm tính toàn vẹn tham chiếu (Referential Integrity) chuẩn CSDL ạ."*
-
----
-
-### ❓ Câu 9: Trong lớp cơ sở `Nguoi`, tại sao bắt buộc phải có `virtual ~Nguoi()`?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, khi ta thao tác với con trỏ lớp cơ sở `Nguoi* ptr = new ThiSinh()`, nếu không có từ khóa `virtual` ở hàm hủy, khi gọi lệnh `delete ptr`, trình biên dịch sẽ chỉ liên kết tĩnh và gọi duy nhất `~Nguoi()`, bỏ sót các thuộc tính và tài nguyên của lớp con `ThiSinh`, dẫn đến lỗi rò rỉ bộ nhớ (Memory Leak).  
-  > Khai báo `virtual ~Nguoi()` kích hoạt cơ chế liên kết động (Dynamic Binding), bảo đảm Destructor của lớp con `~ThiSinh()` luôn được gọi trước rồi mới đến `~Nguoi()` ạ."*
-
----
-
-### ❓ Câu 10: Nếu sau này trường Đại học muốn mở rộng thêm hệ đào tạo hoặc quy chế tuyển sinh thì kiến trúc của em có dễ nâng cấp không?
-* **Trả lời chuẩn A+:**
-  > *"Dạ thưa thầy, hệ thống tuân thủ nguyên lý **Mở/Đóng (Open/Closed Principle)**:  
-  > - Nếu muốn thêm ngành học mới: Chỉ cần thêm dòng vào bảng `danhmuc_nganh.txt` hoặc thêm ngay trên giao diện mà không cần sửa code.  
-  > - Nếu muốn mở rộng đối tượng như Giảng viên chấm thi hay Cán bộ coi thi: Chỉ cần tạo lớp mới kế thừa từ lớp cơ sở `Nguoi` có sẵn, hoàn toàn không làm ảnh hưởng đến mã nguồn hiện tại ạ!"*
-
----
-*Tài liệu nâng cấp toàn diện - Đồ án PBL2 Khoa CNTT - Đại học Bách khoa Đà Nẵng.*
+10. **Hỏi**: Em đã áp dụng các thư viện nào để dựng GUI?  
+    *Trả lời*: Em sử dụng thư viện **Dear ImGui** kết hợp backend **DirectX 9** và Win32 API gốc của Windows, giúp ứng dụng đạt tốc độ hiển thị 60 FPS mượt mà, dung lượng file thực thi nhỏ gọn và không cần cài đặt thêm runtime cồng kềnh.

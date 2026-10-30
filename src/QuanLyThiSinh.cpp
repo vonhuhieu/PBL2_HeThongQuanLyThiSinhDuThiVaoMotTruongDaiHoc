@@ -3,20 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <algorithm>
 
-// Hàm tách xâu theo ký tự phân cách
-static Vector<string> split(const string& str, char delim) {
-    Vector<string> tokens;
-    string token;
-    stringstream ss(str);
-    while (getline(ss, token, delim)) {
-        tokens.push_back(Utils::trim(token));
-    }
-    return tokens;
-}
-
-// Comparators cho hàm sort của Vector
+// Comparator sắp xếp tổng điểm giảm dần
 static bool cmpTongDiemGiam(const ThiSinh& a, const ThiSinh& b) {
     if (a.tinhTongDiem() != b.tinhTongDiem()) {
         return a.tinhTongDiem() > b.tinhTongDiem();
@@ -24,10 +12,12 @@ static bool cmpTongDiemGiam(const ThiSinh& a, const ThiSinh& b) {
     return a.getSoBaoDanh() < b.getSoBaoDanh();
 }
 
+// Comparator sắp xếp SBD tăng dần
 static bool cmpSBDTang(const ThiSinh& a, const ThiSinh& b) {
     return a.getSoBaoDanh() < b.getSoBaoDanh();
 }
 
+// Comparator sắp xếp Tên A-Z (theo tên tiếng Việt: so sánh từ cuối cùng trước)
 static bool cmpTenAZ(const ThiSinh& a, const ThiSinh& b) {
     string nameA = Utils::trim(a.getHoTen());
     string nameB = Utils::trim(b.getHoTen());
@@ -44,497 +34,318 @@ static bool cmpTenAZ(const ThiSinh& a, const ThiSinh& b) {
     return Utils::toLower(nameA) < Utils::toLower(nameB);
 }
 
-static bool cmpNganh(const ThiSinh& a, const ThiSinh& b) {
-    if (a.getMaNganh() != b.getMaNganh()) {
-        return a.getMaNganh() < b.getMaNganh();
-    }
-    return a.tinhTongDiem() > b.tinhTongDiem();
-}
-
 // Constructor
 QuanLyThiSinh::QuanLyThiSinh(const string& dirData) {
-    pathKhuVuc = dirData + "/danhmuc_khuvuc.txt";
-    pathNganh = dirData + "/danhmuc_nganh.txt";
-    pathHoSo = dirData + "/hoso_thisinh.txt";
-    pathDangKy = dirData + "/dangky_thi.txt";
-    pathLegacy = dirData + "/thisinh.txt";
+    pathNguoi = dirData + "/nguoi.txt";
+    pathThiSinh = dirData + "/thisinh.txt";
+    pathSystem = dirData + "/system.txt";
+    diemChuanHienTai = 22.00;
+    namTuyenSinh = "2026";
+    tenTruong = "TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG";
 
-    docTatCaDuLieu();
+    docCauHinhHeThong(pathSystem);
+
+    if (!docDuLieu() || dsThiSinh.empty()) {
+        taoDuLieuMauNeuTrong();
+    }
 }
 
 // Destructor
 QuanLyThiSinh::~QuanLyThiSinh() {
-    luuTatCaDuLieu();
+    luuDuLieu();
+    luuCauHinhHeThong(pathSystem);
 }
 
-// Đọc toàn bộ CSDL quan hệ từ các tệp
-bool QuanLyThiSinh::docTatCaDuLieu() {
-    dsKhuVuc.clear();
-    dsNganh.clear();
+// Nạp dữ liệu mẫu ban đầu nếu hệ thống chưa có dữ liệu
+void QuanLyThiSinh::taoDuLieuMauNeuTrong() {
     dsThiSinh.clear();
+    dsThiSinh.push_back(ThiSinh("201948572134", "Nguyen Van An", "15/03/2005", "TP. Da Nang", "Nam", "DUT001", 9.50, 9.00, 9.75));
+    dsThiSinh.push_back(ThiSinh("201837461928", "Tran Thi Bich", "22/07/2005", "TP. Da Nang", "Nu", "DUT002", 8.75, 8.50, 9.00));
+    dsThiSinh.push_back(ThiSinh("201726354819", "Le Hoang Cong", "10/11/2005", "TP. Hue", "Nam", "DUT003", 7.50, 6.75, 7.00));
+    dsThiSinh.push_back(ThiSinh("201615243701", "Pham Thi Diem", "05/01/2005", "Quang Ngai", "Nu", "DUT004", 9.00, 8.75, 8.25));
+    dsThiSinh.push_back(ThiSinh("201504132692", "Vo Minh Duc", "18/09/2005", "Ha Tinh", "Nam", "DUT005", 6.25, 5.50, 6.00));
+    dsThiSinh.push_back(ThiSinh("201493021583", "Hoang Thi Ha", "30/04/2005", "Nghe An", "Nu", "DUT006", 9.75, 9.50, 9.80));
+    dsThiSinh.push_back(ThiSinh("201382910474", "Dang Quoc Khanh", "12/12/2005", "Quang Tri", "Nam", "DUT007", 5.00, 4.50, 5.50));
+    dsThiSinh.push_back(ThiSinh("201271809365", "Bui Mai Linh", "08/08/2005", "TP. Ha Noi", "Nu", "DUT008", 8.50, 8.25, 8.75));
+    dsThiSinh.push_back(ThiSinh("201160798256", "Ngo Van Nam", "25/02/2005", "TP. Ho Chi Minh", "Nam", "DUT009", 7.00, 7.25, 6.50));
+    dsThiSinh.push_back(ThiSinh("201059687147", "Dinh Thao Quyen", "19/10/2005", "Gia Lai", "Nu", "DUT010", 8.00, 8.50, 7.75));
+    dsThiSinh.push_back(ThiSinh("200948576038", "Phan Thanh Tung", "03/06/2005", "TP. Da Nang", "Nam", "DUT011", 9.25, 9.00, 9.25));
+    dsThiSinh.push_back(ThiSinh("200837465929", "Do Thu Trang", "14/05/2005", "TP. Da Nang", "Nu", "DUT012", 6.75, 7.00, 7.50));
+    dsThiSinh.push_back(ThiSinh("048203001234", "Vo Nhu Hieu", "04/03/2003", "TP. Da Nang", "Nam", "DUT013", 9.00, 3.00, 4.00));
+    dsThiSinh.push_back(ThiSinh("202011223344", "Nguyen Van An", "01/01/2005", "TP. Ha Noi", "Nam", "DUT014", 9.00, 8.50, 9.25));
 
-    // 1. Đọc Bảng 1: KhuVuc
-    ifstream finKV(pathKhuVuc);
-    if (finKV.is_open()) {
-        int count = 0;
-        finKV >> count;
-        string line;
-        getline(finKV, line);
-        for (int i = 0; i < count && getline(finKV, line); ++i) {
-            line = Utils::trim(line);
-            if (line.empty()) continue;
-            Vector<string> parts = split(line, '|');
-            if (parts.size() >= 3) {
-                try {
-                    double diem = stod(parts[2]);
-                    dsKhuVuc.push_back(KhuVuc(parts[0], parts[1], diem));
-                } catch (...) {}
+    luuDuLieu();
+    luuCauHinhHeThong(pathSystem);
+}
+
+// 1. Đọc dữ liệu từ 2 tệp quan hệ theo chuẩn Key - Value (như đồ án mẫu)
+bool QuanLyThiSinh::docDuLieu() {
+    ifstream finNguoi(pathNguoi);
+    if (!finNguoi.is_open()) return false;
+
+    Vector<Nguoi> dsNguoiTam;
+    string line;
+    string curCCCD = "", curTen = "", curNS = "", curQue = "", curGT = "Nam";
+
+    while (getline(finNguoi, line)) {
+        line = Utils::trim(line);
+        if (line.empty() || line == "#NGUOI") continue;
+        if (line == "====") break;
+
+        if (line == "---") {
+            if (!curCCCD.empty()) {
+                dsNguoiTam.push_back(Nguoi(curCCCD, curTen, curNS, curQue, curGT));
             }
+            curCCCD = curTen = curNS = curQue = "";
+            curGT = "Nam";
+            continue;
         }
-        finKV.close();
-    }
 
-    // Nếu bảng khu vực trống, nạp mặc định
-    if (dsKhuVuc.empty()) {
-        dsKhuVuc.push_back(KhuVuc("KV1", "Khu vuc 1", 0.75));
-        dsKhuVuc.push_back(KhuVuc("KV2NT", "Khu vuc 2 Nong thon", 0.50));
-        dsKhuVuc.push_back(KhuVuc("KV2", "Khu vuc 2", 0.25));
-        dsKhuVuc.push_back(KhuVuc("KV3", "Khu vuc 3 (Khong uu tien)", 0.00));
-    }
-
-    // 2. Đọc Bảng 2: NganhXetTuyen
-    ifstream finNg(pathNganh);
-    if (finNg.is_open()) {
-        int count = 0;
-        finNg >> count;
-        string line;
-        getline(finNg, line);
-        for (int i = 0; i < count && getline(finNg, line); ++i) {
-            line = Utils::trim(line);
-            if (line.empty()) continue;
-            Vector<string> parts = split(line, '|');
-            if (parts.size() >= 5) {
-                try {
-                    int ct = stoi(parts[3]);
-                    double dc = stod(parts[4]);
-                    dsNganh.push_back(NganhXetTuyen(parts[0], parts[1], parts[2], ct, dc));
-                } catch (...) {}
-            }
+        string k, v;
+        if (Utils::tachKeyValue(line, k, v)) {
+            string kLower = Utils::toLower(k);
+            if (kLower == "so cccd" || kLower == "cccd") curCCCD = v;
+            else if (kLower == "ho va ten" || kLower == "ho ten" || kLower == "ten") curTen = v;
+            else if (kLower == "ngay sinh") curNS = v;
+            else if (kLower == "que quan") curQue = v;
+            else if (kLower == "gioi tinh") curGT = v;
         }
-        finNg.close();
     }
+    finNguoi.close();
 
-    // Nếu bảng ngành trống, nạp mặc định
-    if (dsNganh.empty()) {
-        dsNganh.push_back(NganhXetTuyen("7480201", "Cong nghe Thong tin", "A00", 150, 26.25));
-        dsNganh.push_back(NganhXetTuyen("7520207", "Ky thuat Dieu khien & Tu dong hoa", "A00", 120, 24.50));
-        dsNganh.push_back(NganhXetTuyen("7520114", "Ky thuat Co dien tu", "A00", 100, 23.75));
-        dsNganh.push_back(NganhXetTuyen("7510301", "Ky thuat Dien - Dien tu", "A00", 80, 22.00));
-        dsNganh.push_back(NganhXetTuyen("7580201", "Ky thuat Xay dung", "A00", 90, 19.50));
-    }
+    ifstream finTS(pathThiSinh);
+    if (!finTS.is_open()) return false;
 
-    // 3. Đọc Bảng 3: HoSoThiSinh và Bảng 4: DangKyThi
-    // Đọc thông tin hồ sơ trước
-    struct HoSoTam {
-        string maTS;
-        string cmnd;
-        string hoTen;
-        string ngaySinh;
-        string queQuan;
-        string gioiTinh;
-        string maKV;
-    };
-    Vector<HoSoTam> dsHoSo;
+    dsThiSinh.clear();
+    string curSBD = "", curFK_CCCD = "";
+    double curToan = 0.0, curLy = 0.0, curHoa = 0.0;
 
-    ifstream finHoSo(pathHoSo);
-    if (finHoSo.is_open()) {
-        int count = 0;
-        finHoSo >> count;
-        string line;
-        getline(finHoSo, line);
-        for (int i = 0; i < count && getline(finHoSo, line); ++i) {
-            line = Utils::trim(line);
-            if (line.empty()) continue;
-            Vector<string> parts = split(line, '|');
-            if (parts.size() >= 7) {
-                HoSoTam hs;
-                hs.maTS = parts[0];
-                hs.cmnd = parts[1];
-                hs.hoTen = parts[2];
-                hs.ngaySinh = parts[3];
-                hs.queQuan = parts[4];
-                hs.gioiTinh = parts[5];
-                hs.maKV = parts[6];
-                dsHoSo.push_back(hs);
-            }
-        }
-        finHoSo.close();
-    }
+    while (getline(finTS, line)) {
+        line = Utils::trim(line);
+        if (line.empty() || line == "#THISINH") continue;
+        if (line == "====") break;
 
-    // Đọc bảng đăng ký thi và Join với hồ sơ
-    ifstream finDK(pathDangKy);
-    if (finDK.is_open()) {
-        int count = 0;
-        finDK >> count;
-        string line;
-        getline(finDK, line);
-        for (int i = 0; i < count && getline(finDK, line); ++i) {
-            line = Utils::trim(line);
-            if (line.empty()) continue;
-            Vector<string> parts = split(line, '|');
-            if (parts.size() >= 6) {
-                string sbd = parts[0];
-                string maTS = parts[1];
-                string maNg = parts[2];
-                double t = 0.0, l = 0.0, h = 0.0;
-                try {
-                    t = stod(parts[3]);
-                    l = stod(parts[4]);
-                    h = stod(parts[5]);
-                } catch (...) {}
-
-                // Tìm hồ sơ tương ứng theo maTS (Khóa ngoại FK)
-                for (int j = 0; j < dsHoSo.size(); ++j) {
-                    if (dsHoSo[j].maTS == maTS) {
-                        double ut = getDiemUuTienTheoKhuVuc(dsHoSo[j].maKV);
-                        ThiSinh ts(dsHoSo[j].maTS, dsHoSo[j].cmnd, dsHoSo[j].hoTen,
-                                   dsHoSo[j].ngaySinh, dsHoSo[j].queQuan, dsHoSo[j].gioiTinh,
-                                   sbd, dsHoSo[j].maKV, maNg, t, l, h, ut);
+        if (line == "---") {
+            if (!curSBD.empty() && !curFK_CCCD.empty()) {
+                for (size_t i = 0; i < dsNguoiTam.size(); ++i) {
+                    if (dsNguoiTam[i].getSoCCCD() == curFK_CCCD) {
+                        ThiSinh ts(dsNguoiTam[i].getSoCCCD(),
+                                   dsNguoiTam[i].getHoTen(),
+                                   dsNguoiTam[i].getNgaySinh(),
+                                   dsNguoiTam[i].getQueQuan(),
+                                   dsNguoiTam[i].getGioiTinh(),
+                                   curSBD, curToan, curLy, curHoa);
                         dsThiSinh.push_back(ts);
                         break;
                     }
                 }
             }
+            curSBD = curFK_CCCD = "";
+            curToan = curLy = curHoa = 0.0;
+            continue;
         }
-        finDK.close();
+
+        string k, v;
+        if (Utils::tachKeyValue(line, k, v)) {
+            string kLower = Utils::toLower(k);
+            if (kLower == "so bao danh" || kLower == "sbd") curSBD = v;
+            else if (kLower == "so cccd" || kLower == "cccd") curFK_CCCD = v;
+            else if (kLower == "diem toan" || kLower == "toan") {
+                try { curToan = stod(v); } catch (...) {}
+            }
+            else if (kLower == "diem ly" || kLower == "ly") {
+                try { curLy = stod(v); } catch (...) {}
+            }
+            else if (kLower == "diem hoa" || kLower == "hoa") {
+                try { curHoa = stod(v); } catch (...) {}
+            }
+        }
     }
+    finTS.close();
 
     return true;
 }
 
-// Lưu dữ liệu vào 4 tệp CSDL quan hệ và cập nhật file legacy
-bool QuanLyThiSinh::luuTatCaDuLieu() const {
-    // 1. Lưu Bảng KhuVuc
-    ofstream fKV(pathKhuVuc);
-    if (fKV.is_open()) {
-        fKV << dsKhuVuc.size() << "\n";
-        for (int i = 0; i < dsKhuVuc.size(); ++i) {
-            fKV << dsKhuVuc[i].getMaKhuVuc() << "|"
-                << dsKhuVuc[i].getTenKhuVuc() << "|"
-                << fixed << setprecision(2) << dsKhuVuc[i].getDiemUuTien() << "\n";
-        }
-        fKV.close();
-    }
+// 2. Lưu dữ liệu phân rã vào 2 tệp quan hệ theo chuẩn Key - Value
+bool QuanLyThiSinh::luuDuLieu() const {
+    ofstream foutNguoi(pathNguoi);
+    if (!foutNguoi.is_open()) return false;
 
-    // 2. Lưu Bảng NganhXetTuyen
-    ofstream fNg(pathNganh);
-    if (fNg.is_open()) {
-        fNg << dsNganh.size() << "\n";
-        for (int i = 0; i < dsNganh.size(); ++i) {
-            fNg << dsNganh[i].getMaNganh() << "|"
-                << dsNganh[i].getTenNganh() << "|"
-                << dsNganh[i].getToHopMon() << "|"
-                << dsNganh[i].getChiTieu() << "|"
-                << fixed << setprecision(2) << dsNganh[i].getDiemChuan() << "\n";
-        }
-        fNg.close();
+    foutNguoi << "#NGUOI\n";
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        const ThiSinh& ts = dsThiSinh[i];
+        foutNguoi << "So CCCD: " << ts.getSoCCCD() << "\n"
+                  << "Ho va Ten: " << ts.getHoTen() << "\n"
+                  << "Ngay Sinh: " << ts.getNgaySinh() << "\n"
+                  << "Que Quan: " << ts.getQueQuan() << "\n"
+                  << "Gioi Tinh: " << ts.getGioiTinh() << "\n"
+                  << "---\n";
     }
+    foutNguoi << "====\n";
+    foutNguoi.close();
 
-    // 3. Lưu Bảng HoSoThiSinh
-    ofstream fHS(pathHoSo);
-    if (fHS.is_open()) {
-        fHS << dsThiSinh.size() << "\n";
-        for (int i = 0; i < dsThiSinh.size(); ++i) {
-            const ThiSinh& ts = dsThiSinh[i];
-            fHS << ts.getMaThiSinh() << "|"
-                << ts.getSoCMND() << "|"
-                << ts.getHoTen() << "|"
-                << ts.getNgaySinh() << "|"
-                << ts.getQueQuan() << "|"
-                << ts.getGioiTinh() << "|"
-                << ts.getMaKhuVuc() << "\n";
-        }
-        fHS.close();
-    }
+    ofstream foutTS(pathThiSinh);
+    if (!foutTS.is_open()) return false;
 
-    // 4. Lưu Bảng DangKyThi
-    ofstream fDK(pathDangKy);
-    if (fDK.is_open()) {
-        fDK << dsThiSinh.size() << "\n";
-        for (int i = 0; i < dsThiSinh.size(); ++i) {
-            const ThiSinh& ts = dsThiSinh[i];
-            fDK << ts.getSoBaoDanh() << "|"
-                << ts.getMaThiSinh() << "|"
-                << ts.getMaNganh() << "|"
-                << fixed << setprecision(2) << ts.getDiemToan() << "|"
-                << ts.getDiemLy() << "|"
-                << ts.getDiemHoa() << "\n";
-        }
-        fDK.close();
+    foutTS << "#THISINH\n";
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        const ThiSinh& ts = dsThiSinh[i];
+        foutTS << "So Bao Danh: " << ts.getSoBaoDanh() << "\n"
+               << "So CCCD: " << ts.getSoCCCD() << "\n"
+               << fixed << setprecision(2)
+               << "Diem Toan: " << ts.getDiemToan() << "\n"
+               << "Diem Ly: " << ts.getDiemLy() << "\n"
+               << "Diem Hoa: " << ts.getDiemHoa() << "\n"
+               << "---\n";
     }
-
-    // 5. Lưu file legacy thisinh.txt để bảo toàn tính tương thích
-    ofstream fLeg(pathLegacy);
-    if (fLeg.is_open()) {
-        fLeg << dsThiSinh.size() << "\n";
-        for (int i = 0; i < dsThiSinh.size(); ++i) {
-            const ThiSinh& ts = dsThiSinh[i];
-            fLeg << ts.getSoCMND() << "\n"
-                 << ts.getHoTen() << "\n"
-                 << ts.getNgaySinh() << "\n"
-                 << ts.getQueQuan() << "\n"
-                 << ts.getGioiTinh() << "\n"
-                 << ts.getSoBaoDanh() << "\n"
-                 << fixed << setprecision(2)
-                 << ts.getDiemToan() << " " << ts.getDiemLy() << " " 
-                 << ts.getDiemHoa() << " " << ts.getDiemUuTien() << "\n";
-        }
-        fLeg.close();
-    }
+    foutTS << "====\n";
+    foutTS.close();
 
     return true;
 }
 
-// Xuất báo cáo xét tuyển đại học
-bool QuanLyThiSinh::xuatBaoCaoXetTuyen(const string& path) const {
+// Đọc cấu hình hệ thống (data/system.txt)
+bool QuanLyThiSinh::docCauHinhHeThong(const string& path) {
+    ifstream fin(path);
+    if (!fin.is_open()) return false;
+
+    string line;
+    while (getline(fin, line)) {
+        line = Utils::trim(line);
+        if (line.empty() || line == "#SYSTEM_CONFIG" || line == "====") continue;
+
+        string k, v;
+        if (Utils::tachKeyValue(line, k, v)) {
+            string kLower = Utils::toLower(k);
+            if (kLower == "truong" || kLower == "ten truong") tenTruong = v;
+            else if (kLower == "nam tuyen sinh" || kLower == "nam") namTuyenSinh = v;
+            else if (kLower == "diem chuan") {
+                try { diemChuanHienTai = stod(v); } catch (...) {}
+            }
+        }
+    }
+    fin.close();
+    return true;
+}
+
+// Lưu cấu hình hệ thống (data/system.txt)
+bool QuanLyThiSinh::luuCauHinhHeThong(const string& path) const {
     ofstream fout(path);
     if (!fout.is_open()) return false;
 
-    fout << "===================================================================================================================\n";
-    fout << "                                  TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG\n";
-    fout << "                                       BAO CAO KET QUA XET TUYEN DAI HOC\n";
-    fout << "                                   (He thong CSDL Quan he chuan 3NF - PBL2)\n";
-    fout << "===================================================================================================================\n\n";
-
-    fout << left << setw(4) << "STT"
-         << setw(8) << "Ma TS"
-         << setw(9) << "SBD"
-         << setw(14) << "CMND/CCCD"
-         << setw(22) << "Ho va Ten"
-         << setw(12) << "Ngay Sinh"
-         << setw(14) << "Que Quan"
-         << setw(5) << "KV"
-         << setw(28) << "Nganh Dang Ky"
-         << right
-         << setw(6) << "Toan"
-         << setw(6) << "Ly"
-         << setw(6) << "Hoa"
-         << setw(6) << "UT"
-         << setw(8) << "Tong"
-         << setw(8) << "D.Chuan"
-         << "   " << left << setw(14) << "Ket Qua" << "\n";
-    fout << string(160, '-') << "\n";
-
-    int soTrungTuyen = 0;
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        const ThiSinh& ts = dsThiSinh[i];
-        double dcNganh = getDiemChuanNganh(ts.getMaNganh());
-        bool trungTuyen = ts.xetTrungTuyen(dcNganh);
-        if (trungTuyen) soTrungTuyen++;
-
-        string tenNg = getTenNganh(ts.getMaNganh());
-        if (tenNg.length() > 26) tenNg = tenNg.substr(0, 23) + "...";
-
-        fout << left << setw(4) << (i + 1)
-             << setw(8) << ts.getMaThiSinh()
-             << setw(9) << ts.getSoBaoDanh()
-             << setw(14) << ts.getSoCMND()
-             << setw(22) << ts.getHoTen().substr(0, 20)
-             << setw(12) << ts.getNgaySinh()
-             << setw(14) << ts.getQueQuan().substr(0, 12)
-             << setw(5) << ts.getMaKhuVuc()
-             << setw(28) << tenNg
-             << right << fixed << setprecision(2)
-             << setw(6) << ts.getDiemToan()
-             << setw(6) << ts.getDiemLy()
-             << setw(6) << ts.getDiemHoa()
-             << setw(6) << ts.getDiemUuTien()
-             << setw(8) << ts.tinhTongDiem()
-             << setw(8) << dcNganh
-             << "   " << left << setw(14) << (trungTuyen ? "TRUNG TUYEN" : "Khong dat") << "\n";
-    }
-
-    fout << string(160, '=') << "\n";
-    fout << "Tong so thi sinh dang ky : " << dsThiSinh.size() << "\n";
-    fout << "Tong so trung tuyen     : " << soTrungTuyen << " (" 
-         << fixed << setprecision(1) << (dsThiSinh.empty() ? 0.0 : (double)soTrungTuyen * 100.0 / dsThiSinh.size()) << "%)\n\n";
-
-    // Phân tích theo từng ngành
-    fout << "--- THONG KE THEO TUNG NGANH XET TUYEN ---\n";
-    for (int i = 0; i < dsNganh.size(); ++i) {
-        string ma = dsNganh[i].getMaNganh();
-        int dk = demSoLuongDangKyTheoNganh(ma);
-        int tt = demSoLuongTrungTuyenTheoNganh(ma);
-        fout << "- " << dsNganh[i].getTenNganh() << " (" << ma << "):\n";
-        fout << "    + Diem chuan: " << dsNganh[i].getDiemChuan() << " | Chi tieu: " << dsNganh[i].getChiTieu() << "\n";
-        fout << "    + So dang ky: " << dk << " | So trung tuyen: " << tt << "\n";
-    }
-
+    fout << "#SYSTEM_CONFIG\n"
+         << "Truong: " << tenTruong << "\n"
+         << "Nam Tuyen Sinh: " << namTuyenSinh << "\n"
+         << fixed << setprecision(2)
+         << "Diem Chuan: " << diemChuanHienTai << "\n"
+         << "====\n";
     fout.close();
     return true;
 }
 
-// Tra cứu khóa ngoại
-double QuanLyThiSinh::getDiemUuTienTheoKhuVuc(const string& maKV) const {
-    string target = Utils::toUpper(Utils::trim(maKV));
-    for (int i = 0; i < dsKhuVuc.size(); ++i) {
-        if (Utils::toUpper(dsKhuVuc[i].getMaKhuVuc()) == target) {
-            return dsKhuVuc[i].getDiemUuTien();
-        }
-    }
-    return 0.0;
-}
-
-string QuanLyThiSinh::getTenKhuVuc(const string& maKV) const {
-    string target = Utils::toUpper(Utils::trim(maKV));
-    for (int i = 0; i < dsKhuVuc.size(); ++i) {
-        if (Utils::toUpper(dsKhuVuc[i].getMaKhuVuc()) == target) {
-            return dsKhuVuc[i].getTenKhuVuc();
-        }
-    }
-    return maKV;
-}
-
-string QuanLyThiSinh::getTenNganh(const string& maNganh) const {
-    string target = Utils::trim(maNganh);
-    for (int i = 0; i < dsNganh.size(); ++i) {
-        if (dsNganh[i].getMaNganh() == target) {
-            return dsNganh[i].getTenNganh();
-        }
-    }
-    return maNganh;
-}
-
-double QuanLyThiSinh::getDiemChuanNganh(const string& maNganh) const {
-    string target = Utils::trim(maNganh);
-    for (int i = 0; i < dsNganh.size(); ++i) {
-        if (dsNganh[i].getMaNganh() == target) {
-            return dsNganh[i].getDiemChuan();
-        }
-    }
-    return 20.0;
-}
-
-int QuanLyThiSinh::timViTriKhuVuc(const string& maKV) const {
-    string target = Utils::toUpper(Utils::trim(maKV));
-    for (int i = 0; i < dsKhuVuc.size(); ++i) {
-        if (Utils::toUpper(dsKhuVuc[i].getMaKhuVuc()) == target) return i;
-    }
-    return -1;
-}
-
-int QuanLyThiSinh::timViTriNganh(const string& maNganh) const {
-    string target = Utils::trim(maNganh);
-    for (int i = 0; i < dsNganh.size(); ++i) {
-        if (dsNganh[i].getMaNganh() == target) return i;
-    }
-    return -1;
-}
-
-int QuanLyThiSinh::timViTriTheoSBD(const string& sbd) const {
-    string target = Utils::toUpper(Utils::trim(sbd));
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (Utils::toUpper(dsThiSinh[i].getSoBaoDanh()) == target) return i;
-    }
-    return -1;
-}
-
-int QuanLyThiSinh::timViTriTheoMaTS(const string& maTS) const {
-    string target = Utils::toUpper(Utils::trim(maTS));
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (Utils::toUpper(dsThiSinh[i].getMaThiSinh()) == target) return i;
-    }
-    return -1;
-}
-
-int QuanLyThiSinh::timViTriTheoCMND(const string& cmnd) const {
-    string target = Utils::trim(cmnd);
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (dsThiSinh[i].getSoCMND() == target) return i;
-    }
-    return -1;
-}
-
-string QuanLyThiSinh::sinhMaThiSinhMoi() const {
+// Tự động sinh Số báo danh tăng dần (DUT001 -> DUT015...)
+string QuanLyThiSinh::sinhSoBaoDanhMoi() const {
     int maxId = 0;
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        string m = dsThiSinh[i].getMaThiSinh();
-        if (m.length() > 2 && m.substr(0, 2) == "TS") {
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        string sbd = dsThiSinh[i].getSoBaoDanh();
+        if (sbd.length() >= 4 && Utils::toUpper(sbd.substr(0, 3)) == "DUT") {
             try {
-                int val = stoi(m.substr(2));
-                if (val > maxId) maxId = val;
+                int num = stoi(sbd.substr(3));
+                if (num > maxId) maxId = num;
             } catch (...) {}
         }
     }
-    int newId = maxId + 1;
+    int nextId = maxId + 1;
     stringstream ss;
-    ss << "TS" << setfill('0') << setw(3) << newId;
+    ss << "DUT" << setfill('0') << setw(3) << nextId;
     return ss.str();
 }
 
-// Thêm thí sinh (Kiểm tra toàn vẹn CSDL)
-bool QuanLyThiSinh::themThiSinh(const ThiSinh& ts) {
-    if (timViTriTheoMaTS(ts.getMaThiSinh()) != -1) return false;
-    if (timViTriTheoSBD(ts.getSoBaoDanh()) != -1) return false;
-    if (timViTriTheoCMND(ts.getSoCMND()) != -1) return false;
+// Tìm vị trí theo Số báo danh
+int QuanLyThiSinh::timViTriTheoSBD(const string& sbd) const {
+    string target = Utils::toUpper(Utils::trim(sbd));
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        if (Utils::toUpper(dsThiSinh[i].getSoBaoDanh()) == target) {
+            return (int)i;
+        }
+    }
+    return -1;
+}
 
-    ThiSinh moi = ts;
-    moi.setDiemUuTien(getDiemUuTienTheoKhuVuc(moi.getMaKhuVuc()));
-    dsThiSinh.push_back(moi);
-    luuTatCaDuLieu();
+// Tìm vị trí theo Số CCCD
+int QuanLyThiSinh::timViTriTheoCCCD(const string& cccd) const {
+    string target = Utils::trim(cccd);
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        if (dsThiSinh[i].getSoCCCD() == target) {
+            return (int)i;
+        }
+    }
+    return -1;
+}
+
+// Tìm danh sách theo Họ tên
+Vector<ThiSinh> QuanLyThiSinh::timTheoTen(const string& ten) const {
+    Vector<ThiSinh> ketQua;
+    string target = Utils::trim(ten);
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        if (Utils::containsIgnoreCase(dsThiSinh[i].getHoTen(), target)) {
+            ketQua.push_back(dsThiSinh[i]);
+        }
+    }
+    return ketQua;
+}
+
+// Tìm danh sách theo Quê quán
+Vector<ThiSinh> QuanLyThiSinh::timTheoQueQuan(const string& que) const {
+    Vector<ThiSinh> ketQua;
+    string target = Utils::trim(que);
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        if (Utils::containsIgnoreCase(dsThiSinh[i].getQueQuan(), target)) {
+            ketQua.push_back(dsThiSinh[i]);
+        }
+    }
+    return ketQua;
+}
+
+// Thêm thí sinh mới
+bool QuanLyThiSinh::themThiSinh(const ThiSinh& ts) {
+    if (timViTriTheoSBD(ts.getSoBaoDanh()) != -1) return false;
+    if (timViTriTheoCCCD(ts.getSoCCCD()) != -1) return false;
+
+    dsThiSinh.push_back(ts);
+    luuDuLieu();
     return true;
 }
 
 // Cập nhật thông tin thí sinh
 bool QuanLyThiSinh::capNhatThiSinh(const ThiSinh& ts) {
-    int idx = timViTriTheoMaTS(ts.getMaThiSinh());
+    int idx = timViTriTheoSBD(ts.getSoBaoDanh());
     if (idx == -1) {
-        idx = timViTriTheoSBD(ts.getSoBaoDanh());
+        idx = timViTriTheoCCCD(ts.getSoCCCD());
     }
     if (idx == -1) return false;
 
-    // Kiểm tra trùng CMND với thí sinh khác
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (i != idx && dsThiSinh[i].getSoCMND() == ts.getSoCMND()) {
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        if ((int)i != idx && dsThiSinh[i].getSoCCCD() == ts.getSoCCCD()) {
             return false;
         }
     }
 
-    ThiSinh moi = ts;
-    moi.setDiemUuTien(getDiemUuTienTheoKhuVuc(moi.getMaKhuVuc()));
-    dsThiSinh[idx] = moi;
-    luuTatCaDuLieu();
+    dsThiSinh[idx] = ts;
+    luuDuLieu();
     return true;
 }
 
-// Xóa thí sinh
-bool QuanLyThiSinh::xoaThiSinh(const string& maTSHoacSBD) {
-    int idx = timViTriTheoMaTS(maTSHoacSBD);
+// Xóa thí sinh (Cascade delete)
+bool QuanLyThiSinh::xoaThiSinh(const string& sbdHoacCCCD) {
+    int idx = timViTriTheoSBD(sbdHoacCCCD);
     if (idx == -1) {
-        idx = timViTriTheoSBD(maTSHoacSBD);
+        idx = timViTriTheoCCCD(sbdHoacCCCD);
     }
     if (idx == -1) return false;
 
     dsThiSinh.erase(idx);
-    luuTatCaDuLieu();
-    return true;
-}
-
-// Cập nhật điểm chuẩn ngành
-bool QuanLyThiSinh::capNhatDiemChuanNganh(const string& maNganh, double diemChuanMoi) {
-    int idx = timViTriNganh(maNganh);
-    if (idx == -1) return false;
-    dsNganh[idx].setDiemChuan(diemChuanMoi);
-    luuTatCaDuLieu();
-    return true;
-}
-
-// Cập nhật chỉ tiêu ngành
-bool QuanLyThiSinh::capNhatChiTieuNganh(const string& maNganh, int chiTieuMoi) {
-    int idx = timViTriNganh(maNganh);
-    if (idx == -1) return false;
-    dsNganh[idx].setChiTieu(chiTieuMoi);
-    luuTatCaDuLieu();
+    luuDuLieu();
     return true;
 }
 
@@ -543,101 +354,224 @@ void QuanLyThiSinh::sapXepTheoTongDiemGiamDan() {
     dsThiSinh.sort(cmpTongDiemGiam);
 }
 
-void QuanLyThiSinh::sapXepTheoSBDTangDan() {
-    dsThiSinh.sort(cmpSBDTang);
-}
-
 void QuanLyThiSinh::sapXepTheoTenAZ() {
     dsThiSinh.sort(cmpTenAZ);
 }
 
-void QuanLyThiSinh::sapXepTheoNganh() {
-    dsThiSinh.sort(cmpNganh);
+void QuanLyThiSinh::sapXepTheoSBDTangDan() {
+    dsThiSinh.sort(cmpSBDTang);
 }
 
-// Nghiệp vụ thống kê & xét tuyển
-Vector<ThiSinh> QuanLyThiSinh::getDanhSachTrungTuyen(const string& maNganh) const {
-    Vector<ThiSinh> res;
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (!maNganh.empty() && dsThiSinh[i].getMaNganh() != maNganh) {
-            continue;
-        }
-        double dc = getDiemChuanNganh(dsThiSinh[i].getMaNganh());
-        if (dsThiSinh[i].xetTrungTuyen(dc)) {
-            res.push_back(dsThiSinh[i]);
+// Getters / Setters
+double QuanLyThiSinh::getDiemChuan() const { return diemChuanHienTai; }
+void QuanLyThiSinh::setDiemChuan(double dc) {
+    diemChuanHienTai = dc;
+    luuCauHinhHeThong(pathSystem);
+}
+string QuanLyThiSinh::getNamTuyenSinh() const { return namTuyenSinh; }
+void QuanLyThiSinh::setNamTuyenSinh(const string& nam) {
+    namTuyenSinh = nam;
+    luuCauHinhHeThong(pathSystem);
+}
+string QuanLyThiSinh::getTenTruong() const { return tenTruong; }
+
+// Lấy danh sách trúng tuyển
+Vector<ThiSinh> QuanLyThiSinh::getDanhSachTrungTuyen(double diemChuan) const {
+    Vector<ThiSinh> ketQua;
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        if (dsThiSinh[i].xetTrungTuyen(diemChuan)) {
+            ketQua.push_back(dsThiSinh[i]);
         }
     }
-    res.sort(cmpTongDiemGiam);
-    return res;
+    ketQua.sort(cmpTongDiemGiam);
+    return ketQua;
 }
 
+// Lấy danh sách thủ khoa kỳ thi
 Vector<ThiSinh> QuanLyThiSinh::getDanhSachThuKhoa() const {
-    Vector<ThiSinh> res;
-    if (dsThiSinh.empty()) return res;
+    Vector<ThiSinh> thuKhoaList;
+    if (dsThiSinh.empty()) return thuKhoaList;
 
     double maxDiem = dsThiSinh[0].tinhTongDiem();
-    for (int i = 1; i < dsThiSinh.size(); ++i) {
+    for (size_t i = 1; i < dsThiSinh.size(); ++i) {
         if (dsThiSinh[i].tinhTongDiem() > maxDiem) {
             maxDiem = dsThiSinh[i].tinhTongDiem();
         }
     }
 
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
         if (dsThiSinh[i].tinhTongDiem() == maxDiem) {
-            res.push_back(dsThiSinh[i]);
+            thuKhoaList.push_back(dsThiSinh[i]);
         }
     }
-    return res;
+    return thuKhoaList;
 }
 
-ThiSinh QuanLyThiSinh::getThuKhoaCuaNganh(const string& maNganh) const {
-    ThiSinh best;
-    double maxDiem = -1.0;
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (dsThiSinh[i].getMaNganh() == maNganh) {
-            if (dsThiSinh[i].tinhTongDiem() > maxDiem) {
-                maxDiem = dsThiSinh[i].tinhTongDiem();
-                best = dsThiSinh[i];
-            }
-        }
-    }
-    return best;
-}
-
-void QuanLyThiSinh::tinhThongKePhoDiem(int& kem, int& tb, int& kha, int& gioi, int& xuatSac) const {
-    kem = tb = kha = gioi = xuatSac = 0;
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
+// Thống kê phân bố phổ điểm
+void QuanLyThiSinh::tinhThongKePhoDiem(int& mucThap, int& mucTB, int& mucKha, int& mucCao, int& mucRatCao) const {
+    mucThap = mucTB = mucKha = mucCao = mucRatCao = 0;
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
         double tong = dsThiSinh[i].tinhTongDiem();
-        if (tong >= 27.0) xuatSac++;
-        else if (tong >= 24.0) gioi++;
-        else if (tong >= 21.0) kha++;
-        else if (tong >= 15.0) tb++;
-        else kem++;
+        if (tong >= 27.00) mucRatCao++;
+        else if (tong >= 24.00) mucCao++;
+        else if (tong >= 21.00) mucKha++;
+        else if (tong >= 15.00) mucTB++;
+        else mucThap++;
     }
 }
 
-int QuanLyThiSinh::demSoLuongDangKyTheoNganh(const string& maNganh) const {
-    int cnt = 0;
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (dsThiSinh[i].getMaNganh() == maNganh) cnt++;
-    }
-    return cnt;
-}
+// 6.1 Xuất báo cáo kết quả xét tuyển toàn trường (data/ketqua_xettuyen.txt)
+bool QuanLyThiSinh::xuatBaoCaoXetTuyen(const string& path, double diemChuan, const string& keyword) const {
+    ofstream fout(path);
+    if (!fout.is_open()) return false;
 
-int QuanLyThiSinh::demSoLuongTrungTuyenTheoNganh(const string& maNganh) const {
-    int cnt = 0;
-    double dc = getDiemChuanNganh(maNganh);
-    for (int i = 0; i < dsThiSinh.size(); ++i) {
-        if (dsThiSinh[i].getMaNganh() == maNganh && dsThiSinh[i].xetTrungTuyen(dc)) {
-            cnt++;
+    string kw = Utils::trim(keyword);
+    string kwLower = Utils::toLower(kw);
+
+    fout << "                                  " << tenTruong << "\n";
+    fout << "                                       BAO CAO KET QUA XET TUYEN DAI HOC\n";
+    fout << "                                             (Nam tuyen sinh: " << namTuyenSinh << ")\n";
+    fout << "                                        Diem chuan xet tuyen: " << fixed << setprecision(2) << diemChuan << " diem\n";
+    if (!kw.empty()) {
+        fout << "                                        Tu khoa tim kiem    : \"" << kw << "\"\n";
+    }
+    fout << "===================================================================================================================\n";
+    fout << " STT |   SBD   |    So CCCD   |      Ho va Ten      | Ngay Sinh |   Que Quan   | Toan |  Ly  | Hoa  | Tong | Ket Qua  |\n";
+    fout << "-------------------------------------------------------------------------------------------------------------------\n";
+
+    int soXetTuyen = 0;
+    int soTrungTuyen = 0;
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        const ThiSinh& ts = dsThiSinh[i];
+        if (!kwLower.empty()) {
+            bool match = Utils::containsIgnoreCase(ts.getSoBaoDanh(), kwLower) ||
+                         Utils::containsIgnoreCase(ts.getSoCCCD(), kwLower) ||
+                         Utils::containsIgnoreCase(ts.getHoTen(), kwLower) ||
+                         Utils::containsIgnoreCase(ts.getQueQuan(), kwLower);
+            if (!match) continue;
         }
+
+        soXetTuyen++;
+        bool pass = ts.xetTrungTuyen(diemChuan);
+        if (pass) soTrungTuyen++;
+
+        fout << " " << right << setw(3) << soXetTuyen << " | "
+             << left  << setw(7) << ts.getSoBaoDanh() << " | "
+             << left  << setw(12) << ts.getSoCCCD() << " | "
+             << left  << setw(19) << ts.getHoTen().substr(0, 19) << " | "
+             << left  << setw(10) << ts.getNgaySinh() << " | "
+             << left  << setw(12) << ts.getQueQuan().substr(0, 12) << " | "
+             << right << fixed << setprecision(2)
+             << setw(4) << ts.getDiemToan() << " | "
+             << setw(4) << ts.getDiemLy() << " | "
+             << setw(4) << ts.getDiemHoa() << " | "
+             << setw(4) << ts.tinhTongDiem() << " |"
+             << left << (pass ? "TRUNG TUYEN" : (ts.kiemTraDiemLiet() ? "Diem liet  " : "Khong dat  ")) << "\n";
     }
-    return cnt;
+
+    fout << "===================================================================================================================\n";
+    fout << "Tong so thi sinh bao cao : " << soXetTuyen << "\n";
+    double tiLe = (soXetTuyen == 0) ? 0.0 : ((double)soTrungTuyen * 100.0 / soXetTuyen);
+    fout << "So thi sinh trung tuyen  : " << soTrungTuyen << " (" << fixed << setprecision(1) << tiLe << "%)\n";
+    fout << "So thi sinh khong dat    : " << (soXetTuyen - soTrungTuyen) << " (" << fixed << setprecision(1) << (100.0 - tiLe) << "%)\n";
+
+    Vector<ThiSinh> dsTK = getDanhSachThuKhoa();
+    if (!dsTK.empty()) {
+        fout << "Thu khoa ky thi          : ";
+        for (size_t i = 0; i < dsTK.size(); ++i) {
+            fout << dsTK[i].getHoTen() << " (" << dsTK[i].getSoBaoDanh() << ")";
+            if (i + 1 < dsTK.size()) fout << ", ";
+        }
+        fout << " - Tong diem: " << fixed << setprecision(2) << dsTK[0].tinhTongDiem() << "\n";
+    }
+    fout << "===================================================================================================================\n";
+
+    fout.close();
+    return true;
 }
 
-Vector<ThiSinh>& QuanLyThiSinh::getDanhSachThiSinh() { return dsThiSinh; }
-const Vector<ThiSinh>& QuanLyThiSinh::getDanhSachThiSinh() const { return dsThiSinh; }
-Vector<KhuVuc>& QuanLyThiSinh::getDanhSachKhuVuc() { return dsKhuVuc; }
-const Vector<KhuVuc>& QuanLyThiSinh::getDanhSachKhuVuc() const { return dsKhuVuc; }
-Vector<NganhXetTuyen>& QuanLyThiSinh::getDanhSachNganh() { return dsNganh; }
-const Vector<NganhXetTuyen>& QuanLyThiSinh::getDanhSachNganh() const { return dsNganh; }
+// 6.2 Xuất báo cáo vinh danh thủ khoa riêng biệt (data/thukhoa.txt - Giống file driver_salary_statistics của mẫu)
+bool QuanLyThiSinh::xuatBaoCaoThuKhoa(const string& path) const {
+    ofstream fout(path);
+    if (!fout.is_open()) return false;
+
+    fout << "                                  " << tenTruong << "\n";
+    fout << "                                    BANG VINH DANH THU KHOA KY THI TUYEN SINH\n";
+    fout << "                                             (Nam tuyen sinh: " << namTuyenSinh << ")\n";
+    fout << "=========================================================================================================\n";
+    fout << " STT |   SBD   |    So CCCD   |       Ho va Ten      | Ngay Sinh |   Que Quan   | Toan |  Ly  | Hoa  | Tong  |\n";
+    fout << "---------------------------------------------------------------------------------------------------------\n";
+
+    Vector<ThiSinh> dsTK = getDanhSachThuKhoa();
+    for (size_t i = 0; i < dsTK.size(); ++i) {
+        const ThiSinh& ts = dsTK[i];
+        fout << " " << right << setw(3) << (i + 1) << " | "
+             << left  << setw(7) << ts.getSoBaoDanh() << " | "
+             << left  << setw(12) << ts.getSoCCCD() << " | "
+             << left  << setw(20) << ts.getHoTen().substr(0, 20) << " | "
+             << left  << setw(10) << ts.getNgaySinh() << " | "
+             << left  << setw(12) << ts.getQueQuan().substr(0, 12) << " | "
+             << right << fixed << setprecision(2)
+             << setw(4) << ts.getDiemToan() << " | "
+             << setw(4) << ts.getDiemLy() << " | "
+             << setw(4) << ts.getDiemHoa() << " | "
+             << setw(5) << ts.tinhTongDiem() << " |\n";
+    }
+    fout << "=========================================================================================================\n";
+    fout.close();
+    return true;
+}
+
+// 6.3 Xuất báo cáo phân tích phổ điểm (data/thongke_phodiem.txt - Giống file drivers_statistics của mẫu)
+bool QuanLyThiSinh::xuatBaoCaoPhoDiem(const string& path) const {
+    ofstream fout(path);
+    if (!fout.is_open()) return false;
+
+    int thap, tb, kha, cao, ratCao;
+    tinhThongKePhoDiem(thap, tb, kha, cao, ratCao);
+    size_t total = dsThiSinh.size();
+
+    fout << "                                  " << tenTruong << "\n";
+    fout << "                                       BANG PHAN TICH PHO DIEM THI\n";
+    fout << "                                             (Nam tuyen sinh: " << namTuyenSinh << ")\n";
+    fout << "=========================================================================================================\n";
+    fout << " STT |         Muc Diem Thi         | Khoang Tong Diem (3 Mon) | So Luong Thi Sinh |     Ty Le Phan Tram     |\n";
+    fout << "---------------------------------------------------------------------------------------------------------\n";
+
+    auto inDong = [&](int stt, const string& tenMuc, const string& khoang, int soLuong) {
+        double pct = total > 0 ? (soLuong * 100.0 / total) : 0.0;
+        fout << " " << right << setw(3) << stt << " | "
+             << left  << setw(28) << tenMuc << " | "
+             << left  << setw(24) << khoang << " | "
+             << right << setw(17) << soLuong << " | "
+             << right << fixed << setprecision(2) << setw(19) << pct << "% |\n";
+    };
+
+    inDong(1, "Muc diem Rat Cao (Xuat sac)", ">= 27.00 diem", ratCao);
+    inDong(2, "Muc diem Cao (Gioi)", "24.00 <= Diem < 27.00", cao);
+    inDong(3, "Muc diem Kha", "21.00 <= Diem < 24.00", kha);
+    inDong(4, "Muc diem Trung binh", "15.00 <= Diem < 21.00", tb);
+    inDong(5, "Muc diem Thap", "< 15.00 diem", thap);
+
+    fout << "=========================================================================================================\n";
+    fout << "Tong so thi sinh toan truong: " << total << "\n";
+    fout << "Diem chuan xet tuyen hien tai: " << fixed << setprecision(2) << diemChuanHienTai << " diem\n";
+    Vector<ThiSinh> dsTT = getDanhSachTrungTuyen(diemChuanHienTai);
+    fout << "So thi sinh dat diem chuan  : " << dsTT.size() << " ("
+         << fixed << setprecision(1) << (total > 0 ? (dsTT.size() * 100.0 / total) : 0.0) << "%)\n";
+    fout << "=========================================================================================================\n";
+
+    fout.close();
+    return true;
+}
+
+// Xuất đồng thời cả 3 báo cáo chuyên biệt
+bool QuanLyThiSinh::xuatTatCaBaoCao() const {
+    bool ok1 = xuatBaoCaoXetTuyen("data/ketqua_xettuyen.txt", diemChuanHienTai);
+    bool ok2 = xuatBaoCaoThuKhoa("data/thukhoa.txt");
+    bool ok3 = xuatBaoCaoPhoDiem("data/thongke_phodiem.txt");
+    return (ok1 && ok2 && ok3);
+}
+
+Vector<ThiSinh>& QuanLyThiSinh::getDanhSach() { return dsThiSinh; }
+const Vector<ThiSinh>& QuanLyThiSinh::getDanhSach() const { return dsThiSinh; }
