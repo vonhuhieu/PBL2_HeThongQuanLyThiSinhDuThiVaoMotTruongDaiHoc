@@ -1,4 +1,4 @@
-#include "../include/QuanLyThiSinh.h"
+﻿#include "../include/QuanLyThiSinh.h"
 #include "../include/ConsoleUI.h"
 #include "../include/Utils.h"
 #include "../include/AppGUI.h"
@@ -8,7 +8,7 @@
 
 using namespace std;
 
-// In bảng danh sách thí sinh
+// In báº£ng danh sÃ¡ch thÃ­ sinh
 static void inBangThiSinh(const Vector<ThiSinh>& ds, const QuanLyThiSinh& ql, bool hienThiKetQua = false) {
     if (ds.empty()) {
         ConsoleUI::printWarning("Danh sach hien tai dang trong!");
@@ -70,7 +70,7 @@ static void inBangThiSinh(const Vector<ThiSinh>& ds, const QuanLyThiSinh& ql, bo
     cout << "  Tong cong: " << ds.size() << " thi sinh.\n";
 }
 
-// Chức năng 1: Hiển thị toàn bộ danh sách
+// Chá»©c nÄƒng 1: Hiá»ƒn thá»‹ toÃ n bá»™ danh sÃ¡ch
 static void chucNangHienThi(QuanLyThiSinh& ql) {
     ConsoleUI::clearScreen();
     ConsoleUI::printTitle("TOAN BO DANH SACH THI SINH DU THI");
@@ -78,7 +78,7 @@ static void chucNangHienThi(QuanLyThiSinh& ql) {
     ConsoleUI::pauseScreen();
 }
 
-// Chức năng 2: Thêm thí sinh mới
+// Chá»©c nÄƒng 2: ThÃªm thÃ­ sinh má»›i
 static void chucNangThem(QuanLyThiSinh& ql) {
     ConsoleUI::clearScreen();
     ConsoleUI::printTitle("TIEP NHAN HO SO THI SINH MOI");
@@ -163,7 +163,7 @@ static void chucNangThem(QuanLyThiSinh& ql) {
     ConsoleUI::pauseScreen();
 }
 
-// Chức năng 3: Sửa thông tin thí sinh
+// Chá»©c nÄƒng 3: Sá»­a thÃ´ng tin thÃ­ sinh
 static void chucNangSua(QuanLyThiSinh& ql) {
     ConsoleUI::clearScreen();
     ConsoleUI::printTitle("CAP NHAT THONG TIN THI SINH");
@@ -233,7 +233,7 @@ static void chucNangSua(QuanLyThiSinh& ql) {
     ConsoleUI::pauseScreen();
 }
 
-// Chức năng 4: Xóa thí sinh
+// Chá»©c nÄƒng 4: XÃ³a thÃ­ sinh
 static void chucNangXoa(QuanLyThiSinh& ql) {
     ConsoleUI::clearScreen();
     ConsoleUI::printTitle("XOA HO SO THI SINH (CASCADE DELETE)");
@@ -272,7 +272,7 @@ static void chucNangXoa(QuanLyThiSinh& ql) {
     ConsoleUI::pauseScreen();
 }
 
-// Chức năng 5: Menu tìm kiếm
+// Chá»©c nÄƒng 5: Menu tÃ¬m kiáº¿m
 static void chucNangTimKiem(QuanLyThiSinh& ql) {
     const string options[] = {
         "Tim kiem chinh xac theo So Bao Danh (SBD)",
@@ -319,7 +319,7 @@ static void chucNangTimKiem(QuanLyThiSinh& ql) {
             ConsoleUI::pauseScreen();
         } else if (choice == 3) {
             ConsoleUI::clearScreen();
-            cout << "  Nhap Quê quán cần tìm: ";
+            cout << "  Nhap QuÃª quÃ¡n cáº§n tÃ¬m: ";
             string que; getline(cin, que);
             Vector<ThiSinh> kq = ql.timTheoQueQuan(que);
             inBangThiSinh(kq, ql, true);
@@ -330,7 +330,7 @@ static void chucNangTimKiem(QuanLyThiSinh& ql) {
     }
 }
 
-// Chức năng 6: Menu sắp xếp
+// Chá»©c nÄƒng 6: Menu sáº¯p xáº¿p
 static void chucNangSapXep(QuanLyThiSinh& ql) {
     const string options[] = {
         "Sap xep theo Tong diem 3 mon (Giam dan)",
@@ -362,7 +362,7 @@ static void chucNangSapXep(QuanLyThiSinh& ql) {
     }
 }
 
-// Chức năng 7: Menu xét tuyển & Thống kê
+// Chá»©c nÄƒng 7: Menu xÃ©t tuyá»ƒn & Thá»‘ng kÃª
 static void chucNangXetTuyen(QuanLyThiSinh& ql) {
     const string options[] = {
         "Thiet lap Diem chuan xet tuyen cua truong",
@@ -401,7 +401,7 @@ static void chucNangXetTuyen(QuanLyThiSinh& ql) {
                 ConsoleUI::printWarning("Chua co thi sinh nao!");
             } else {
                 ConsoleUI::setColor(ConsoleColor::COLOR_YELLOW);
-                cout << "\n  ★ ★ ★ CHUC MUNG THU KHOA ★ ★ ★\n\n";
+                cout << "\n  â˜… â˜… â˜… CHUC MUNG THU KHOA â˜… â˜… â˜…\n\n";
                 ConsoleUI::resetColor();
                 for (size_t i = 0; i < dsTK.size(); ++i) {
                     cout << "  - Ho va Ten : " << dsTK[i].getHoTen() << "\n"
@@ -455,7 +455,7 @@ static void chucNangXetTuyen(QuanLyThiSinh& ql) {
     }
 }
 
-// Chức năng 8: Xuất báo cáo kết quả xét tuyển
+// Chá»©c nÄƒng 8: Xuáº¥t bÃ¡o cÃ¡o káº¿t quáº£ xÃ©t tuyá»ƒn
 static void chucNangXuatBaoCao(QuanLyThiSinh& ql) {
     ConsoleUI::clearScreen();
     ConsoleUI::printTitle("XUAT BAO CAO KET QUA XET TUYEN RA TEP");
@@ -470,7 +470,7 @@ static void chucNangXuatBaoCao(QuanLyThiSinh& ql) {
     ConsoleUI::pauseScreen();
 }
 
-// Chế độ Console hoàn chỉnh
+// Cháº¿ Ä‘á»™ Console hoÃ n chá»‰nh
 static int runConsoleMode(QuanLyThiSinh& ql) {
     ConsoleUI::setupConsole();
 
@@ -507,14 +507,28 @@ static int runConsoleMode(QuanLyThiSinh& ql) {
 }
 
 int main(int argc, char* argv[]) {
-    // Khởi tạo hệ quản trị CSDL quan hệ và nghiệp vụ tuyển sinh
+    // Khá»Ÿi táº¡o há»‡ quáº£n trá»‹ CSDL quan há»‡ vÃ  nghiá»‡p vá»¥ tuyá»ƒn sinh
     QuanLyThiSinh ql("data");
 
-    // Nếu người dùng chạy với tham số --console, chuyển sang Console
+    // Cháº¿ Ä‘á»™ kiá»ƒm thá»­ tá»± Ä‘á»™ng khÃ´ng giao diá»‡n
+    if (argc > 1 && string(argv[1]) == "--test") {
+        cout << "=== PBL2 MySQL Test Mode ===" << endl;
+        cout << "MySQL Connected: " << (ql.isMySQLConnected() ? "YES" : "NO (Offline fallback active)") << endl;
+        cout << "So luong thi sinh: " << ql.getDanhSach().size() << endl;
+        cout << "So luong tinh thanh: " << ql.getDanhSachTinhThanh().size() << endl;
+        cout << "So luong gioi tinh: " << ql.getDanhSachGioiTinh().size() << endl;
+        cout << "Diem chuan: " << ql.getDiemChuan() << endl;
+        cout << "Diem liet: " << ql.getDiemLiet() << endl;
+        bool ok = ql.xuatTatCaBaoCao();
+        cout << "Xuat bao cao: " << (ok ? "THANH CONG" : "THAT BAI") << endl;
+        return 0;
+    }
+
+    // Náº¿u ngÆ°á»i dÃ¹ng cháº¡y vá»›i tham sá»‘ --console, chuyá»ƒn sang Console
     if (argc > 1 && string(argv[1]) == "--console") {
         return runConsoleMode(ql);
     }
 
-    // Mặc định: Khởi chạy Giao diện Đồ họa Hiện đại (Dear ImGui DirectX 9)
+    // Máº·c Ä‘á»‹nh: Khá»Ÿi cháº¡y Giao diá»‡n Äá»“ há»a Hiá»‡n Ä‘áº¡i (Dear ImGui DirectX 9)
     return AppGUI::run(ql);
 }

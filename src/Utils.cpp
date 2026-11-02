@@ -1,14 +1,14 @@
 #include "../include/Utils.h"
-#include <sstream>
-#include <cctype>
 #include <algorithm>
+#include <cctype>
+#include <sstream>
+#include <vector>
 
 namespace Utils {
-
     string trim(const string& str) {
-        size_t first = str.find_first_not_of(" \t\n\r");
+        size_t first = str.find_first_not_of(" \t\r\n");
         if (first == string::npos) return "";
-        size_t last = str.find_last_not_of(" \t\n\r");
+        size_t last = str.find_last_not_of(" \t\r\n");
         return str.substr(first, (last - first + 1));
     }
 
@@ -21,51 +21,41 @@ namespace Utils {
         string result = "";
 
         while (ss >> word) {
-            // Chuyển toàn bộ ký tự sang chữ thường
             for (size_t i = 0; i < word.length(); ++i) {
-                word[i] = static_cast<char>(tolower(static_cast<unsigned char>(word[i])));
+                word[i] = tolower(static_cast<unsigned char>(word[i]));
             }
-            // Viết hoa chữ cái đầu tiên
             if (!word.empty()) {
-                word[0] = static_cast<char>(toupper(static_cast<unsigned char>(word[0])));
+                word[0] = toupper(static_cast<unsigned char>(word[0]));
             }
-            if (!result.empty()) {
-                result += " ";
-            }
+            if (!result.empty()) result += " ";
             result += word;
         }
+
         return result;
     }
 
     string toLower(const string& str) {
         string res = str;
-        for (char& c : res) {
-            c = static_cast<char>(tolower(static_cast<unsigned char>(c)));
-        }
+        transform(res.begin(), res.end(), res.begin(),
+                  [](unsigned char c) { return tolower(c); });
         return res;
     }
 
     string toUpper(const string& str) {
         string res = str;
-        for (char& c : res) {
-            c = static_cast<char>(toupper(static_cast<unsigned char>(c)));
-        }
+        transform(res.begin(), res.end(), res.begin(),
+                  [](unsigned char c) { return toupper(c); });
         return res;
     }
 
     bool containsIgnoreCase(const string& source, const string& target) {
-        string sLower = toLower(source);
-        string tLower = toLower(target);
-        return (sLower.find(tLower) != string::npos);
-    }
-
-    static bool laNamNhuan(int nam) {
-        return (nam % 400 == 0) || (nam % 4 == 0 && nam % 100 != 0);
+        string srcLower = toLower(source);
+        string tgtLower = toLower(target);
+        return srcLower.find(tgtLower) != string::npos;
     }
 
     bool kiemTraCCCD(const string& cccd) {
         string trimmed = trim(cccd);
-        // CCCD chuẩn quốc gia bắt buộc đúng 12 chữ số
         if (trimmed.length() != 12) return false;
         for (char c : trimmed) {
             if (!isdigit(static_cast<unsigned char>(c))) return false;
@@ -73,9 +63,12 @@ namespace Utils {
         return true;
     }
 
+    static bool laNamNhuan(int year) {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+    }
+
     bool kiemTraNgaySinh(const string& dateStr) {
         string s = trim(dateStr);
-        // Định dạng hợp lệ: dd/mm/yyyy (độ dài đúng 10 ký tự)
         if (s.length() != 10) return false;
         if (s[2] != '/' || s[5] != '/') return false;
 
@@ -84,12 +77,11 @@ namespace Utils {
             if (!isdigit(static_cast<unsigned char>(s[i]))) return false;
         }
 
-        int d = (s[0] - '0') * 10 + (s[1] - '0');
-        int m = (s[3] - '0') * 10 + (s[4] - '0');
-        int y = (s[6] - '0') * 1000 + (s[7] - '0') * 100 + 
-                (s[8] - '0') * 10 + (s[9] - '0');
+        int d = stoi(s.substr(0, 2));
+        int m = stoi(s.substr(3, 2));
+        int y = stoi(s.substr(6, 4));
 
-        if (y < 1970 || y > 2020) return false;
+        if (y < 1900 || y > 2026) return false;
         if (m < 1 || m > 12) return false;
 
         int ngayTrongThang[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -117,7 +109,7 @@ namespace Utils {
 
     bool kiemTraGioiTinh(const string& gt) {
         string s = toLower(trim(gt));
-        return (s == "nam" || s == "nu");
+        return (s == "nam" || s == "nu" || s == "khac");
     }
 
     bool tachKeyValue(const string& line, string& key, string& value) {
@@ -127,5 +119,25 @@ namespace Utils {
         key = trim(line.substr(0, colonPos));
         value = trim(line.substr(colonPos + 1));
         return (!key.empty());
+    }
+
+    double toDouble(const string& str, double defVal) {
+        string s = trim(str);
+        if (s.empty()) return defVal;
+        try {
+            return stod(s);
+        } catch (...) {
+            return defVal;
+        }
+    }
+
+    int toInt(const string& str, int defVal) {
+        string s = trim(str);
+        if (s.empty()) return defVal;
+        try {
+            return stoi(s);
+        } catch (...) {
+            return defVal;
+        }
     }
 }

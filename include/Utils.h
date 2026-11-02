@@ -38,6 +38,10 @@ namespace Utils {
 
     // Tách dòng văn bản dạng "Key: Value" thành 2 phần key và value (phục vụ đọc CSDL)
     bool tachKeyValue(const string& line, string& key, string& value);
+
+    // Chuyển đổi an toàn chuỗi sang double / int
+    double toDouble(const string& str, double defVal = 0.0);
+    int toInt(const string& str, int defVal = 0);
 }
 
 #endif // UTILS_H

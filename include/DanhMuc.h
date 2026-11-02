@@ -15,7 +15,7 @@ struct TinhThanh {
     string loai;    // Phân loại: "Thanh pho truc thuoc Trung uong" hoặc "Tinh truc thuoc"
 
     TinhThanh() : ma(""), ten(""), loai("") {}
-    TinhThanh(const string& m, const string& t, const string& l)
+    TinhThanh(const string& m, const string& t, const string& l = "Tinh")
         : ma(m), ten(t), loai(l) {}
 
     bool operator==(const TinhThanh& other) const {
@@ -33,7 +33,7 @@ struct GioiTinh {
     string moTa;    // Mô tả chi tiết
 
     GioiTinh() : ma(""), ten(""), moTa("") {}
-    GioiTinh(const string& m, const string& t, const string& desc)
+    GioiTinh(const string& m, const string& t, const string& desc = "")
         : ma(m), ten(t), moTa(desc) {}
 
     bool operator==(const GioiTinh& other) const {

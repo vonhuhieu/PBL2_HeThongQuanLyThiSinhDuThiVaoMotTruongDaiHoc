@@ -5,27 +5,26 @@
 #include "ThiSinh.h"
 #include "DanhMuc.h"
 #include "Constants.h"
+#include "MySQLConnector.h"
 #include <string>
 
 using namespace std;
 
 /**
  * @brief Lớp Quản trị hệ thống Cơ sở dữ liệu và Nghiệp vụ tuyển sinh Đại học
- * Áp dụng mô hình Cơ sở dữ liệu quan hệ Class Table Inheritance (3NF):
- * - data/tinhthanh.txt: Bảng danh mục TỈNH / THÀNH PHỐ (PK: ma)
- * - data/gioitinh.txt: Bảng danh mục GIỚI TÍNH (PK: ma)
- * - data/nguoi.txt: Bảng thực thể cha NGƯỜI (PK: soCCCD, FK: queQuan -> tinh_thanh, FK: gioiTinh -> gioi_tinh)
- * - data/thisinh.txt: Bảng thực thể con THÍ SINH (PK: soBaoDanh, FK: soCCCD -> nguoi)
- * - data/system.txt: Tệp cấu hình hệ thống (Điểm chuẩn, Điểm liệt, Năm tuyển sinh, Trường)
- * - data/ketqua_xettuyen.txt: Báo cáo kết quả trúng tuyển dạng bảng
- * - data/thukhoa.txt: Báo cáo vinh danh thủ khoa
- * - data/thongke_phodiem.txt: Báo cáo phân tích phổ điểm
+ * Kiến trúc lai (Hybrid Architecture):
+ * 1. MySQL Engine (Laragon 8.4): Quản trị cơ sở dữ liệu quan hệ 5 bảng 3NF
+ * 2. In-Memory Vector Engine: Cấu trúc dữ liệu mảng động tự cài đặt (DSA & OOP)
+ * 3. File System Cache: Bộ đệm tệp tin sao lưu đa tệp (nguoi.txt, thisinh.txt, system.txt...)
  */
 class QuanLyThiSinh {
 private:
     Vector<ThiSinh> dsThiSinh;       // Danh sách thí sinh hợp nhất in-memory
     Vector<TinhThanh> dsTinhThanh;   // Danh mục tỉnh / thành phố (34 tỉnh thành)
     Vector<GioiTinh> dsGioiTinh;     // Danh mục giới tính (Nam, Nu, Khac)
+
+    MySQLConnector db;               // Bộ kết nối MySQL Database Server
+    bool suDungMySQL;                // Trạng thái ưu tiên MySQL
 
     string pathNguoi;                // data/nguoi.txt
     string pathThiSinh;              // data/thisinh.txt
@@ -45,7 +44,16 @@ public:
     QuanLyThiSinh(const string& dirData = "data");
     ~QuanLyThiSinh();
 
-    // 1. Quản lý đọc / ghi CSDL quan hệ đa tệp (Key - Value)
+    // 0. Quản lý kết nối MySQL
+    bool ketNoiMySQL();
+    void ngatKetNoiMySQL();
+    bool isMySQLConnected() const;
+    MySQLConnector& getDB();
+    const MySQLConnector& getDB() const;
+    bool dongBoTuMySQL();
+    bool dongBoLenMySQL();
+
+    // 1. Quản lý đọc / ghi CSDL quan hệ đa tệp (Key - Value) & MySQL
     bool docDuLieu();
     bool luuDuLieu() const;
     bool docCauHinhHeThong(const string& path = "data/system.txt");
@@ -74,7 +82,7 @@ public:
     bool kiemTraHopLeQueQuan(const string& maHoacTen) const;
     bool kiemTraHopLeGioiTinh(const string& maHoacTen) const;
 
-    // 3. Nghiệp vụ CRUD Thí sinh (Có kiểm tra ràng buộc toàn vẹn)
+    // 3. Nghiệp vụ CRUD Thí sinh (Đồng bộ đồng thời Memory, MySQL & File)
     bool themThiSinh(const ThiSinh& ts);
     bool capNhatThiSinh(const ThiSinh& ts);
     bool xoaThiSinh(const string& sbdHoacCCCD);

@@ -1,4 +1,4 @@
-#include "../include/AppGUI.h"
+﻿#include "../include/AppGUI.h"
 #include "../include/Utils.h"
 #include "../include/Constants.h"
 #include "../include/DanhMuc.h"
@@ -401,8 +401,23 @@ int AppGUI::run(QuanLyThiSinh& ql) {
             ImGui::TextColored(ImVec4(0.35f, 0.75f, 1.0f, 1.0f), "%s", ql.getTenTruong().c_str());
             ImGui::Separator();
             ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.35f, 1.0f), "PBL2 (DE TAI 24): HE THONG QUAN LY THI SINH TUYEN SINH DAI HOC");
-            ImGui::SameLine(ImGui::GetWindowWidth() - 360);
-            ImGui::TextColored(ImVec4(0.70f, 0.80f, 0.90f, 1.0f), "[ CSDL Quan He 3NF 5 Bang + Dear ImGui ]");
+            if (ql.isMySQLConnected()) {
+                ImGui::SameLine(ImGui::GetWindowWidth() - 460);
+                ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "[ * MySQL 8.4: Connected ]");
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(0.70f, 0.80f, 0.90f, 1.0f), "[ 3NF 5 Bang ]");
+            } else {
+                ImGui::SameLine(ImGui::GetWindowWidth() - 480);
+                ImGui::TextColored(ImVec4(1.0f, 0.35f, 0.35f, 1.0f), "[ o MySQL: Offline ]");
+                ImGui::SameLine();
+                if (ImGui::SmallButton("Ket noi lai##Hdr")) {
+                    if (ql.ketNoiMySQL()) {
+                        ql.dongBoTuMySQL();
+                    }
+                }
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(0.70f, 0.80f, 0.90f, 1.0f), "[ Cache File ]");
+            }
         }
         ImGui::EndChild();
         ImGui::PopStyleColor();
@@ -1198,7 +1213,40 @@ int AppGUI::run(QuanLyThiSinh& ql) {
             if (ImGui::BeginTabItem("  5. Luu tru & Xuat Bao cao  ")) {
                 ImGui::Spacing();
 
-                ImGui::Text("Chuc nang quan tri he thong CSDL da tep (Key - Value):");
+                ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "Quan tri He quan tri Co so Du lieu MySQL (Laragon):");
+                ImGui::Spacing();
+                if (ql.isMySQLConnected()) {
+                    ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "Trang thai: Da ket noi CSDL `pbl2_tuyensinh` (Host: 127.0.0.1:3306 - MySQL 8.4)");
+                    if (ImGui::Button("[ Dong bo toan bo du lieu len MySQL ]", ImVec2(310, 34))) {
+                        if (ql.dongBoLenMySQL()) {
+                            showToast = true;
+                            toastMsg = "Da dong bo toan bo du lieu len MySQL thanh cong!";
+                        }
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("[ Tai du lieu tu MySQL ve Bo nho / Cache ]", ImVec2(330, 34))) {
+                        if (ql.dongBoTuMySQL()) {
+                            showToast = true;
+                            toastMsg = "Da tai du lieu tu MySQL ve bo nho va cache thanh cong!";
+                        }
+                    }
+                } else {
+                    ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "Trang thai: Chua ket noi MySQL Server (Vui long khoi dong Laragon / MySQL)");
+                    if (ImGui::Button("[ Ket noi lai MySQL Server ]", ImVec2(240, 34))) {
+                        if (ql.ketNoiMySQL()) {
+                            ql.dongBoTuMySQL();
+                            showToast = true;
+                            toastMsg = "Ket noi MySQL thanh cong!";
+                        } else {
+                            showToast = true;
+                            toastMsg = "Ket noi MySQL that bai! Kiem tra Laragon da chay chua.";
+                        }
+                    }
+                }
+                ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::Spacing();
+                ImGui::Text("Chuc nang quan tri sao luu he thong CSDL da tep (Key - Value):");
                 ImGui::Spacing();
 
                 if (ImGui::Button("[ Luu Toan Bo CSDL (nguoi.txt, thisinh.txt, tinhthanh.txt, gioitinh.txt, system.txt) ]", ImVec2(480, 36))) {
