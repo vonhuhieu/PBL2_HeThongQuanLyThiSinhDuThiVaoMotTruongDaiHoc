@@ -35,9 +35,11 @@ double ThiSinh::tinhTongDiem() const {
     return diemToan + diemLy + diemHoa;
 }
 
-// Kiểm tra điểm liệt (điểm môn thi <= 1.00)
+// Kiểm tra điểm liệt (sử dụng hằng số AdmissionConst::DIEM_LIET)
 bool ThiSinh::kiemTraDiemLiet() const {
-    return (diemToan <= 1.00 || diemLy <= 1.00 || diemHoa <= 1.00);
+    return (diemToan <= AdmissionConst::DIEM_LIET || 
+            diemLy <= AdmissionConst::DIEM_LIET || 
+            diemHoa <= AdmissionConst::DIEM_LIET);
 }
 
 // Xét tuyển theo điểm chuẩn chung của kỳ thi

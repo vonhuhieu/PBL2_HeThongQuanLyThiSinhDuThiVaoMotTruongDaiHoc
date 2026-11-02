@@ -2,6 +2,7 @@
 #define THISINH_H
 
 #include "Nguoi.h"
+#include "Constants.h"
 #include <string>
 
 /**

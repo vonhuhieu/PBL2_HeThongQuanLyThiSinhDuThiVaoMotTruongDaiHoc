@@ -2,19 +2,19 @@
 So CCCD: 012345678901
 Ho va Ten: Vo Nhu Hieu
 Ngay Sinh: 04/03/2003
-Que Quan: TP. Da Nang
-Gioi Tinh: Nam
+Que Quan: 48
+Gioi Tinh: NAM
 ---
 So CCCD: 012345678902
 Ho va Ten: Vo Huy Tuong
 Ngay Sinh: 27/07/2009
-Que Quan: TP. Da Nang
-Gioi Tinh: Nam
+Que Quan: 48
+Gioi Tinh: NAM
 ---
 So CCCD: 012345678903
 Ho va Ten: Nguyen Thi Nhat Vy
 Ngay Sinh: 10/09/2005
-Que Quan: Quang Ngai
-Gioi Tinh: Nu
+Que Quan: 51
+Gioi Tinh: NU
 ---
 ====

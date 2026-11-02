@@ -131,7 +131,4 @@ Ma: 92
 Ten: TP. Can Tho
 Loai: Thanh pho truc thuoc Trung uong
 ---
-Ma: 96
-Ten: Ca Mau
-Loai: Tinh
 ====

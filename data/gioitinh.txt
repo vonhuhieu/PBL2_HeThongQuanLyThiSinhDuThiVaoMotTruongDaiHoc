@@ -1,0 +1,14 @@
+#GIOITINH
+Ma: NAM
+Ten: Nam
+Mo Ta: Nam gioi
+---
+Ma: NU
+Ten: Nu
+Mo Ta: Nu gioi
+---
+Ma: KHAC
+Ten: Khac
+Mo Ta: Gioi tinh khac
+---
+====

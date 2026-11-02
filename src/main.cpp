@@ -9,7 +9,7 @@
 using namespace std;
 
 // In bảng danh sách thí sinh
-static void inBangThiSinh(const Vector<ThiSinh>& ds, double diemChuan = 22.0, bool hienThiKetQua = false) {
+static void inBangThiSinh(const Vector<ThiSinh>& ds, const QuanLyThiSinh& ql, bool hienThiKetQua = false) {
     if (ds.empty()) {
         ConsoleUI::printWarning("Danh sach hien tai dang trong!");
         return;
@@ -37,13 +37,15 @@ static void inBangThiSinh(const Vector<ThiSinh>& ds, double diemChuan = 22.0, bo
 
     for (size_t i = 0; i < ds.size(); ++i) {
         const ThiSinh& ts = ds[i];
+        string tenQue = ql.layTenTinhThanh(ts.getQueQuan());
+        string tenGT  = ql.layTenGioiTinh(ts.getGioiTinh());
         cout << "  " << right << setw(3) << (i + 1) << "  "
              << left  << setw(9) << ts.getSoBaoDanh()
              << setw(14) << ts.getSoCCCD()
              << setw(22) << ts.getHoTen().substr(0, 20)
              << setw(12) << ts.getNgaySinh()
-             << setw(16) << ts.getQueQuan().substr(0, 14)
-             << setw(6)  << ts.getGioiTinh()
+             << setw(16) << tenQue.substr(0, 14)
+             << setw(6)  << tenGT
              << right << fixed << setprecision(2)
              << setw(6) << ts.getDiemToan()
              << setw(6) << ts.getDiemLy()
@@ -51,13 +53,13 @@ static void inBangThiSinh(const Vector<ThiSinh>& ds, double diemChuan = 22.0, bo
              << setw(7) << ts.tinhTongDiem();
 
         if (hienThiKetQua) {
-            bool pass = ts.xetTrungTuyen(diemChuan);
+            bool pass = ts.xetTrungTuyen(ql.getDiemChuan());
             if (pass) {
                 ConsoleUI::setColor(ConsoleColor::COLOR_GREEN);
-                cout << "   " << left << setw(14) << "TRUNG TUYEN";
+                cout << "   " << left << setw(14) << AdmissionConst::KET_QUA_TRUNG_TUYEN;
             } else {
                 ConsoleUI::setColor(ConsoleColor::COLOR_RED);
-                cout << "   " << left << setw(14) << (ts.kiemTraDiemLiet() ? "Diem liet" : "Khong dat");
+                cout << "   " << left << setw(14) << (ts.kiemTraDiemLiet() ? "Diem liet" : AdmissionConst::KET_QUA_KHONG_DAT);
             }
             ConsoleUI::resetColor();
         }
@@ -72,7 +74,7 @@ static void inBangThiSinh(const Vector<ThiSinh>& ds, double diemChuan = 22.0, bo
 static void chucNangHienThi(QuanLyThiSinh& ql) {
     ConsoleUI::clearScreen();
     ConsoleUI::printTitle("TOAN BO DANH SACH THI SINH DU THI");
-    inBangThiSinh(ql.getDanhSach(), ql.getDiemChuan(), false);
+    inBangThiSinh(ql.getDanhSach(), ql, false);
     ConsoleUI::pauseScreen();
 }
 
@@ -130,16 +132,13 @@ static void chucNangThem(QuanLyThiSinh& ql) {
         return;
     }
 
-    cout << "  [5/8] Nhap Que quan (Tinh / Thanh pho)  : ";
+    cout << "  [5/8] Nhap Que quan (Ma hoac Ten tinh)  : ";
     getline(cin, que);
-    que = Utils::chuanHoaTen(que);
+    que = ql.layMaTinhThanh(que);
 
-    cout << "  [6/8] Nhap Gioi tinh (Nam / Nu)         : ";
+    cout << "  [6/8] Nhap Gioi tinh (NAM / NU / KHAC)  : ";
     getline(cin, gt);
-    gt = Utils::chuanHoaTen(gt);
-    if (!Utils::kiemTraGioiTinh(gt)) {
-        gt = "Nam";
-    }
+    gt = ql.layMaGioiTinh(gt);
 
     cout << "  [7/8] Nhap diem thi mon Toan (0 - 10)   : ";
     cin >> toan;
@@ -293,7 +292,7 @@ static void chucNangTimKiem(QuanLyThiSinh& ql) {
             if (idx != -1) {
                 Vector<ThiSinh> motTS;
                 motTS.push_back(ql.getDanhSach()[idx]);
-                inBangThiSinh(motTS, ql.getDiemChuan(), true);
+                inBangThiSinh(motTS, ql, true);
             } else {
                 ConsoleUI::printError("Khong tim thay thi sinh co SBD nay!");
             }
@@ -306,7 +305,7 @@ static void chucNangTimKiem(QuanLyThiSinh& ql) {
             if (idx != -1) {
                 Vector<ThiSinh> motTS;
                 motTS.push_back(ql.getDanhSach()[idx]);
-                inBangThiSinh(motTS, ql.getDiemChuan(), true);
+                inBangThiSinh(motTS, ql, true);
             } else {
                 ConsoleUI::printError("Khong tim thay thi sinh co so CCCD nay!");
             }
@@ -316,14 +315,14 @@ static void chucNangTimKiem(QuanLyThiSinh& ql) {
             cout << "  Nhap Ho ten (hoac tu khoa can tim): ";
             string ten; getline(cin, ten);
             Vector<ThiSinh> kq = ql.timTheoTen(ten);
-            inBangThiSinh(kq, ql.getDiemChuan(), true);
+            inBangThiSinh(kq, ql, true);
             ConsoleUI::pauseScreen();
         } else if (choice == 3) {
             ConsoleUI::clearScreen();
             cout << "  Nhap Quê quán cần tìm: ";
             string que; getline(cin, que);
             Vector<ThiSinh> kq = ql.timTheoQueQuan(que);
-            inBangThiSinh(kq, ql.getDiemChuan(), true);
+            inBangThiSinh(kq, ql, true);
             ConsoleUI::pauseScreen();
         } else {
             return;
@@ -345,17 +344,17 @@ static void chucNangSapXep(QuanLyThiSinh& ql) {
         if (choice == 0) {
             ql.sapXepTheoTongDiemGiamDan();
             ConsoleUI::printSuccess("Da sap xep danh sach theo Tong diem giam dan!");
-            inBangThiSinh(ql.getDanhSach(), ql.getDiemChuan(), true);
+            inBangThiSinh(ql.getDanhSach(), ql, true);
             ConsoleUI::pauseScreen();
         } else if (choice == 1) {
             ql.sapXepTheoTenAZ();
             ConsoleUI::printSuccess("Da sap xep danh sach theo Ten thi sinh A -> Z!");
-            inBangThiSinh(ql.getDanhSach(), ql.getDiemChuan(), false);
+            inBangThiSinh(ql.getDanhSach(), ql, false);
             ConsoleUI::pauseScreen();
         } else if (choice == 2) {
             ql.sapXepTheoSBDTangDan();
             ConsoleUI::printSuccess("Da sap xep danh sach theo So Bao Danh tang dan!");
-            inBangThiSinh(ql.getDanhSach(), ql.getDiemChuan(), false);
+            inBangThiSinh(ql.getDanhSach(), ql, false);
             ConsoleUI::pauseScreen();
         } else {
             return;
@@ -392,7 +391,7 @@ static void chucNangXetTuyen(QuanLyThiSinh& ql) {
             ConsoleUI::printTitle("DANH SACH THI SINH TRUNG TUYEN");
             cout << "  (Diem chuan: " << fixed << setprecision(2) << ql.getDiemChuan() << " diem)\n";
             Vector<ThiSinh> dsTT = ql.getDanhSachTrungTuyen(ql.getDiemChuan());
-            inBangThiSinh(dsTT, ql.getDiemChuan(), true);
+            inBangThiSinh(dsTT, ql, true);
             ConsoleUI::pauseScreen();
         } else if (choice == 2) {
             ConsoleUI::clearScreen();
