@@ -1,16 +1,27 @@
                                   TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG
                                        BAO CAO KET QUA XET TUYEN DAI HOC
                                              (Nam tuyen sinh: 2026)
-                                        Diem chuan xet tuyen: 22.00 diem
+                                        Diem chuan xet tuyen: 23.00 diem
 ===================================================================================================================
  STT |   SBD   |    So CCCD   |      Ho va Ten      | Ngay Sinh |   Que Quan   | Toan |  Ly  | Hoa  | Tong | Ket Qua  |
 -------------------------------------------------------------------------------------------------------------------
    1 | DUT001  | 012345678901 | Vo Nhu Hieu         | 04/03/2003 | TP. Da Nang  | 9.00 | 7.00 | 8.00 | 24.00 |TRUNG TUYEN
    2 | DUT002  | 012345678902 | Vo Huy Tuong        | 27/07/2009 | TP. Da Nang  | 9.00 | 9.75 | 8.50 | 27.25 |TRUNG TUYEN
    3 | DUT003  | 012345678903 | Nguyen Thi Nhat Vy  | 10/09/2005 | Quang Ngai   | 9.50 | 9.50 | 8.25 | 27.25 |TRUNG TUYEN
+   4 | DUT004  | 201948572134 | Nguyen Van An       | 15/03/2005 | TP. Da Nang  | 9.50 | 9.00 | 9.75 | 28.25 |TRUNG TUYEN
+   5 | DUT005  | 201837461928 | Tran Thi Bich       | 22/07/2005 | TP. Da Nang  | 8.75 | 8.50 | 9.00 | 26.25 |TRUNG TUYEN
+   6 | DUT006  | 201726354819 | Le Hoang Cong       | 10/11/2005 | TP. Hue      | 7.50 | 6.75 | 7.00 | 21.25 |Khong dat
+   7 | DUT007  | 201615243701 | Pham Thi Diem       | 05/01/2005 | Quang Ngai   | 9.00 | 8.75 | 8.25 | 26.00 |TRUNG TUYEN
+   8 | DUT008  | 201504132692 | Vo Minh Duc         | 18/09/2005 | Ha Tinh      | 6.25 | 5.50 | 6.00 | 17.75 |Khong dat
+   9 | DUT009  | 201493021583 | Hoang Thi Ha        | 30/04/2005 | Nghe An      | 9.75 | 9.50 | 9.80 | 29.05 |TRUNG TUYEN
+  10 | DUT010  | 201382910474 | Dang Quoc Khanh     | 12/12/2005 | Quang Tri    | 5.00 | 4.50 | 5.50 | 15.00 |Khong dat
+  11 | DUT011  | 201271809365 | Bui Mai Linh        | 08/08/2005 | TP. Ha Noi   | 8.50 | 8.25 | 8.75 | 25.50 |TRUNG TUYEN
+  12 | DUT012  | 201160798256 | Ngo Van Nam         | 25/02/2005 | TP. Ho Chi M | 7.00 | 7.25 | 6.50 | 20.75 |Khong dat
+  13 | DUT013  | 201059687147 | Dinh Thao Quyen     | 19/10/2005 | Khanh Hoa    | 8.00 | 8.50 | 7.75 | 24.25 |TRUNG TUYEN
+  14 | DUT014  | 200948576038 | Phan Thanh Tung     | 03/06/2005 | TP. Da Nang  | 9.25 | 9.00 | 9.25 | 27.50 |TRUNG TUYEN
 ===================================================================================================================
-Tong so thi sinh bao cao : 3
-So thi sinh trung tuyen  : 3 (100.0%)
-So thi sinh khong dat    : 0 (0.0%)
-Thu khoa ky thi          : Vo Huy Tuong (DUT002), Nguyen Thi Nhat Vy (DUT003) - Tong diem: 27.25
+Tong so thi sinh bao cao : 14
+So thi sinh trung tuyen  : 10 (71.4%)
+So thi sinh khong dat    : 4 (28.6%)
+Thu khoa ky thi          : Hoang Thi Ha (DUT009) - Tong diem: 29.05
 ===================================================================================================================
