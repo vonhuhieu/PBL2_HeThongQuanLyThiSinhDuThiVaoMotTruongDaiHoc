@@ -12,58 +12,41 @@ using namespace std;
 
 /**
  * @brief Lớp Quản trị hệ thống Cơ sở dữ liệu và Nghiệp vụ tuyển sinh Đại học
- * Kiến trúc lai (Hybrid Architecture):
- * 1. MySQL Engine (Laragon 8.4): Quản trị cơ sở dữ liệu quan hệ 5 bảng 3NF
- * 2. In-Memory Vector Engine: Cấu trúc dữ liệu mảng động tự cài đặt (DSA & OOP)
- * 3. File System Cache: Bộ đệm tệp tin sao lưu đa tệp (nguoi.txt, thisinh.txt, system.txt...)
+ * PHIÊN BẢN ĐỘC LẬP: 100% CSDL QUAN HỆ MYSQL (LARAGON)
+ * - Toàn bộ dữ liệu được quản trị, lưu trữ và truy vấn trực tiếp từ MySQL Database: `pbl2_tuyensinh`
+ * - Gồm 5 bảng chuẩn 3NF: tinh_thanh, gioi_tinh, nguoi, thisinh, cau_hinh
+ * - Không sử dụng bất kỳ tệp văn bản .txt nào làm cơ sở dữ liệu
+ * - Vector<T> tự xây dựng đóng vai trò bộ đệm in-memory và cấu trúc giải thuật cho GUI & QuickSort
  */
 class QuanLyThiSinh {
 private:
-    Vector<ThiSinh> dsThiSinh;       // Danh sách thí sinh hợp nhất in-memory
-    Vector<TinhThanh> dsTinhThanh;   // Danh mục tỉnh / thành phố (34 tỉnh thành)
-    Vector<GioiTinh> dsGioiTinh;     // Danh mục giới tính (Nam, Nu, Khac)
+    Vector<ThiSinh> dsThiSinh;       // Danh sách thí sinh in-memory (lấy từ MySQL)
+    Vector<TinhThanh> dsTinhThanh;   // Danh mục tỉnh / thành phố (34 tỉnh thành từ MySQL)
+    Vector<GioiTinh> dsGioiTinh;     // Danh mục giới tính (Nam, Nu, Khac từ MySQL)
 
-    MySQLConnector db;               // Bộ kết nối MySQL Database Server
-    bool suDungMySQL;                // Trạng thái ưu tiên MySQL
-
-    string pathNguoi;                // data/nguoi.txt
-    string pathThiSinh;              // data/thisinh.txt
-    string pathTinhThanh;            // data/tinhthanh.txt
-    string pathGioiTinh;             // data/gioitinh.txt
-    string pathSystem;               // data/system.txt
+    MySQLConnector db;               // Bộ kết nối MySQL Database Server (Laragon)
 
     double diemChuanHienTai;         // Điểm chuẩn xét tuyển đại học hiện hành
     double diemLietHienTai;          // Ngưỡng điểm liệt (mặc định 1.00)
     string namTuyenSinh;             // Năm tuyển sinh (vd: 2026)
     string tenTruong;                // Tên trường đại học
 
-    // Hàm hỗ trợ nạp dữ liệu mẫu ban đầu nếu tệp chưa tồn tại
-    void taoDuLieuMauNeuTrong();
-
 public:
-    QuanLyThiSinh(const string& dirData = "data");
+    QuanLyThiSinh();
     ~QuanLyThiSinh();
 
-    // 0. Quản lý kết nối MySQL
+    // 1. Quản trị kết nối và Đọc/Ghi CSDL MySQL
     bool ketNoiMySQL();
     void ngatKetNoiMySQL();
     bool isMySQLConnected() const;
     MySQLConnector& getDB();
     const MySQLConnector& getDB() const;
-    bool dongBoTuMySQL();
-    bool dongBoLenMySQL();
 
-    // 1. Quản lý đọc / ghi CSDL quan hệ đa tệp (Key - Value) & MySQL
-    bool docDuLieu();
-    bool luuDuLieu() const;
-    bool docCauHinhHeThong(const string& path = "data/system.txt");
-    bool luuCauHinhHeThong(const string& path = "data/system.txt") const;
-
-    // Quản lý đọc / ghi danh mục
-    bool docDanhMucTinhThanh(const string& path = "data/tinhthanh.txt");
-    bool luuDanhMucTinhThanh(const string& path = "data/tinhthanh.txt") const;
-    bool docDanhMucGioiTinh(const string& path = "data/gioitinh.txt");
-    bool luuDanhMucGioiTinh(const string& path = "data/gioitinh.txt") const;
+    bool docDuLieuTuMySQL();
+    bool luuDuLieuVaoMySQL();
+    bool dongBoTuMySQL() { return docDuLieuTuMySQL(); }
+    bool dongBoLenMySQL() { return luuDuLieuVaoMySQL(); }
+    bool khoiTaoDuLieuMauMySQL();
 
     // 2. Tra cứu & Sinh mã tự động
     string sinhSoBaoDanhMoi() const; // Tự động tăng SBD (DUT001 -> DUT015...)
@@ -82,12 +65,12 @@ public:
     bool kiemTraHopLeQueQuan(const string& maHoacTen) const;
     bool kiemTraHopLeGioiTinh(const string& maHoacTen) const;
 
-    // 3. Nghiệp vụ CRUD Thí sinh (Đồng bộ đồng thời Memory, MySQL & File)
+    // 3. Nghiệp vụ CRUD Thí sinh (Thao tác trực tiếp tới CSDL MySQL)
     bool themThiSinh(const ThiSinh& ts);
     bool capNhatThiSinh(const ThiSinh& ts);
     bool xoaThiSinh(const string& sbdHoacCCCD);
 
-    // 4. Nghiệp vụ CRUD Danh mục Hệ thống
+    // 4. Nghiệp vụ CRUD Danh mục Hệ thống (Thao tác trực tiếp tới CSDL MySQL)
     bool themTinhThanh(const TinhThanh& tt);
     bool capNhatTinhThanh(const TinhThanh& tt);
     bool xoaTinhThanh(const string& ma);
@@ -115,7 +98,7 @@ public:
     Vector<ThiSinh> getDanhSachThuKhoa() const;
     void tinhThongKePhoDiem(int& mucThap, int& mucTB, int& mucKha, int& mucCao, int& mucRatCao) const;
 
-    // 7. Xuất các báo cáo dạng bảng kẻ khung chuyên biệt
+    // 7. Xuất các báo cáo dạng bảng kẻ khung chuyên biệt ra thư mục data/
     bool xuatBaoCaoXetTuyen(const string& path = "data/ketqua_xettuyen.txt", double diemChuan = 22.0, const string& keyword = "") const;
     bool xuatBaoCaoThuKhoa(const string& path = "data/thukhoa.txt") const;
     bool xuatBaoCaoPhoDiem(const string& path = "data/thongke_phodiem.txt") const;

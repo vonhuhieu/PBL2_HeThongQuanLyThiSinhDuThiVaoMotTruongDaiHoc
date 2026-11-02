@@ -25,32 +25,32 @@ public:
     MySQLConnector();
     ~MySQLConnector();
 
-    // Thiet lap cau hinh ket noi
+    // Thiết lập cấu hình kết nối
     void setConfig(const DBConfig& cfg);
     DBConfig getConfig() const;
 
-    // Ket noi va ngat ket noi
+    // Kết nối và ngắt kết nối
     bool connect();
     void disconnect();
     bool isConnected() const;
     std::string getLastError() const;
 
-    // Thuc thi truy van
+    // Thực thi truy vấn
     bool execute(const std::string& sql);
     MYSQL_RES* query(const std::string& sql);
     void freeResult(MYSQL_RES* res);
 
-    // Xu ly chuoi an toan tranh SQL Injection
+    // Xử lý chuỗi an toàn chống SQL Injection
     std::string escape(const std::string& input);
 
-    // Quan ly Transaction
+    // Quản lý Transaction
     bool beginTransaction();
     bool commit();
     bool rollback();
 
-    // Khoi tao CSDL va cac bang neu chua co
+    // Khởi tạo Schema, bảng và dữ liệu mẫu tự động
     bool initSchemaAndTables();
+    bool seedDefaultData();
 };
 
 #endif // MYSQL_CONNECTOR_H
-

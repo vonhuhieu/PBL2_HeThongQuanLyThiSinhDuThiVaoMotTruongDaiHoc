@@ -1,4 +1,4 @@
-﻿#include "../include/QuanLyThiSinh.h"
+#include "../include/QuanLyThiSinh.h"
 #include "../include/ConsoleUI.h"
 #include "../include/Utils.h"
 #include "../include/AppGUI.h"
@@ -228,7 +228,7 @@ static void chucNangSua(QuanLyThiSinh& ql) {
         }
     }
 
-    ql.luuDuLieu();
+    ql.luuDuLieuVaoMySQL();
     ConsoleUI::printSuccess("Cap nhat ho so thi sinh thanh cong!");
     ConsoleUI::pauseScreen();
 }
@@ -498,7 +498,7 @@ static int runConsoleMode(QuanLyThiSinh& ql) {
             case 6: chucNangXetTuyen(ql); break;
             case 7: chucNangXuatBaoCao(ql); break;
             case 8:
-                ql.luuDuLieu();
+                ql.luuDuLieuVaoMySQL();
                 ConsoleUI::clearScreen();
                 ConsoleUI::printSuccess("Du lieu da duoc luu vao CSDL thanh cong. Tam biet!");
                 return 0;
@@ -508,7 +508,7 @@ static int runConsoleMode(QuanLyThiSinh& ql) {
 
 int main(int argc, char* argv[]) {
     // Khá»Ÿi táº¡o há»‡ quáº£n trá»‹ CSDL quan há»‡ vÃ  nghiá»‡p vá»¥ tuyá»ƒn sinh
-    QuanLyThiSinh ql("data");
+    QuanLyThiSinh ql;
 
     // Cháº¿ Ä‘á»™ kiá»ƒm thá»­ tá»± Ä‘á»™ng khÃ´ng giao diá»‡n
     if (argc > 1 && string(argv[1]) == "--test") {

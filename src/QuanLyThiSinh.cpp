@@ -35,64 +35,39 @@ static bool cmpTenAZ(const ThiSinh& a, const ThiSinh& b) {
     return Utils::toLower(nameA) < Utils::toLower(nameB);
 }
 
-// Constructor
-QuanLyThiSinh::QuanLyThiSinh(const string& dirData) {
-    pathNguoi = dirData + "/nguoi.txt";
-    pathThiSinh = dirData + "/thisinh.txt";
-    pathTinhThanh = dirData + "/tinhthanh.txt";
-    pathGioiTinh = dirData + "/gioitinh.txt";
-    pathSystem = dirData + "/system.txt";
-
+// Constructor (Khởi tạo kết nối MySQL Laragon và nạp dữ liệu từ MySQL)
+QuanLyThiSinh::QuanLyThiSinh() {
     diemChuanHienTai = AdmissionConst::DIEM_CHUAN_MAC_DINH;
     diemLietHienTai = AdmissionConst::DIEM_LIET;
     namTuyenSinh = "2026";
     tenTruong = "TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG";
-    suDungMySQL = false;
 
-    // 1. Luôn đọc file cấu hình & danh mục cục bộ trước để có sẵn fallback
-    docCauHinhHeThong(pathSystem);
-    docDanhMucTinhThanh(pathTinhThanh);
-    docDanhMucGioiTinh(pathGioiTinh);
-    docDuLieu();
-    if (dsThiSinh.empty()) {
-        taoDuLieuMauNeuTrong();
-    }
-
-    // 2. Thử kết nối tới MySQL Server (Laragon)
+    // Kết nối tới CSDL MySQL Laragon
     if (ketNoiMySQL()) {
-        dongBoTuMySQL();
+        docDuLieuTuMySQL();
     }
 }
 
 // Destructor
 QuanLyThiSinh::~QuanLyThiSinh() {
-    if (isMySQLConnected()) {
-        dongBoLenMySQL();
-        ngatKetNoiMySQL();
-    }
-    luuDuLieu();
-    luuDanhMucTinhThanh(pathTinhThanh);
-    luuDanhMucGioiTinh(pathGioiTinh);
-    luuCauHinhHeThong(pathSystem);
+    ngatKetNoiMySQL();
 }
 
 // ==============================================================================
-// 0. QUẢN LÝ KẾT NỐI VÀ ĐỒNG BỘ MYSQL
+// 1. QUẢN LÝ KẾT NỐI VÀ TRUY VẤN CSDL MYSQL
 // ==============================================================================
 
 bool QuanLyThiSinh::ketNoiMySQL() {
     if (db.connect()) {
-        suDungMySQL = true;
         db.initSchemaAndTables();
+        db.seedDefaultData();
         return true;
     }
-    suDungMySQL = false;
     return false;
 }
 
 void QuanLyThiSinh::ngatKetNoiMySQL() {
     db.disconnect();
-    suDungMySQL = false;
 }
 
 bool QuanLyThiSinh::isMySQLConnected() const {
@@ -107,26 +82,10 @@ const MySQLConnector& QuanLyThiSinh::getDB() const {
     return db;
 }
 
-bool QuanLyThiSinh::dongBoTuMySQL() {
+bool QuanLyThiSinh::docDuLieuTuMySQL() {
     if (!db.isConnected()) return false;
 
-    // 1. Kiểm tra số lượng thí sinh hiện có trong MySQL
-    bool coDuLieuTrongDB = false;
-    MYSQL_RES* resCheck = db.query("SELECT COUNT(*) FROM `thisinh`;");
-    if (resCheck) {
-        MYSQL_ROW row = mysql_fetch_row(resCheck);
-        if (row && row[0] && Utils::toInt(row[0]) > 0) {
-            coDuLieuTrongDB = true;
-        }
-        db.freeResult(resCheck);
-    }
-
-    // Nếu MySQL hoàn toàn trống dữ liệu, tự động seed từ memory/file lên MySQL
-    if (!coDuLieuTrongDB) {
-        return dongBoLenMySQL();
-    }
-
-    // 2. Đọc Tỉnh Thành từ MySQL
+    // 1. Đọc Danh mục Tỉnh / Thành phố từ bảng `tinh_thanh`
     MYSQL_RES* resTT = db.query("SELECT `ma_tinh`, `ten_tinh`, `loai` FROM `tinh_thanh` ORDER BY `ma_tinh` ASC;");
     if (resTT) {
         MYSQL_ROW row;
@@ -140,7 +99,7 @@ bool QuanLyThiSinh::dongBoTuMySQL() {
         db.freeResult(resTT);
     }
 
-    // 3. Đọc Giới Tính từ MySQL
+    // 2. Đọc Danh mục Giới tính từ bảng `gioi_tinh`
     MYSQL_RES* resGT = db.query("SELECT `ma_gioi_tinh`, `ten_gioi_tinh` FROM `gioi_tinh` ORDER BY `ma_gioi_tinh` ASC;");
     if (resGT) {
         MYSQL_ROW row;
@@ -153,7 +112,7 @@ bool QuanLyThiSinh::dongBoTuMySQL() {
         db.freeResult(resGT);
     }
 
-    // 4. Đọc Cấu Hình từ MySQL
+    // 3. Đọc Cấu hình hệ thống từ bảng `cau_hinh`
     MYSQL_RES* resCH = db.query("SELECT `khoa`, `gia_tri` FROM `cau_hinh`;");
     if (resCH) {
         MYSQL_ROW row;
@@ -162,13 +121,13 @@ bool QuanLyThiSinh::dongBoTuMySQL() {
             string v = row[1] ? row[1] : "";
             if (k == "truong") tenTruong = v;
             else if (k == "nam_tuyen_sinh") namTuyenSinh = v;
-            else if (k == "diem_chuan") diemChuanHienTai = Utils::toDouble(v);
-            else if (k == "diem_liet") diemLietHienTai = Utils::toDouble(v);
+            else if (k == "diem_chuan") diemChuanHienTai = Utils::toDouble(v, 23.0);
+            else if (k == "diem_liet") diemLietHienTai = Utils::toDouble(v, 1.0);
         }
         db.freeResult(resCH);
     }
 
-    // 5. Đọc Thí Sinh từ JOIN 2 bảng nguoi và thisinh
+    // 4. Đọc Thí sinh từ JOIN 2 bảng `thisinh` và `nguoi`
     MYSQL_RES* resTS = db.query(
         "SELECT ts.sbd, n.so_cccd, n.ho_ten, n.ngay_sinh, n.que_quan, n.gioi_tinh, "
         "       ts.diem_toan, ts.diem_ly, ts.diem_hoa "
@@ -195,41 +154,15 @@ bool QuanLyThiSinh::dongBoTuMySQL() {
         db.freeResult(resTS);
     }
 
-    // Cập nhật lại cache file local để đồng bộ 100%
-    luuDuLieu();
-    luuDanhMucTinhThanh(pathTinhThanh);
-    luuDanhMucGioiTinh(pathGioiTinh);
-    luuCauHinhHeThong(pathSystem);
-    xuatTatCaBaoCao();
-
     return true;
 }
 
-bool QuanLyThiSinh::dongBoLenMySQL() {
+bool QuanLyThiSinh::luuDuLieuVaoMySQL() {
     if (!db.isConnected()) return false;
 
     db.beginTransaction();
 
-    // 1. Đồng bộ Danh mục Tỉnh thành
-    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
-        string sql = "INSERT INTO `tinh_thanh` (`ma_tinh`, `ten_tinh`, `loai`) VALUES ('" +
-                     db.escape(dsTinhThanh[i].ma) + "', '" +
-                     db.escape(dsTinhThanh[i].ten) + "', '" +
-                     db.escape(dsTinhThanh[i].loai) + "') " +
-                     "ON DUPLICATE KEY UPDATE `ten_tinh`=VALUES(`ten_tinh`), `loai`=VALUES(`loai`);";
-        db.execute(sql);
-    }
-
-    // 2. Đồng bộ Danh mục Giới tính
-    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
-        string sql = "INSERT INTO `gioi_tinh` (`ma_gioi_tinh`, `ten_gioi_tinh`) VALUES ('" +
-                     db.escape(dsGioiTinh[i].ma) + "', '" +
-                     db.escape(dsGioiTinh[i].ten) + "') " +
-                     "ON DUPLICATE KEY UPDATE `ten_gioi_tinh`=VALUES(`ten_gioi_tinh`);";
-        db.execute(sql);
-    }
-
-    // 3. Đồng bộ Cấu hình hệ thống
+    // 1. Lưu Cấu hình
     stringstream ssDC, ssDL;
     ssDC << fixed << setprecision(2) << diemChuanHienTai;
     ssDL << fixed << setprecision(2) << diemLietHienTai;
@@ -240,7 +173,7 @@ bool QuanLyThiSinh::dongBoLenMySQL() {
                "('diem_liet', '" + ssDL.str() + "', 'Diem liet mon thi') "
                "ON DUPLICATE KEY UPDATE `gia_tri`=VALUES(`gia_tri`);");
 
-    // 4. Đồng bộ Người và Thí sinh
+    // 2. Lưu Người & Thí sinh
     for (size_t i = 0; i < dsThiSinh.size(); ++i) {
         const ThiSinh& ts = dsThiSinh[i];
         string maQue = layMaTinhThanh(ts.getQueQuan());
@@ -272,431 +205,13 @@ bool QuanLyThiSinh::dongBoLenMySQL() {
     return db.commit();
 }
 
-// ==============================================================================
-// 1. QUẢN LÝ ĐỌC / GHI DANH MỤC & CƠ SỞ DỮ LIỆU TỆP (FALLBACK)
-// ==============================================================================
-
-bool QuanLyThiSinh::docDanhMucTinhThanh(const string& path) {
-    dsTinhThanh.clear();
-    ifstream fin(path);
-    if (!fin.is_open()) {
-        dsTinhThanh.push_back(TinhThanh("01", "TP. Ha Noi", "Thanh pho truc thuoc Trung uong"));
-        dsTinhThanh.push_back(TinhThanh("04", "Cao Bang", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("08", "Tuyen Quang", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("10", "Lao Cai", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("11", "Dien Bien", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("12", "Lai Chau", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("14", "Son La", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("19", "Thai Nguyen", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("20", "Lang Son", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("22", "Quang Ninh", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("25", "Phu Tho", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("27", "Bac Ninh", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("31", "TP. Hai Phong", "Thanh pho truc thuoc Trung uong"));
-        dsTinhThanh.push_back(TinhThanh("33", "Hung Yen", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("37", "Ninh Binh", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("38", "Thanh Hoa", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("40", "Nghe An", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("42", "Ha Tinh", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("45", "Quang Tri", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("46", "TP. Hue", "Thanh pho truc thuoc Trung uong"));
-        dsTinhThanh.push_back(TinhThanh("48", "TP. Da Nang", "Thanh pho truc thuoc Trung uong"));
-        dsTinhThanh.push_back(TinhThanh("51", "Quang Ngai", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("56", "Khanh Hoa", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("64", "Gia Lai", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("66", "Dak Lak", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("68", "Lam Dong", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("72", "Tay Ninh", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("75", "Dong Nai", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("79", "TP. Ho Chi Minh", "Thanh pho truc thuoc Trung uong"));
-        dsTinhThanh.push_back(TinhThanh("86", "Vinh Long", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("87", "Dong Thap", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("89", "An Giang", "Tinh truc thuoc"));
-        dsTinhThanh.push_back(TinhThanh("92", "TP. Can Tho", "Thanh pho truc thuoc Trung uong"));
-        dsTinhThanh.push_back(TinhThanh("96", "Ca Mau", "Tinh truc thuoc"));
-        luuDanhMucTinhThanh(path);
-        return true;
+bool QuanLyThiSinh::khoiTaoDuLieuMauMySQL() {
+    if (!db.isConnected()) return false;
+    bool ok = db.seedDefaultData();
+    if (ok) {
+        docDuLieuTuMySQL();
     }
-
-    string line;
-    string curMa = "", curTen = "", curLoai = "";
-    while (getline(fin, line)) {
-        line = Utils::trim(line);
-        if (line.empty() || line == "#TINHTHANH") continue;
-        if (line == "====") break;
-
-        if (line == "---") {
-            if (!curMa.empty() && !curTen.empty()) {
-                dsTinhThanh.push_back(TinhThanh(curMa, curTen, curLoai.empty() ? "Tinh" : curLoai));
-            }
-            curMa = curTen = curLoai = "";
-            continue;
-        }
-
-        size_t colon = line.find(':');
-        if (colon != string::npos) {
-            string key = Utils::trim(line.substr(0, colon));
-            string val = Utils::trim(line.substr(colon + 1));
-            string kLower = Utils::toLower(key);
-            if (kLower == "ma" || kLower == "ma tinh") curMa = val;
-            else if (kLower == "ten" || kLower == "ten tinh") curTen = val;
-            else if (kLower == "loai") curLoai = val;
-        }
-    }
-    if (!curMa.empty() && !curTen.empty()) {
-        dsTinhThanh.push_back(TinhThanh(curMa, curTen, curLoai.empty() ? "Tinh" : curLoai));
-    }
-    fin.close();
-    return true;
-}
-
-bool QuanLyThiSinh::luuDanhMucTinhThanh(const string& path) const {
-    ofstream fout(path);
-    if (!fout.is_open()) return false;
-
-    fout << "#TINHTHANH\n";
-    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
-        fout << "Ma: " << dsTinhThanh[i].ma << "\n"
-             << "Ten: " << dsTinhThanh[i].ten << "\n"
-             << "Loai: " << dsTinhThanh[i].loai << "\n"
-             << "---\n";
-    }
-    fout << "====\n";
-    fout.close();
-    return true;
-}
-
-bool QuanLyThiSinh::docDanhMucGioiTinh(const string& path) {
-    dsGioiTinh.clear();
-    ifstream fin(path);
-    if (!fin.is_open()) {
-        dsGioiTinh.push_back(GioiTinh(AdmissionConst::GT_NAM, "Nam"));
-        dsGioiTinh.push_back(GioiTinh(AdmissionConst::GT_NU, "Nu"));
-        dsGioiTinh.push_back(GioiTinh(AdmissionConst::GT_KHAC, "Khac"));
-        luuDanhMucGioiTinh(path);
-        return true;
-    }
-
-    string line;
-    string curMa = "", curTen = "", curMoTa = "";
-    while (getline(fin, line)) {
-        line = Utils::trim(line);
-        if (line.empty() || line == "#GIOITINH") continue;
-        if (line == "====") break;
-
-        if (line == "---") {
-            if (!curMa.empty() && !curTen.empty()) {
-                dsGioiTinh.push_back(GioiTinh(curMa, curTen, curMoTa));
-            }
-            curMa = curTen = curMoTa = "";
-            continue;
-        }
-
-        size_t colon = line.find(':');
-        if (colon != string::npos) {
-            string key = Utils::trim(line.substr(0, colon));
-            string val = Utils::trim(line.substr(colon + 1));
-            string kLower = Utils::toLower(key);
-            if (kLower == "ma" || kLower == "ma gioi tinh") curMa = val;
-            else if (kLower == "ten" || kLower == "ten gioi tinh") curTen = val;
-            else if (kLower == "mo ta" || kLower == "mota") curMoTa = val;
-        }
-    }
-    if (!curMa.empty() && !curTen.empty()) {
-        dsGioiTinh.push_back(GioiTinh(curMa, curTen, curMoTa));
-    }
-    fin.close();
-    return true;
-}
-
-bool QuanLyThiSinh::luuDanhMucGioiTinh(const string& path) const {
-    ofstream fout(path);
-    if (!fout.is_open()) return false;
-
-    fout << "#GIOITINH\n";
-    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
-        fout << "Ma: " << dsGioiTinh[i].ma << "\n"
-             << "Ten: " << dsGioiTinh[i].ten << "\n";
-        if (!dsGioiTinh[i].moTa.empty()) {
-            fout << "Mo Ta: " << dsGioiTinh[i].moTa << "\n";
-        }
-        fout << "---\n";
-    }
-    fout << "====\n";
-    fout.close();
-    return true;
-}
-
-string QuanLyThiSinh::layTenTinhThanh(const string& maHoacTen) const {
-    string norm = Utils::trim(maHoacTen);
-    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
-        if (dsTinhThanh[i].ma == norm || Utils::toLower(dsTinhThanh[i].ten) == Utils::toLower(norm)) {
-            return dsTinhThanh[i].ten;
-        }
-    }
-    return norm;
-}
-
-string QuanLyThiSinh::layMaTinhThanh(const string& tenHoacMa) const {
-    string norm = Utils::trim(tenHoacMa);
-    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
-        if (dsTinhThanh[i].ma == norm || Utils::toLower(dsTinhThanh[i].ten) == Utils::toLower(norm)) {
-            return dsTinhThanh[i].ma;
-        }
-    }
-    return norm;
-}
-
-string QuanLyThiSinh::layTenGioiTinh(const string& maHoacTen) const {
-    string norm = Utils::toUpper(Utils::trim(maHoacTen));
-    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
-        if (Utils::toUpper(dsGioiTinh[i].ma) == norm || Utils::toUpper(dsGioiTinh[i].ten) == norm) {
-            return dsGioiTinh[i].ten;
-        }
-    }
-    return maHoacTen;
-}
-
-string QuanLyThiSinh::layMaGioiTinh(const string& tenHoacMa) const {
-    string norm = Utils::toUpper(Utils::trim(tenHoacMa));
-    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
-        if (Utils::toUpper(dsGioiTinh[i].ma) == norm || Utils::toUpper(dsGioiTinh[i].ten) == norm) {
-            return dsGioiTinh[i].ma;
-        }
-    }
-    return tenHoacMa;
-}
-
-bool QuanLyThiSinh::kiemTraHopLeQueQuan(const string& maHoacTen) const {
-    string norm = Utils::trim(maHoacTen);
-    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
-        if (dsTinhThanh[i].ma == norm || Utils::toLower(dsTinhThanh[i].ten) == Utils::toLower(norm)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool QuanLyThiSinh::kiemTraHopLeGioiTinh(const string& maHoacTen) const {
-    string norm = Utils::toUpper(Utils::trim(maHoacTen));
-    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
-        if (Utils::toUpper(dsGioiTinh[i].ma) == norm || Utils::toUpper(dsGioiTinh[i].ten) == norm) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void QuanLyThiSinh::taoDuLieuMauNeuTrong() {
-    dsThiSinh.clear();
-    dsThiSinh.push_back(ThiSinh("012345678901", "Vo Nhu Hieu", "04/03/2003", "48", "NAM", "DUT001", 9.00, 7.00, 8.00));
-    dsThiSinh.push_back(ThiSinh("012345678902", "Vo Huy Tuong", "27/07/2009", "48", "NAM", "DUT002", 9.00, 9.75, 8.50));
-    dsThiSinh.push_back(ThiSinh("012345678903", "Nguyen Thi Nhat Vy", "10/09/2005", "51", "NU", "DUT003", 9.50, 9.50, 8.25));
-
-    luuDuLieu();
-    luuCauHinhHeThong(pathSystem);
-    luuDanhMucTinhThanh(pathTinhThanh);
-    luuDanhMucGioiTinh(pathGioiTinh);
-    xuatTatCaBaoCao();
-}
-
-bool QuanLyThiSinh::docDuLieu() {
-    dsThiSinh.clear();
-
-    struct HoSoNguoi {
-        string cccd;
-        string ten;
-        string ns;
-        string que;
-        string gt;
-    };
-    Vector<HoSoNguoi> dsNguoi;
-
-    ifstream finNguoi(pathNguoi);
-    if (!finNguoi.is_open()) return false;
-
-    string line;
-    HoSoNguoi curN;
-    while (getline(finNguoi, line)) {
-        line = Utils::trim(line);
-        if (line.empty() || line == "#NGUOI") continue;
-        if (line == "====") break;
-
-        if (line == "---") {
-            if (!curN.cccd.empty()) dsNguoi.push_back(curN);
-            curN = HoSoNguoi();
-            continue;
-        }
-
-        size_t colon = line.find(':');
-        if (colon != string::npos) {
-            string key = Utils::trim(line.substr(0, colon));
-            string val = Utils::trim(line.substr(colon + 1));
-            string kLower = Utils::toLower(key);
-
-            if (kLower == "so cccd" || kLower == "cccd") curN.cccd = val;
-            else if (kLower == "ho va ten" || kLower == "ho ten" || kLower == "ten") curN.ten = val;
-            else if (kLower == "ngay sinh") curN.ns = val;
-            else if (kLower == "que quan") curN.que = layMaTinhThanh(val);
-            else if (kLower == "gioi tinh") curN.gt = layMaGioiTinh(val);
-        }
-    }
-    if (!curN.cccd.empty()) dsNguoi.push_back(curN);
-    finNguoi.close();
-
-    ifstream finTS(pathThiSinh);
-    if (!finTS.is_open()) return false;
-
-    struct DiemTS {
-        string sbd;
-        string cccd;
-        double toan;
-        double ly;
-        double hoa;
-        DiemTS() : toan(0), ly(0), hoa(0) {}
-    };
-    Vector<DiemTS> dsDiem;
-
-    DiemTS curD;
-    while (getline(finTS, line)) {
-        line = Utils::trim(line);
-        if (line.empty() || line == "#THISINH") continue;
-        if (line == "====") break;
-
-        if (line == "---") {
-            if (!curD.sbd.empty()) dsDiem.push_back(curD);
-            curD = DiemTS();
-            continue;
-        }
-
-        size_t colon = line.find(':');
-        if (colon != string::npos) {
-            string key = Utils::trim(line.substr(0, colon));
-            string val = Utils::trim(line.substr(colon + 1));
-            string kLower = Utils::toLower(key);
-
-            if (kLower == "so bao danh" || kLower == "sbd") curD.sbd = val;
-            else if (kLower == "so cccd" || kLower == "cccd") curD.cccd = val;
-            else if (kLower == "diem toan" || kLower == "toan") curD.toan = Utils::toDouble(val);
-            else if (kLower == "diem ly" || kLower == "ly") curD.ly = Utils::toDouble(val);
-            else if (kLower == "diem hoa" || kLower == "hoa") curD.hoa = Utils::toDouble(val);
-        }
-    }
-    if (!curD.sbd.empty()) dsDiem.push_back(curD);
-    finTS.close();
-
-    for (size_t i = 0; i < dsDiem.size(); ++i) {
-        const DiemTS& d = dsDiem[i];
-        bool found = false;
-        for (size_t j = 0; j < dsNguoi.size(); ++j) {
-            if (dsNguoi[j].cccd == d.cccd) {
-                ThiSinh ts(dsNguoi[j].cccd, dsNguoi[j].ten, dsNguoi[j].ns,
-                           dsNguoi[j].que, dsNguoi[j].gt,
-                           d.sbd, d.toan, d.ly, d.hoa);
-                dsThiSinh.push_back(ts);
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            ThiSinh ts(d.cccd, "Chua cap nhat", "01/01/2005", "48", "NAM",
-                       d.sbd, d.toan, d.ly, d.hoa);
-            dsThiSinh.push_back(ts);
-        }
-    }
-
-    return true;
-}
-
-bool QuanLyThiSinh::luuDuLieu() const {
-    ofstream foutNguoi(pathNguoi);
-    if (!foutNguoi.is_open()) return false;
-
-    foutNguoi << "#NGUOI\n";
-    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
-        const ThiSinh& ts = dsThiSinh[i];
-        string maQue = layMaTinhThanh(ts.getQueQuan());
-        string maGT = layMaGioiTinh(ts.getGioiTinh());
-        foutNguoi << "So CCCD: " << ts.getSoCCCD() << "\n"
-                  << "Ho va Ten: " << ts.getHoTen() << "\n"
-                  << "Ngay Sinh: " << ts.getNgaySinh() << "\n"
-                  << "Que Quan: " << maQue << "\n"
-                  << "Gioi Tinh: " << maGT << "\n"
-                  << "---\n";
-    }
-    foutNguoi << "====\n";
-    foutNguoi.close();
-
-    ofstream foutTS(pathThiSinh);
-    if (!foutTS.is_open()) return false;
-
-    foutTS << "#THISINH\n";
-    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
-        const ThiSinh& ts = dsThiSinh[i];
-        foutTS << "So Bao Danh: " << ts.getSoBaoDanh() << "\n"
-               << "So CCCD: " << ts.getSoCCCD() << "\n"
-               << fixed << setprecision(2)
-               << "Diem Toan: " << ts.getDiemToan() << "\n"
-               << "Diem Ly: " << ts.getDiemLy() << "\n"
-               << "Diem Hoa: " << ts.getDiemHoa() << "\n"
-               << "---\n";
-    }
-    foutTS << "====\n";
-    foutTS.close();
-
-    return true;
-}
-
-bool QuanLyThiSinh::docCauHinhHeThong(const string& path) {
-    ifstream fin(path);
-    if (!fin.is_open()) {
-        diemChuanHienTai = AdmissionConst::DIEM_CHUAN_MAC_DINH;
-        diemLietHienTai = AdmissionConst::DIEM_LIET;
-        namTuyenSinh = "2026";
-        tenTruong = "TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG";
-        luuCauHinhHeThong(path);
-        return true;
-    }
-
-    string line;
-    while (getline(fin, line)) {
-        line = Utils::trim(line);
-        if (line.empty() || line == "#SYSTEM_CONFIG") continue;
-        if (line == "====") break;
-
-        size_t colon = line.find(':');
-        if (colon != string::npos) {
-            string key = Utils::trim(line.substr(0, colon));
-            string val = Utils::trim(line.substr(colon + 1));
-            string kLower = Utils::toLower(key);
-
-            if (kLower == "truong" || kLower == "ten truong") tenTruong = val;
-            else if (kLower == "nam tuyen sinh" || kLower == "nam") namTuyenSinh = val;
-            else if (kLower == "diem chuan") {
-                try { diemChuanHienTai = stod(val); } catch (...) {}
-            }
-            else if (kLower == "diem liet") {
-                try { diemLietHienTai = stod(val); } catch (...) {}
-            }
-        }
-    }
-    fin.close();
-    return true;
-}
-
-bool QuanLyThiSinh::luuCauHinhHeThong(const string& path) const {
-    ofstream fout(path);
-    if (!fout.is_open()) return false;
-
-    fout << "#SYSTEM_CONFIG\n"
-         << "Truong: " << tenTruong << "\n"
-         << "Nam Tuyen Sinh: " << namTuyenSinh << "\n"
-         << fixed << setprecision(2)
-         << "Diem Chuan: " << diemChuanHienTai << "\n"
-         << "Diem Liet: " << diemLietHienTai << "\n"
-         << "====\n";
-    fout.close();
-    return true;
+    return ok;
 }
 
 // ==============================================================================
@@ -764,8 +279,68 @@ Vector<ThiSinh> QuanLyThiSinh::timTheoQueQuan(const string& que) const {
     return res;
 }
 
+string QuanLyThiSinh::layTenTinhThanh(const string& maHoacTen) const {
+    string norm = Utils::trim(maHoacTen);
+    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
+        if (dsTinhThanh[i].ma == norm || Utils::toLower(dsTinhThanh[i].ten) == Utils::toLower(norm)) {
+            return dsTinhThanh[i].ten;
+        }
+    }
+    return norm;
+}
+
+string QuanLyThiSinh::layMaTinhThanh(const string& tenHoacMa) const {
+    string norm = Utils::trim(tenHoacMa);
+    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
+        if (dsTinhThanh[i].ma == norm || Utils::toLower(dsTinhThanh[i].ten) == Utils::toLower(norm)) {
+            return dsTinhThanh[i].ma;
+        }
+    }
+    return norm;
+}
+
+string QuanLyThiSinh::layTenGioiTinh(const string& maHoacTen) const {
+    string norm = Utils::toUpper(Utils::trim(maHoacTen));
+    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
+        if (Utils::toUpper(dsGioiTinh[i].ma) == norm || Utils::toUpper(dsGioiTinh[i].ten) == norm) {
+            return dsGioiTinh[i].ten;
+        }
+    }
+    return maHoacTen;
+}
+
+string QuanLyThiSinh::layMaGioiTinh(const string& tenHoacMa) const {
+    string norm = Utils::toUpper(Utils::trim(tenHoacMa));
+    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
+        if (Utils::toUpper(dsGioiTinh[i].ma) == norm || Utils::toUpper(dsGioiTinh[i].ten) == norm) {
+            return dsGioiTinh[i].ma;
+        }
+    }
+    return tenHoacMa;
+}
+
+bool QuanLyThiSinh::kiemTraHopLeQueQuan(const string& maHoacTen) const {
+    string norm = Utils::trim(maHoacTen);
+    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
+        if (dsTinhThanh[i].ma == norm || Utils::toLower(dsTinhThanh[i].ten) == Utils::toLower(norm)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QuanLyThiSinh::kiemTraHopLeGioiTinh(const string& maHoacTen) const {
+    string norm = Utils::toUpper(Utils::trim(maHoacTen));
+    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
+        if (Utils::toUpper(dsGioiTinh[i].ma) == norm || Utils::toUpper(dsGioiTinh[i].ten) == norm) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // ==============================================================================
-// 3. NGHIỆP VỤ CRUD THÍ SINH (ĐỒNG BỘ IN-MEMORY + MYSQL + FILE)
+// 3. NGHIỆP VỤ CRUD THÍ SINH (TRỰC TIẾP TỚI MYSQL)
 // ==============================================================================
 
 bool QuanLyThiSinh::themThiSinh(const ThiSinh& ts) {
@@ -783,7 +358,6 @@ bool QuanLyThiSinh::themThiSinh(const ThiSinh& ts) {
 
     dsThiSinh.push_back(chuanHoa);
 
-    // Đồng bộ trực tiếp vào MySQL nếu đang kết nối
     if (isMySQLConnected()) {
         db.beginTransaction();
         string sqlNguoi = "INSERT INTO `nguoi` (`so_cccd`, `ho_ten`, `ngay_sinh`, `que_quan`, `gioi_tinh`) VALUES ('" +
@@ -810,8 +384,6 @@ bool QuanLyThiSinh::themThiSinh(const ThiSinh& ts) {
         db.commit();
     }
 
-    luuDuLieu();
-    xuatTatCaBaoCao();
     return true;
 }
 
@@ -839,7 +411,6 @@ bool QuanLyThiSinh::capNhatThiSinh(const ThiSinh& ts) {
 
     dsThiSinh[idx] = chuanHoa;
 
-    // Đồng bộ trực tiếp vào MySQL nếu đang kết nối
     if (isMySQLConnected()) {
         db.beginTransaction();
         string sqlNguoi = "UPDATE `nguoi` SET `ho_ten`='" + db.escape(chuanHoa.getHoTen()) + "', " +
@@ -862,8 +433,6 @@ bool QuanLyThiSinh::capNhatThiSinh(const ThiSinh& ts) {
         db.commit();
     }
 
-    luuDuLieu();
-    xuatTatCaBaoCao();
     return true;
 }
 
@@ -878,21 +447,19 @@ bool QuanLyThiSinh::xoaThiSinh(const string& sbdHoacCCCD) {
     string sbdXoa = dsThiSinh[idx].getSoBaoDanh();
     dsThiSinh.erase(idx);
 
-    // Đồng bộ xóa trong MySQL (Nhờ Foreign Key ON DELETE CASCADE, xóa nguoi sẽ tự xóa thisinh)
     if (isMySQLConnected()) {
         db.beginTransaction();
+        // Nhờ ràng buộc Foreign Key ON DELETE CASCADE, xóa nguoi sẽ tự động xóa thisinh
         db.execute("DELETE FROM `thisinh` WHERE `sbd`='" + db.escape(sbdXoa) + "';");
         db.execute("DELETE FROM `nguoi` WHERE `so_cccd`='" + db.escape(cccdXoa) + "';");
         db.commit();
     }
 
-    luuDuLieu();
-    xuatTatCaBaoCao();
     return true;
 }
 
 // ==============================================================================
-// 4. NGHIỆP VỤ CRUD DANH MỤC HỆ THỐNG
+// 4. NGHIỆP VỤ CRUD DANH MỤC HỆ THỐNG (TRỰC TIẾP TỚI MYSQL)
 // ==============================================================================
 
 bool QuanLyThiSinh::themTinhThanh(const TinhThanh& tt) {
@@ -909,7 +476,6 @@ bool QuanLyThiSinh::themTinhThanh(const TinhThanh& tt) {
         db.execute(sql);
     }
 
-    luuDanhMucTinhThanh(pathTinhThanh);
     return true;
 }
 
@@ -922,7 +488,6 @@ bool QuanLyThiSinh::capNhatTinhThanh(const TinhThanh& tt) {
                              "`loai`='" + db.escape(tt.loai) + "' WHERE `ma_tinh`='" + db.escape(tt.ma) + "';";
                 db.execute(sql);
             }
-            luuDanhMucTinhThanh(pathTinhThanh);
             return true;
         }
     }
@@ -939,7 +504,6 @@ bool QuanLyThiSinh::xoaTinhThanh(const string& ma) {
             if (isMySQLConnected()) {
                 db.execute("DELETE FROM `tinh_thanh` WHERE `ma_tinh`='" + db.escape(ma) + "';");
             }
-            luuDanhMucTinhThanh(pathTinhThanh);
             return true;
         }
     }
@@ -960,7 +524,6 @@ bool QuanLyThiSinh::themGioiTinh(const GioiTinh& gt) {
         db.execute(sql);
     }
 
-    luuDanhMucGioiTinh(pathGioiTinh);
     return true;
 }
 
@@ -973,7 +536,6 @@ bool QuanLyThiSinh::capNhatGioiTinh(const GioiTinh& gt) {
                              "WHERE `ma_gioi_tinh`='" + db.escape(gt.ma) + "';";
                 db.execute(sql);
             }
-            luuDanhMucGioiTinh(pathGioiTinh);
             return true;
         }
     }
@@ -991,7 +553,6 @@ bool QuanLyThiSinh::xoaGioiTinh(const string& ma) {
             if (isMySQLConnected()) {
                 db.execute("DELETE FROM `gioi_tinh` WHERE `ma_gioi_tinh`='" + db.escape(ma) + "';");
             }
-            luuDanhMucGioiTinh(pathGioiTinh);
             return true;
         }
     }
@@ -1028,8 +589,6 @@ void QuanLyThiSinh::setDiemChuan(double dc) {
         db.execute("INSERT INTO `cau_hinh` (`khoa`, `gia_tri`, `mo_ta`) VALUES ('diem_chuan', '" + ss.str() + "', 'Diem chuan trung tuyen') "
                    "ON DUPLICATE KEY UPDATE `gia_tri`=VALUES(`gia_tri`);");
     }
-    luuCauHinhHeThong(pathSystem);
-    xuatTatCaBaoCao();
 }
 
 double QuanLyThiSinh::getDiemLiet() const { return diemLietHienTai; }
@@ -1042,8 +601,6 @@ void QuanLyThiSinh::setDiemLiet(double dl) {
         db.execute("INSERT INTO `cau_hinh` (`khoa`, `gia_tri`, `mo_ta`) VALUES ('diem_liet', '" + ss.str() + "', 'Diem liet mon thi') "
                    "ON DUPLICATE KEY UPDATE `gia_tri`=VALUES(`gia_tri`);");
     }
-    luuCauHinhHeThong(pathSystem);
-    xuatTatCaBaoCao();
 }
 
 string QuanLyThiSinh::getNamTuyenSinh() const { return namTuyenSinh; }
@@ -1054,8 +611,6 @@ void QuanLyThiSinh::setNamTuyenSinh(const string& nam) {
         db.execute("INSERT INTO `cau_hinh` (`khoa`, `gia_tri`, `mo_ta`) VALUES ('nam_tuyen_sinh', '" + db.escape(nam) + "', 'Nam tuyen sinh') "
                    "ON DUPLICATE KEY UPDATE `gia_tri`=VALUES(`gia_tri`);");
     }
-    luuCauHinhHeThong(pathSystem);
-    xuatTatCaBaoCao();
 }
 
 string QuanLyThiSinh::getTenTruong() const { return tenTruong; }
@@ -1066,8 +621,6 @@ void QuanLyThiSinh::setTenTruong(const string& truong) {
         db.execute("INSERT INTO `cau_hinh` (`khoa`, `gia_tri`, `mo_ta`) VALUES ('truong', '" + db.escape(truong) + "', 'Ten truong tuyen sinh') "
                    "ON DUPLICATE KEY UPDATE `gia_tri`=VALUES(`gia_tri`);");
     }
-    luuCauHinhHeThong(pathSystem);
-    xuatTatCaBaoCao();
 }
 
 Vector<ThiSinh> QuanLyThiSinh::getDanhSachTrungTuyen(double diemChuan) const {
@@ -1113,7 +666,7 @@ void QuanLyThiSinh::tinhThongKePhoDiem(int& mucThap, int& mucTB, int& mucKha, in
 }
 
 // ==============================================================================
-// 7. XUẤT CÁC BÁO CÁO DẠNG BẢNG KẺ KHUNG CHUYÊN BIỆT
+// 7. XUẤT CÁC BÁO CÁO DẠNG BẢNG KẺ KHUNG (RA THƯ MỤC data/)
 // ==============================================================================
 
 bool QuanLyThiSinh::xuatBaoCaoXetTuyen(const string& path, double diemChuan, const string& keyword) const {

@@ -1,16 +1,16 @@
                                   TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG
                                        BAO CAO KET QUA XET TUYEN DAI HOC
                                              (Nam tuyen sinh: 2026)
-                                        Diem chuan xet tuyen: 25.00 diem
+                                        Diem chuan xet tuyen: 22.00 diem
 ===================================================================================================================
  STT |   SBD   |    So CCCD   |      Ho va Ten      | Ngay Sinh |   Que Quan   | Toan |  Ly  | Hoa  | Tong | Ket Qua  |
 -------------------------------------------------------------------------------------------------------------------
-   1 | DUT001  | 012345678901 | Vo Nhu Hieu         | 04/03/2003 | TP. Da Nang  | 9.00 | 7.00 | 8.00 | 24.00 |Khong dat
+   1 | DUT001  | 012345678901 | Vo Nhu Hieu         | 04/03/2003 | TP. Da Nang  | 9.00 | 7.00 | 8.00 | 24.00 |TRUNG TUYEN
    2 | DUT002  | 012345678902 | Vo Huy Tuong        | 27/07/2009 | TP. Da Nang  | 9.00 | 9.75 | 8.50 | 27.25 |TRUNG TUYEN
    3 | DUT003  | 012345678903 | Nguyen Thi Nhat Vy  | 10/09/2005 | Quang Ngai   | 9.50 | 9.50 | 8.25 | 27.25 |TRUNG TUYEN
 ===================================================================================================================
 Tong so thi sinh bao cao : 3
-So thi sinh trung tuyen  : 2 (66.7%)
-So thi sinh khong dat    : 1 (33.3%)
+So thi sinh trung tuyen  : 3 (100.0%)
+So thi sinh khong dat    : 0 (0.0%)
 Thu khoa ky thi          : Vo Huy Tuong (DUT002), Nguyen Thi Nhat Vy (DUT003) - Tong diem: 27.25
 ===================================================================================================================

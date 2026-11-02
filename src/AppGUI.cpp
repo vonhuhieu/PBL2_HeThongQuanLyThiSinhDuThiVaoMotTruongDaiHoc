@@ -1,4 +1,4 @@
-﻿#include "../include/AppGUI.h"
+#include "../include/AppGUI.h"
 #include "../include/Utils.h"
 #include "../include/Constants.h"
 #include "../include/DanhMuc.h"
@@ -649,7 +649,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 if (ImGui::BeginTabBar("SubTabsCSDL", ImGuiTabBarFlags_None)) {
 
                     // SUBTAB 2.1: BẢNG THỰC THỂ CHA NGƯỜI
-                    if (ImGui::BeginTabItem("  Bang 1: NGUOI (data/nguoi.txt)  ")) {
+                    if (ImGui::BeginTabItem("  Bang 1: NGUOI (MySQL: nguoi)  ")) {
                         ImGui::Spacing();
                         ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG THUC THE CHA: NGUOI (Khoa chinh: soCCCD | Khoa ngoai: queQuan, gioiTinh)");
                         ImGui::Separator();
@@ -685,7 +685,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     }
 
                     // SUBTAB 2.2: BẢNG THỰC THỂ CON THÍ SINH
-                    if (ImGui::BeginTabItem("  Bang 2: THI SINH (data/thisinh.txt)  ")) {
+                    if (ImGui::BeginTabItem("  Bang 2: THI SINH (MySQL: thisinh)  ")) {
                         ImGui::Spacing();
                         ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG THUC THE CON: THI SINH (Khoa chinh: soBaoDanh | Khoa ngoai: soCCCD)");
                         ImGui::Separator();
@@ -721,7 +721,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     }
 
                     // SUBTAB 2.3: BẢNG DANH MỤC TỈNH THÀNH
-                    if (ImGui::BeginTabItem("  Bang 3: TINH THANH (data/tinhthanh.txt)  ")) {
+                    if (ImGui::BeginTabItem("  Bang 3: TINH THANH (MySQL: tinh_thanh)  ")) {
                         ImGui::Spacing();
                         ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG DANH MUC: 34 TINH / THANH PHO (Khoa chinh: ma)");
                         ImGui::Separator();
@@ -751,7 +751,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     }
 
                     // SUBTAB 2.4: BẢNG DANH MỤC GIỚI TÍNH
-                    if (ImGui::BeginTabItem("  Bang 4: GIOI TINH (data/gioitinh.txt)  ")) {
+                    if (ImGui::BeginTabItem("  Bang 4: GIOI TINH (MySQL: gioi_tinh)  ")) {
                         ImGui::Spacing();
                         ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG DANH MUC: GIOI TINH (Khoa chinh: ma)");
                         ImGui::Separator();
@@ -781,9 +781,9 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     }
 
                     // SUBTAB 2.5: BẢNG CẤU HÌNH HỆ THỐNG
-                    if (ImGui::BeginTabItem("  Bang 5: HE THONG (data/system.txt)  ")) {
+                    if (ImGui::BeginTabItem("  Bang 5: CAU HINH (MySQL: cau_hinh)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG THAM SO HE THONG & TUYEN SINH (data/system.txt)");
+                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG THAM SO HE THONG & TUYEN SINH (MySQL: cau_hinh)");
                         ImGui::Separator();
 
                         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.12f, 0.15f, 0.20f, 1.0f));
@@ -814,7 +814,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                             ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), 
                                 "+---------------------------------------------------------------------------------+\n"
                                 "|                BANG 3: TINH THANH               BANG 4: GIOI TINH               |\n"
-                                "|                   (tinhthanh.txt)                  (gioitinh.txt)               |\n"
+                                "|                   (tinh_thanh)                  (gioi_tinh)               |\n"
                                 "+------------------------------------+  +-----------------------------------------+\n"
                                 "| * ma (PK)   : 01, 04, 48...        |  | * ma (PK)   : NAM, NU, KHAC...          |\n"
                                 "|   ten       : TP. Da Nang...       |  |   ten       : Nam, Nu, Khac             |\n"
@@ -825,7 +825,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 "                  |                                          |\n"
                                 "                  | N (FK: queQuan)                          | N (FK: gioiTinh)\n"
                                 "+---------------------------------------------------------------------------------+\n"
-                                "|                   BANG 1: NGUOI (Tep luu tru: data/nguoi.txt)                   |\n"
+                                "|                   BANG 1: NGUOI (Bang CSDL: nguoi)                   |\n"
                                 "+---------------------------------------------------------------------------------+\n"
                                 "|  * soCCCD (PRIMARY KEY - PK)  : So Can cuoc Cong dan (12 chu so)                |\n"
                                 "|    hoTen                      : Ho va ten                                       |\n"
@@ -838,7 +838,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 "                                          |\n"
                                 "                                          | 1 (FK: soCCCD)\n"
                                 "+---------------------------------------------------------------------------------+\n"
-                                "|                 BANG 2: THI SINH (Tep luu tru: data/thisinh.txt)                |\n"
+                                "|                 BANG 2: THI SINH (Bang CSDL: thisinh)                |\n"
                                 "+---------------------------------------------------------------------------------+\n"
                                 "|  * soBaoDanh (PRIMARY KEY - PK): So bao danh du thi (DUTxxx)                    |\n"
                                 "|  * soCCCD (FOREIGN KEY - FK)   : Khoa ngoai tham chieu sang bang NGUOI          |\n"
@@ -846,7 +846,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 "|    diemLy                     : Diem thi mon Vat ly (0.00 - 10.00)              |\n"
                                 "|    diemHoa                    : Diem thi mon Hoa hoc (0.00 - 10.00)             |\n"
                                 "+---------------------------------------------------------------------------------+\n\n"
-                                "[*] BANG 5: data/system.txt (Truong, Nam tuyen sinh, Diem chuan, Diem liet)\n"
+                                "[*] BANG 5: cau_hinh (Truong, Nam tuyen sinh, Diem chuan, Diem liet)\n"
                                 "[*] BAO CAO: data/ketqua_xettuyen.txt, data/thukhoa.txt, data/thongke_phodiem.txt\n");
                         }
                         ImGui::EndChild();
@@ -1161,7 +1161,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     // SUBTAB 4.3: THAM SỐ TUYỂN SINH & CẤU HÌNH HỆ THỐNG
                     if (ImGui::BeginTabItem("  Tham so Tuyen sinh & Cau hinh  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "THIET LAP THAM SO KY THI (data/system.txt):");
+                        ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "THIET LAP THAM SO KY THI (MySQL: cau_hinh):");
                         ImGui::Separator();
 
                         ImGui::BeginChild("SystemParamsChild", ImVec2(0, 300), true);
@@ -1246,16 +1246,14 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::Spacing();
                 ImGui::Separator();
                 ImGui::Spacing();
-                ImGui::Text("Chuc nang quan tri sao luu he thong CSDL da tep (Key - Value):");
-                ImGui::Spacing();
-
-                if (ImGui::Button("[ Luu Toan Bo CSDL (nguoi.txt, thisinh.txt, tinhthanh.txt, gioitinh.txt, system.txt) ]", ImVec2(480, 36))) {
-                    ql.luuDuLieu();
-                    ql.luuDanhMucTinhThanh("data/tinhthanh.txt");
-                    ql.luuDanhMucGioiTinh("data/gioitinh.txt");
-                    ql.luuCauHinhHeThong("data/system.txt");
-                    showToast = true;
-                    toastMsg = "Da luu toan bo CSDL va danh muc he thong thanh cong!";
+                if (ImGui::Button("[ Luu va Dong bo Toan Bo Du Lieu Vao MySQL (Commit) ]", ImVec2(480, 36))) {
+                    if (ql.luuDuLieuVaoMySQL()) {
+                        showToast = true;
+                        toastMsg = "Da luu toan bo du lieu vao MySQL Database thanh cong!";
+                    } else {
+                        showToast = true;
+                        toastMsg = "Loi luu du lieu vao MySQL! Kiem tra ket noi.";
+                    }
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("[ Xuat Tat Ca Bao Cao (Ket qua, Thu khoa, Pho diem) ]", ImVec2(410, 36))) {
@@ -1309,11 +1307,11 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::Separator();
                 ImGui::Spacing();
                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.35f, 1.0f), "KIEN TRUC DU LIEU DA TEP THEO CHUAN CSDL 3NF:");
-                ImGui::BulletText("1. data/tinhthanh.txt: Bang danh muc TINH THANH (34 tinh thanh theo NQ 202/2025/QH15).");
-                ImGui::BulletText("2. data/gioitinh.txt: Bang danh muc GIOI TINH (NAM, NU, KHAC).");
-                ImGui::BulletText("3. data/nguoi.txt: Bang thuc the cha NGUOI (PK: soCCCD, FK: queQuan, FK: gioiTinh).");
-                ImGui::BulletText("4. data/thisinh.txt: Bang thuc the con THI SINH (PK: soBaoDanh, FK: soCCCD).");
-                ImGui::BulletText("5. data/system.txt: Cau hinh he thong (Truong, Nam tuyen sinh, Diem chuan, Diem liet).");
+                ImGui::BulletText("1. tinh_thanh: Bang danh muc TINH THANH (34 tinh thanh theo NQ 202/2025/QH15 trong MySQL).");
+                ImGui::BulletText("2. gioi_tinh: Bang danh muc GIOI TINH (NAM, NU, KHAC trong MySQL).");
+                ImGui::BulletText("3. nguoi: Bang thuc the cha NGUOI (PK: so_cccd, FK: que_quan, FK: gioi_tinh trong MySQL).");
+                ImGui::BulletText("4. thisinh: Bang thuc the con THI SINH (PK: sbd, FK: so_cccd CASCADE DELETE trong MySQL).");
+                ImGui::BulletText("5. cau_hinh: Bang tham so he thong (Truong, Nam tuyen sinh, Diem chuan, Diem liet trong MySQL).");
                 ImGui::BulletText("6. data/ketqua_xettuyen.txt, data/thukhoa.txt, data/thongke_phodiem.txt: Bao cao dong.");
                 ImGui::EndTabItem();
             }

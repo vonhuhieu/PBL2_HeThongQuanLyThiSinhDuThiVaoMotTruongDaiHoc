@@ -11,6 +11,6 @@
    5 | Muc diem Thap                | < 15.00 diem             |                 0 |                0.00% |
 =========================================================================================================
 Tong so thi sinh toan truong: 3
-Diem chuan xet tuyen hien tai: 25.00 diem
-So thi sinh dat diem chuan  : 2 (66.7%)
+Diem chuan xet tuyen hien tai: 22.00 diem
+So thi sinh dat diem chuan  : 3 (100.0%)
 =========================================================================================================
