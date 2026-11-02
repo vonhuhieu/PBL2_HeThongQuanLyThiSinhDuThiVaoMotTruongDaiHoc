@@ -33,3 +33,4 @@ namespace AdmissionConst {
 }
 
 #endif // CONSTANTS_H
+
