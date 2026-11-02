@@ -38,7 +38,7 @@ static bool RenderSearchableComboTinhThanh(const char* comboId, const Vector<Tin
     string currentLabel = "Chon tinh / thanh pho...";
     for (size_t i = 0; i < ds.size(); ++i) {
         if (ds[i].ma == selectedMa) {
-            currentLabel = ds[i].ten + " (" + ds[i].ma + ")";
+            currentLabel = ds[i].ten;
             break;
         }
     }
@@ -50,7 +50,7 @@ static bool RenderSearchableComboTinhThanh(const char* comboId, const Vector<Tin
             ImGui::SetKeyboardFocusHere();
         }
         ImGui::SetNextItemWidth(-1);
-        ImGui::InputTextWithHint("##filterTinh", "Tim kiem (VD: Da Nang, Ha Noi, 48...)", filterBuf, sizeof(filterBuf));
+        ImGui::InputTextWithHint("##filterTinh", "Tim kiem tinh / thanh pho...", filterBuf, sizeof(filterBuf));
         ImGui::Separator();
 
         string query = Utils::toLower(Utils::trim(filterBuf));
@@ -62,7 +62,7 @@ static bool RenderSearchableComboTinhThanh(const char* comboId, const Vector<Tin
             if (query.empty() || itemName.find(query) != string::npos || itemMa.find(query) != string::npos) {
                 matchCount++;
                 bool isSelected = (selectedMa == ds[i].ma);
-                string displayLabel = "[" + ds[i].ma + "] " + ds[i].ten;
+                string displayLabel = ds[i].ten;
                 if (ImGui::Selectable(displayLabel.c_str(), isSelected)) {
                     selectedMa = ds[i].ma;
                     changed = true;
@@ -98,7 +98,7 @@ static bool RenderComboGioiTinh(const char* comboId, const Vector<GioiTinh>& ds,
     if (ImGui::BeginCombo(comboId, currentLabel.c_str())) {
         for (size_t i = 0; i < ds.size(); ++i) {
             bool isSelected = (Utils::toUpper(selectedMa) == Utils::toUpper(ds[i].ma));
-            string displayLabel = ds[i].ten + " (" + ds[i].moTa + ")";
+            string displayLabel = ds[i].ten;
             if (ImGui::Selectable(displayLabel.c_str(), isSelected)) {
                 selectedMa = ds[i].ma;
                 changed = true;
@@ -341,6 +341,19 @@ int AppGUI::run(QuanLyThiSinh& ql) {
     static char bufNewTenGT[64] = "";
     static char bufNewDescGT[64] = "";
     static string msgGioiTinh = "";
+
+    // State Modal Sửa Danh mục Tỉnh thành & Giới tính
+    static bool showEditTinhThanhModal = false;
+    static char editTinhThanhMa[16] = "";
+    static char editTinhThanhTen[128] = "";
+    static char editTinhThanhLoai[64] = "";
+    static string editTinhThanhError = "";
+
+    static bool showEditGioiTinhModal = false;
+    static char editGioiTinhMa[16] = "";
+    static char editGioiTinhTen[64] = "";
+    static char editGioiTinhDesc[128] = "";
+    static string editGioiTinhError = "";
 
     // Form tham số hệ thống
     static char bufTenTruong[128] = "";
@@ -871,7 +884,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     static float curDC = (float)ql.getDiemChuan();
 
                     ImGui::SetNextItemWidth(140);
-                    if (ImGui::InputFloat("Diem Chuan (thang 30)", &curDC, 0.25f, 1.0f, "%.2f")) {
+                    if (ImGui::InputFloat("Diem Chuan (thang 30)", &curDC, 0.0f, 0.0f, "%.2f")) {
                         if (curDC < 0.0f) curDC = 0.0f;
                         if (curDC > 30.0f) curDC = 30.0f;
                         ql.setDiemChuan((double)curDC);
@@ -1030,7 +1043,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                             ImGui::TableSetupColumn("Ma Tinh (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("Ten Don Vi Hanh Chinh", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("Loai Hinh", ImGuiTableColumnFlags_WidthFixed, 260);
-                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 90);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 130);
                             ImGui::TableHeadersRow();
 
                             for (size_t i = 0; i < ql.getDanhSachTinhThanh().size(); ++i) {
@@ -1047,6 +1060,16 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                                 ImGui::TableSetColumnIndex(4);
                                 ImGui::PushID((int)(1000 + i));
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.45f, 0.7f, 1.0f));
+                                if (ImGui::SmallButton("Sua")) {
+                                    strcpy(editTinhThanhMa, tt.ma.c_str());
+                                    strcpy(editTinhThanhTen, tt.ten.c_str());
+                                    strcpy(editTinhThanhLoai, tt.loai.c_str());
+                                    editTinhThanhError = "";
+                                    showEditTinhThanhModal = true;
+                                }
+                                ImGui::PopStyleColor();
+                                ImGui::SameLine();
                                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.2f, 0.2f, 1.0f));
                                 if (ImGui::SmallButton("Xoa")) {
                                     if (ql.xoaTinhThanh(tt.ma)) {
@@ -1122,7 +1145,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                             ImGui::TableSetupColumn("Ma (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("Ten Hien Thi", ImGuiTableColumnFlags_WidthFixed, 180);
                             ImGui::TableSetupColumn("Mo Ta Chi Tiet", ImGuiTableColumnFlags_WidthStretch);
-                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 90);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 130);
                             ImGui::TableHeadersRow();
 
                             for (size_t i = 0; i < ql.getDanhSachGioiTinh().size(); ++i) {
@@ -1139,6 +1162,16 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                                 ImGui::TableSetColumnIndex(4);
                                 ImGui::PushID((int)(2000 + i));
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.45f, 0.7f, 1.0f));
+                                if (ImGui::SmallButton("Sua")) {
+                                    strcpy(editGioiTinhMa, gt.ma.c_str());
+                                    strcpy(editGioiTinhTen, gt.ten.c_str());
+                                    strcpy(editGioiTinhDesc, gt.moTa.c_str());
+                                    editGioiTinhError = "";
+                                    showEditGioiTinhModal = true;
+                                }
+                                ImGui::PopStyleColor();
+                                ImGui::SameLine();
                                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.2f, 0.2f, 1.0f));
                                 if (ImGui::SmallButton("Xoa")) {
                                     if (ql.xoaGioiTinh(gt.ma)) {
@@ -1178,12 +1211,12 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                             ImGui::Spacing();
                             ImGui::Text("Diem Chuan Xet Tuyen (thang 30):");
                             ImGui::SetNextItemWidth(200);
-                            ImGui::InputFloat("##dcSys", &formDiemChuan, 0.25f, 1.0f, "%.2f");
+                            ImGui::InputFloat("##dcSys", &formDiemChuan, 0.0f, 0.0f, "%.2f");
 
                             ImGui::Spacing();
                             ImGui::Text("Nguong Diem Liet Mon Thi (mac dinh 1.00):");
                             ImGui::SetNextItemWidth(200);
-                            ImGui::InputFloat("##dlSys", &formDiemLiet, 0.25f, 1.0f, "%.2f");
+                            ImGui::InputFloat("##dlSys", &formDiemLiet, 0.0f, 0.0f, "%.2f");
 
                             ImGui::Spacing();
                             ImGui::Separator();
@@ -1693,6 +1726,124 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 }
             } else {
                 showDeleteModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: SỬA TỈNH THÀNH ====================
+        if (showEditTinhThanhModal) {
+            ImGui::OpenPopup("Cap Nhat Tinh / Thanh Pho");
+        }
+        if (ImGui::BeginPopupModal("Cap Nhat Tinh / Thanh Pho", &showEditTinhThanhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "CAP NHAT THONG TIN TINH / THANH PHO (MA: %s)", editTinhThanhMa);
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Tinh (PK):");
+            ImGui::BeginDisabled();
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editMaTT", editTinhThanhMa, sizeof(editTinhThanhMa));
+            ImGui::EndDisabled();
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Tinh / Thanh Pho*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editTenTT", editTinhThanhTen, sizeof(editTinhThanhTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Loai Hinh (Tinh / TP truc thuoc TW):");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editLoaiTT", editTinhThanhLoai, sizeof(editTinhThanhLoai));
+
+            if (!editTinhThanhError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", editTinhThanhError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Luu Thay Doi", ImVec2(130, 30))) {
+                string ten = Utils::trim(editTinhThanhTen);
+                string loai = Utils::trim(editTinhThanhLoai);
+                if (ten.empty()) {
+                    editTinhThanhError = "Ten tinh thanh khong duoc de trong!";
+                } else {
+                    TinhThanh ttCapNhat(editTinhThanhMa, ten, loai);
+                    if (ql.capNhatTinhThanh(ttCapNhat)) {
+                        showEditTinhThanhModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Cap nhat tinh / thanh pho thanh cong!";
+                    } else {
+                        editTinhThanhError = "Khong the cap nhat tinh thanh!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo", ImVec2(100, 30))) {
+                showEditTinhThanhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: SỬA GIỚI TÍNH ====================
+        if (showEditGioiTinhModal) {
+            ImGui::OpenPopup("Cap Nhat Gioi Tinh");
+        }
+        if (ImGui::BeginPopupModal("Cap Nhat Gioi Tinh", &showEditGioiTinhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "CAP NHAT THONG TIN GIOI TINH (MA: %s)", editGioiTinhMa);
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Gioi Tinh (PK):");
+            ImGui::BeginDisabled();
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editMaGT", editGioiTinhMa, sizeof(editGioiTinhMa));
+            ImGui::EndDisabled();
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Hien Thi*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editTenGT", editGioiTinhTen, sizeof(editGioiTinhTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Ghi Chu Mo Ta:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editDescGT", editGioiTinhDesc, sizeof(editGioiTinhDesc));
+
+            if (!editGioiTinhError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", editGioiTinhError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Luu Thay Doi", ImVec2(130, 30))) {
+                string ten = Utils::trim(editGioiTinhTen);
+                string desc = Utils::trim(editGioiTinhDesc);
+                if (ten.empty()) {
+                    editGioiTinhError = "Ten gioi tinh khong duoc de trong!";
+                } else {
+                    GioiTinh gtCapNhat(editGioiTinhMa, ten, desc);
+                    if (ql.capNhatGioiTinh(gtCapNhat)) {
+                        showEditGioiTinhModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Cap nhat gioi tinh thanh cong!";
+                    } else {
+                        editGioiTinhError = "Khong the cap nhat gioi tinh!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo", ImVec2(100, 30))) {
+                showEditGioiTinhModal = false;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
