@@ -49,3 +49,4 @@ INSERT INTO `thisinh` (`sbd`, `so_cccd`, `diem_toan`, `diem_ly`, `diem_hoa`) VAL
 ('DUT013', '201059687147', 8.00, 8.50, 7.75),
 ('DUT014', '200948576038', 9.25, 9.00, 9.25)
 ON DUPLICATE KEY UPDATE `diem_toan` = VALUES(`diem_toan`), `diem_ly` = VALUES(`diem_ly`), `diem_hoa` = VALUES(`diem_hoa`);
+

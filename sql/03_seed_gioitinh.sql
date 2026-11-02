@@ -11,3 +11,4 @@ INSERT INTO `gioi_tinh` (`ma_gioi_tinh`, `ten_gioi_tinh`) VALUES
 ('NU', 'Nu'),
 ('KHAC', 'Khac')
 ON DUPLICATE KEY UPDATE `ten_gioi_tinh` = VALUES(`ten_gioi_tinh`);
+

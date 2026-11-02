@@ -72,3 +72,4 @@ CREATE TABLE `cau_hinh` (
     `mo_ta`    VARCHAR(255)    DEFAULT NULL,
     PRIMARY KEY (`khoa`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

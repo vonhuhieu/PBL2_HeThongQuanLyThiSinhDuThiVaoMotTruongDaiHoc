@@ -102,3 +102,4 @@ LEFT JOIN `thisinh` ts ON n.so_cccd = ts.so_cccd
 GROUP BY tt.ma_tinh, tt.ten_tinh
 HAVING so_thi_sinh > 0
 ORDER BY so_thi_sinh DESC, diem_trung_binh DESC;
+

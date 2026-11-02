@@ -53,3 +53,4 @@ public:
 };
 
 #endif // MYSQL_CONNECTOR_H
+

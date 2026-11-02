@@ -41,3 +41,4 @@ INSERT INTO `tinh_thanh` (`ma_tinh`, `ten_tinh`, `loai`) VALUES
 ('89', 'An Giang', 'Tinh'),
 ('92', 'TP. Can Tho', 'Thanh pho truc thuoc Trung uong')
 ON DUPLICATE KEY UPDATE `ten_tinh` = VALUES(`ten_tinh`), `loai` = VALUES(`loai`);
+

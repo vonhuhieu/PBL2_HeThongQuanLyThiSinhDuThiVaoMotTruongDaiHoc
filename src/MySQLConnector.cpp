@@ -196,3 +196,4 @@ bool MySQLConnector::initSchemaAndTables() {
     }
     return true;
 }
+
