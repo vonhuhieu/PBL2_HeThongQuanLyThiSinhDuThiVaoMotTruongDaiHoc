@@ -1,7 +1,7 @@
                                   TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG
                                        BAO CAO KET QUA XET TUYEN DAI HOC
                                              (Nam tuyen sinh: 2026)
-                                        Diem chuan xet tuyen: 23.00 diem
+                                        Diem chuan xet tuyen: 22.00 diem
 ===================================================================================================================
  STT |   SBD   |    So CCCD   |      Ho va Ten      | Ngay Sinh |   Que Quan   | Toan |  Ly  | Hoa  | Tong | Ket Qua  |
 -------------------------------------------------------------------------------------------------------------------

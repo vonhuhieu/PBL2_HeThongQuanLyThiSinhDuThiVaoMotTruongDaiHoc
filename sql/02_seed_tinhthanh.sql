@@ -1,12 +1,12 @@
 -- ==============================================================================
 -- HE THONG QUAN LY THI SINH TUYEN SINH DAI HOC - PBL2 (DE TAI 24)
 -- File: 02_seed_tinhthanh.sql
--- Muc tieu: Nap danh muc 34 Tinh / Thanh pho
+-- Muc tieu: Nap danh muc 34 Tinh / Thanh pho (lowerCamelCase: maTinh, tenTinh, loai)
 -- ==============================================================================
 
 USE `pbl2_tuyensinh`;
 
-INSERT INTO `tinh_thanh` (`ma_tinh`, `ten_tinh`, `loai`) VALUES
+INSERT INTO `tinh_thanh` (`maTinh`, `tenTinh`, `loai`) VALUES
 ('01', 'TP. Ha Noi', 'Thanh pho truc thuoc Trung uong'),
 ('04', 'Cao Bang', 'Tinh'),
 ('08', 'Tuyen Quang', 'Tinh'),
@@ -40,5 +40,4 @@ INSERT INTO `tinh_thanh` (`ma_tinh`, `ten_tinh`, `loai`) VALUES
 ('87', 'Dong Thap', 'Tinh'),
 ('89', 'An Giang', 'Tinh'),
 ('92', 'TP. Can Tho', 'Thanh pho truc thuoc Trung uong')
-ON DUPLICATE KEY UPDATE `ten_tinh` = VALUES(`ten_tinh`), `loai` = VALUES(`loai`);
-
+ON DUPLICATE KEY UPDATE `tenTinh` = VALUES(`tenTinh`), `loai` = VALUES(`loai`);

@@ -148,45 +148,134 @@ bool MySQLConnector::rollback() {
 bool MySQLConnector::initSchemaAndTables() {
     if (!isConnected()) return false;
 
+    // Kiem tra tuong thich Schema: Neu bang thisinh co cot sbd (chuẩn cũ) thay vi soBaoDanh
+    // Thi tu dong nang cap len Schema moi 10 bang chuan lowerCamelCase
+    MYSQL_RES* checkRes = query("SHOW TABLES LIKE 'thisinh';");
+    if (checkRes) {
+        if (mysql_num_rows(checkRes) > 0) {
+            MYSQL_RES* colRes = query("SHOW COLUMNS FROM `thisinh` LIKE 'soBaoDanh';");
+            if (colRes) {
+                if (mysql_num_rows(colRes) == 0) {
+                    // Phat hien bang cu snake_case -> Drop va tao lai
+                    execute("DROP TABLE IF EXISTS `nguyen_vong`;");
+                    execute("DROP TABLE IF EXISTS `thisinh`;");
+                    execute("DROP TABLE IF EXISTS `nguoi`;");
+                    execute("DROP TABLE IF EXISTS `nganh_theo_khoa_hoc`;");
+                    execute("DROP TABLE IF EXISTS `danh_muc_nganh`;");
+                    execute("DROP TABLE IF EXISTS `khoa`;");
+                    execute("DROP TABLE IF EXISTS `khoa_hoc`;");
+                    execute("DROP TABLE IF EXISTS `tinh_thanh`;");
+                    execute("DROP TABLE IF EXISTS `gioi_tinh`;");
+                    execute("DROP TABLE IF EXISTS `cau_hinh`;");
+                }
+                freeResult(colRes);
+            }
+        }
+        freeResult(checkRes);
+    }
+
     const char* queries[] = {
+        // 1. Tinh thanh
         "CREATE TABLE IF NOT EXISTS `tinh_thanh` ("
-        "  `ma_tinh` VARCHAR(10) NOT NULL,"
-        "  `ten_tinh` VARCHAR(100) NOT NULL,"
+        "  `maTinh` VARCHAR(10) NOT NULL,"
+        "  `tenTinh` VARCHAR(100) NOT NULL,"
         "  `loai` VARCHAR(50) DEFAULT 'Tinh',"
-        "  PRIMARY KEY (`ma_tinh`)"
+        "  PRIMARY KEY (`maTinh`)"
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
 
+        // 2. Gioi tinh
         "CREATE TABLE IF NOT EXISTS `gioi_tinh` ("
-        "  `ma_gioi_tinh` VARCHAR(10) NOT NULL,"
-        "  `ten_gioi_tinh` VARCHAR(30) NOT NULL,"
-        "  PRIMARY KEY (`ma_gioi_tinh`)"
+        "  `maGioiTinh` VARCHAR(10) NOT NULL,"
+        "  `tenGioiTinh` VARCHAR(30) NOT NULL,"
+        "  PRIMARY KEY (`maGioiTinh`)"
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
 
+        // 3. Khoa hoc
+        "CREATE TABLE IF NOT EXISTS `khoa_hoc` ("
+        "  `namTuyenSinh` INT NOT NULL,"
+        "  `tenKhoaHoc` VARCHAR(100) NOT NULL,"
+        "  `trangThai` VARCHAR(30) DEFAULT 'DANG TUYEN SINH',"
+        "  PRIMARY KEY (`namTuyenSinh`)"
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+
+        // 4. Khoa dao tao
+        "CREATE TABLE IF NOT EXISTS `khoa` ("
+        "  `maKhoa` VARCHAR(10) NOT NULL,"
+        "  `tenKhoa` VARCHAR(100) NOT NULL,"
+        "  `maKhoaTheoChuanDUT` VARCHAR(10) NOT NULL,"
+        "  PRIMARY KEY (`maKhoa`)"
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+
+        // 5. Danh muc Nganh (tinh)
+        "CREATE TABLE IF NOT EXISTS `danh_muc_nganh` ("
+        "  `maNganh` VARCHAR(20) NOT NULL,"
+        "  `tenNganh` VARCHAR(150) NOT NULL,"
+        "  `maKhoa` VARCHAR(10) NOT NULL,"
+        "  `tienToLop` VARCHAR(30) NOT NULL,"
+        "  PRIMARY KEY (`maNganh`),"
+        "  CONSTRAINT `fk_nganh_khoa` FOREIGN KEY (`maKhoa`) REFERENCES `khoa` (`maKhoa`) ON UPDATE CASCADE ON DELETE RESTRICT"
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+
+        // 6. Nganh theo khoa hoc
+        "CREATE TABLE IF NOT EXISTS `nganh_theo_khoa_hoc` ("
+        "  `namTuyenSinh` INT NOT NULL,"
+        "  `maNganh` VARCHAR(20) NOT NULL,"
+        "  `chiTieu` INT NOT NULL DEFAULT 60,"
+        "  `diemChuanChot` DOUBLE DEFAULT 0.0,"
+        "  `diemSanToiThieu` DOUBLE DEFAULT 15.00,"
+        "  PRIMARY KEY (`namTuyenSinh`, `maNganh`),"
+        "  CONSTRAINT `fk_ntkh_khoa_hoc` FOREIGN KEY (`namTuyenSinh`) REFERENCES `khoa_hoc` (`namTuyenSinh`) ON UPDATE CASCADE ON DELETE CASCADE,"
+        "  CONSTRAINT `fk_ntkh_nganh` FOREIGN KEY (`maNganh`) REFERENCES `danh_muc_nganh` (`maNganh`) ON UPDATE CASCADE ON DELETE RESTRICT"
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+
+        // 7. Nguoi
         "CREATE TABLE IF NOT EXISTS `nguoi` ("
-        "  `so_cccd` VARCHAR(20) NOT NULL,"
-        "  `ho_ten` VARCHAR(100) NOT NULL,"
-        "  `ngay_sinh` VARCHAR(20) NOT NULL,"
-        "  `que_quan` VARCHAR(10) NOT NULL,"
-        "  `gioi_tinh` VARCHAR(10) NOT NULL,"
-        "  PRIMARY KEY (`so_cccd`),"
-        "  CONSTRAINT `fk_nguoi_que_quan` FOREIGN KEY (`que_quan`) REFERENCES `tinh_thanh` (`ma_tinh`) ON UPDATE CASCADE ON DELETE RESTRICT,"
-        "  CONSTRAINT `fk_nguoi_gioi_tinh` FOREIGN KEY (`gioi_tinh`) REFERENCES `gioi_tinh` (`ma_gioi_tinh`) ON UPDATE CASCADE ON DELETE RESTRICT"
+        "  `soCCCD` VARCHAR(20) NOT NULL,"
+        "  `hoTen` VARCHAR(100) NOT NULL,"
+        "  `ngaySinh` VARCHAR(20) NOT NULL,"
+        "  `queQuan` VARCHAR(10) NOT NULL,"
+        "  `gioiTinh` VARCHAR(10) NOT NULL,"
+        "  PRIMARY KEY (`soCCCD`),"
+        "  CONSTRAINT `fk_nguoi_queQuan` FOREIGN KEY (`queQuan`) REFERENCES `tinh_thanh` (`maTinh`) ON UPDATE CASCADE ON DELETE RESTRICT,"
+        "  CONSTRAINT `fk_nguoi_gioiTinh` FOREIGN KEY (`gioiTinh`) REFERENCES `gioi_tinh` (`maGioiTinh`) ON UPDATE CASCADE ON DELETE RESTRICT"
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
 
+        // 8. Thi sinh
         "CREATE TABLE IF NOT EXISTS `thisinh` ("
-        "  `sbd` VARCHAR(20) NOT NULL,"
-        "  `so_cccd` VARCHAR(20) NOT NULL UNIQUE,"
-        "  `diem_toan` DOUBLE NOT NULL,"
-        "  `diem_ly` DOUBLE NOT NULL,"
-        "  `diem_hoa` DOUBLE NOT NULL,"
-        "  PRIMARY KEY (`sbd`),"
-        "  CONSTRAINT `fk_thisinh_nguoi` FOREIGN KEY (`so_cccd`) REFERENCES `nguoi` (`so_cccd`) ON UPDATE CASCADE ON DELETE CASCADE"
+        "  `soBaoDanh` VARCHAR(20) NOT NULL,"
+        "  `soCCCD` VARCHAR(20) NOT NULL UNIQUE,"
+        "  `namTuyenSinh` INT NOT NULL DEFAULT 2026,"
+        "  `diemToan` DOUBLE NOT NULL,"
+        "  `diemLy` DOUBLE NOT NULL,"
+        "  `diemHoa` DOUBLE NOT NULL,"
+        "  `maSinhVien` VARCHAR(20) DEFAULT NULL,"
+        "  `lopSinhHoat` VARCHAR(50) DEFAULT NULL,"
+        "  `nganhTrungTuyen` VARCHAR(20) DEFAULT NULL,"
+        "  `nguyenVongTrungTuyen` INT DEFAULT 0,"
+        "  PRIMARY KEY (`soBaoDanh`),"
+        "  CONSTRAINT `fk_thisinh_nguoi` FOREIGN KEY (`soCCCD`) REFERENCES `nguoi` (`soCCCD`) ON UPDATE CASCADE ON DELETE CASCADE,"
+        "  CONSTRAINT `fk_thisinh_khoa_hoc` FOREIGN KEY (`namTuyenSinh`) REFERENCES `khoa_hoc` (`namTuyenSinh`) ON UPDATE CASCADE ON DELETE RESTRICT,"
+        "  CONSTRAINT `fk_thisinh_nganh` FOREIGN KEY (`nganhTrungTuyen`) REFERENCES `danh_muc_nganh` (`maNganh`) ON UPDATE CASCADE ON DELETE SET NULL"
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
 
+        // 9. Nguyen vong
+        "CREATE TABLE IF NOT EXISTS `nguyen_vong` ("
+        "  `id` INT AUTO_INCREMENT NOT NULL,"
+        "  `soBaoDanh` VARCHAR(20) NOT NULL,"
+        "  `thuTuNV` INT NOT NULL,"
+        "  `maNganh` VARCHAR(20) NOT NULL,"
+        "  `trangThai` VARCHAR(30) NOT NULL DEFAULT 'DANG XET',"
+        "  PRIMARY KEY (`id`),"
+        "  UNIQUE KEY `uk_thisinh_thuTuNV` (`soBaoDanh`, `thuTuNV`),"
+        "  CONSTRAINT `fk_nv_thisinh` FOREIGN KEY (`soBaoDanh`) REFERENCES `thisinh` (`soBaoDanh`) ON UPDATE CASCADE ON DELETE CASCADE,"
+        "  CONSTRAINT `fk_nv_nganh` FOREIGN KEY (`maNganh`) REFERENCES `danh_muc_nganh` (`maNganh`) ON UPDATE CASCADE ON DELETE RESTRICT"
+        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+
+        // 10. Cau hinh
         "CREATE TABLE IF NOT EXISTS `cau_hinh` ("
         "  `khoa` VARCHAR(50) NOT NULL,"
-        "  `gia_tri` VARCHAR(255) NOT NULL,"
-        "  `mo_ta` VARCHAR(255) DEFAULT NULL,"
+        "  `giaTri` VARCHAR(255) NOT NULL,"
+        "  `moTa` VARCHAR(255) DEFAULT NULL,"
         "  PRIMARY KEY (`khoa`)"
         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
     };
@@ -196,27 +285,30 @@ bool MySQLConnector::initSchemaAndTables() {
             return false;
         }
     }
+
+    // Seed du lieu mac dinh neu he thong trong
+    seedDefaultData();
     return true;
 }
 
 bool MySQLConnector::seedDefaultData() {
     if (!isConnected()) return false;
 
-    // 1. Kiem tra xem da co tinh thanh chua
+    // Kiem tra xem da co tinh thanh chua
     MYSQL_RES* res = query("SELECT COUNT(*) FROM `tinh_thanh`;");
     if (res) {
         MYSQL_ROW row = mysql_fetch_row(res);
         if (row && row[0] && atoi(row[0]) > 0) {
             freeResult(res);
-            return true; // Da co du lieu, khong can seed lai
+            return true; // Da co du lieu
         }
         freeResult(res);
     }
 
     beginTransaction();
 
-    // 2. Seed 34 Tinh/Thanh pho
-    execute("INSERT IGNORE INTO `tinh_thanh` (`ma_tinh`, `ten_tinh`, `loai`) VALUES "
+    // 1. Seed 34 Tinh/Thanh pho
+    execute("INSERT IGNORE INTO `tinh_thanh` (`maTinh`, `tenTinh`, `loai`) VALUES "
             "('01', 'TP. Ha Noi', 'Thanh pho truc thuoc Trung uong'),"
             "('04', 'Cao Bang', 'Tinh'),"
             "('08', 'Tuyen Quang', 'Tinh'),"
@@ -251,19 +343,64 @@ bool MySQLConnector::seedDefaultData() {
             "('89', 'An Giang', 'Tinh'),"
             "('92', 'TP. Can Tho', 'Thanh pho truc thuoc Trung uong');");
 
-    // 3. Seed Gioi Tinh
-    execute("INSERT IGNORE INTO `gioi_tinh` (`ma_gioi_tinh`, `ten_gioi_tinh`) VALUES "
+    // 2. Seed Gioi Tinh
+    execute("INSERT IGNORE INTO `gioi_tinh` (`maGioiTinh`, `tenGioiTinh`) VALUES "
             "('NAM', 'Nam'), ('NU', 'Nu'), ('KHAC', 'Khac');");
 
-    // 4. Seed Cau Hinh
-    execute("INSERT IGNORE INTO `cau_hinh` (`khoa`, `gia_tri`, `mo_ta`) VALUES "
-            "('truong', 'TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG', 'Ten truong tuyen sinh'),"
-            "('nam_tuyen_sinh', '2026', 'Khoa tuyen sinh dai hoc'),"
-            "('diem_chuan', '23.00', 'Diem chuan trung tuyen'),"
-            "('diem_liet', '1.00', 'Muc diem liet theo quy che');");
+    // 3. Seed Khoa DUT
+    execute("INSERT IGNORE INTO `khoa` (`maKhoa`, `tenKhoa`, `maKhoaTheoChuanDUT`) VALUES "
+            "('CNTT', 'Khoa Cong nghe Thong tin', '102'),"
+            "('DIEN', 'Khoa Dien', '105'),"
+            "('DTVT', 'Khoa Dien tu - Vien thong', '106'),"
+            "('CKHI', 'Khoa Co khi', '101'),"
+            "('HOA',  'Khoa Hoa', '107'),"
+            "('XDDD', 'Khoa Xay dung Dan dung & Cong nghiep', '109');");
 
-    // 5. Seed Nguoi
-    execute("INSERT IGNORE INTO `nguoi` (`so_cccd`, `ho_ten`, `ngay_sinh`, `que_quan`, `gioi_tinh`) VALUES "
+    // 4. Seed Danh Muc Nganh DUT
+    execute("INSERT IGNORE INTO `danh_muc_nganh` (`maNganh`, `tenNganh`, `maKhoa`, `tienToLop`) VALUES "
+            "('7480201B', 'CNTT (Khoa hoc Du lieu & Tri tue Nhan tao)', 'CNTT', 'TCLC_KHDL'),"
+            "('7480201',  'Cong nghe Thong tin (Chuong trinh Dac thu)',    'CNTT', 'T_DT'),"
+            "('7480201A', 'Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)', 'CNTT', 'T_N'),"
+            "('7480106',  'Ky thuat May tinh',                              'CNTT', 'KTMT'),"
+            "('7520216',  'Ky thuat Dieu khien & Tu dong hoa',             'DIEN', 'TDH'),"
+            "('7520201',  'Ky thuat Dien (He thong dien)',                  'DIEN', 'D'),"
+            "('7520207A', 'Vi dien tu - Thiet ke vi mach (Ban dan)',       'DTVT', 'VM'),"
+            "('7520207',  'Ky thuat Dien tu - Vien thong',                  'DTVT', 'DT'),"
+            "('7520114',  'Ky thuat Co dien tu',                            'CKHI', 'CDT'),"
+            "('7520130',  'Ky thuat O to',                                  'CKHI', 'OTO'),"
+            "('7520301',  'Ky thuat Hoa hoc',                               'HOA',  'H'),"
+            "('7580201',  'Ky thuat Xay dung',                              'XDDD', 'X');");
+
+    // 5. Seed Khoa Hoc
+    execute("INSERT IGNORE INTO `khoa_hoc` (`namTuyenSinh`, `tenKhoaHoc`, `trangThai`) VALUES "
+            "(2026, 'Khoa 2026 (K26 - Dai hoc Chinh quy)', 'DANG TUYEN SINH'),"
+            "(2025, 'Khoa 2025 (K25 - Dai hoc Chinh quy)', 'DA KET THUC');");
+
+    // 6. Seed Nganh theo khoa hoc K26
+    execute("INSERT IGNORE INTO `nganh_theo_khoa_hoc` (`namTuyenSinh`, `maNganh`, `chiTieu`, `diemChuanChot`, `diemSanToiThieu`) VALUES "
+            "(2026, '7480201B', 60,  0.0, 15.00),"
+            "(2026, '7480201',  120, 0.0, 15.00),"
+            "(2026, '7480201A', 60,  0.0, 15.00),"
+            "(2026, '7480106',  60,  0.0, 15.00),"
+            "(2026, '7520216',  90,  0.0, 15.00),"
+            "(2026, '7520201',  90,  0.0, 15.00),"
+            "(2026, '7520207A', 60,  0.0, 15.00),"
+            "(2026, '7520207',  90,  0.0, 15.00),"
+            "(2026, '7520114',  90,  0.0, 15.00),"
+            "(2026, '7520130',  90,  0.0, 15.00),"
+            "(2026, '7520301',  60,  0.0, 15.00),"
+            "(2026, '7580201',  60,  0.0, 15.00);");
+
+    // 7. Seed Cau Hinh
+    execute("INSERT IGNORE INTO `cau_hinh` (`khoa`, `giaTri`, `moTa`) VALUES "
+            "('tenTruong', 'TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG', 'Ten truong tuyen sinh chinh thuc'),"
+            "('namTuyenSinhHienHanh', '2026', 'Khoa tuyen sinh dai hoc mac dinh'),"
+            "('siSoLopChuan', '30', 'Si so tieu chuan dong cua 1 lop sinh hoat DUT'),"
+            "('diemLiet', '1.00', 'Muc diem liet theo quy che'),"
+            "('diemSanMacDinh', '15.00', 'Diem san toi thieu nhan ho so xet tuyen');");
+
+    // 8. Seed Nguoi
+    execute("INSERT IGNORE INTO `nguoi` (`soCCCD`, `hoTen`, `ngaySinh`, `queQuan`, `gioiTinh`) VALUES "
             "('012345678901', 'Vo Nhu Hieu', '04/03/2003', '48', 'NAM'),"
             "('012345678902', 'Vo Huy Tuong', '27/07/2009', '48', 'NAM'),"
             "('012345678903', 'Nguyen Thi Nhat Vy', '10/09/2005', '51', 'NU'),"
@@ -279,22 +416,39 @@ bool MySQLConnector::seedDefaultData() {
             "('201059687147', 'Dinh Thao Quyen', '19/10/2005', '56', 'NU'),"
             "('200948576038', 'Phan Thanh Tung', '03/06/2005', '48', 'NAM');");
 
-    // 6. Seed Thi Sinh
-    execute("INSERT IGNORE INTO `thisinh` (`sbd`, `so_cccd`, `diem_toan`, `diem_ly`, `diem_hoa`) VALUES "
-            "('DUT001', '012345678901', 9.00, 7.00, 8.00),"
-            "('DUT002', '012345678902', 9.00, 9.75, 8.50),"
-            "('DUT003', '012345678903', 9.50, 9.50, 8.25),"
-            "('DUT004', '201948572134', 9.50, 9.00, 9.75),"
-            "('DUT005', '201837461928', 8.75, 8.50, 9.00),"
-            "('DUT006', '201726354819', 7.50, 6.75, 7.00),"
-            "('DUT007', '201615243701', 9.00, 8.75, 8.25),"
-            "('DUT008', '201504132692', 6.25, 5.50, 6.00),"
-            "('DUT009', '201493021583', 9.75, 9.50, 9.80),"
-            "('DUT010', '201382910474', 5.00, 4.50, 5.50),"
-            "('DUT011', '201271809365', 8.50, 8.25, 8.75),"
-            "('DUT012', '201160798256', 7.00, 7.25, 6.50),"
-            "('DUT013', '201059687147', 8.00, 8.50, 7.75),"
-            "('DUT014', '200948576038', 9.25, 9.00, 9.25);");
+    // 9. Seed Thi Sinh
+    execute("INSERT IGNORE INTO `thisinh` (`soBaoDanh`, `soCCCD`, `namTuyenSinh`, `diemToan`, `diemLy`, `diemHoa`) VALUES "
+            "('DUT001', '012345678901', 2026, 9.00, 7.00, 8.00),"
+            "('DUT002', '012345678902', 2026, 9.00, 9.75, 8.50),"
+            "('DUT003', '012345678903', 2026, 9.50, 9.50, 8.25),"
+            "('DUT004', '201948572134', 2026, 9.50, 9.00, 9.75),"
+            "('DUT005', '201837461928', 2026, 8.75, 8.50, 9.00),"
+            "('DUT006', '201726354819', 2026, 7.50, 6.75, 7.00),"
+            "('DUT007', '201615243701', 2026, 9.00, 8.75, 8.25),"
+            "('DUT008', '201504132692', 2026, 6.25, 5.50, 6.00),"
+            "('DUT009', '201493021583', 2026, 9.75, 9.50, 9.80),"
+            "('DUT010', '201382910474', 2026, 5.00, 4.50, 5.50),"
+            "('DUT011', '201271809365', 2026, 8.50, 8.25, 8.75),"
+            "('DUT012', '201160798256', 2026, 7.00, 7.25, 6.50),"
+            "('DUT013', '201059687147', 2026, 8.00, 8.50, 7.75),"
+            "('DUT014', '200948576038', 2026, 9.25, 9.00, 9.25);");
+
+    // 10. Seed Nguyen Vong
+    execute("INSERT IGNORE INTO `nguyen_vong` (`soBaoDanh`, `thuTuNV`, `maNganh`, `trangThai`) VALUES "
+            "('DUT001', 1, '7480201B', 'DANG XET'), ('DUT001', 2, '7480201', 'DANG XET'), ('DUT001', 3, '7480106', 'DANG XET'),"
+            "('DUT002', 1, '7480201B', 'DANG XET'), ('DUT002', 2, '7520207A', 'DANG XET'),"
+            "('DUT003', 1, '7480201B', 'DANG XET'), ('DUT003', 2, '7480201', 'DANG XET'),"
+            "('DUT004', 1, '7480201B', 'DANG XET'), ('DUT004', 2, '7520216', 'DANG XET'),"
+            "('DUT005', 1, '7480201', 'DANG XET'),  ('DUT005', 2, '7480201B', 'DANG XET'),"
+            "('DUT006', 1, '7520201', 'DANG XET'),  ('DUT006', 2, '7520114', 'DANG XET'),"
+            "('DUT007', 1, '7480201B', 'DANG XET'), ('DUT007', 2, '7480201', 'DANG XET'),"
+            "('DUT008', 1, '7580201', 'DANG XET'),  ('DUT008', 2, '7520301', 'DANG XET'),"
+            "('DUT009', 1, '7480201B', 'DANG XET'), ('DUT009', 2, '7520207A', 'DANG XET'),"
+            "('DUT010', 1, '7580201', 'DANG XET'),"
+            "('DUT011', 1, '7520216', 'DANG XET'),  ('DUT011', 2, '7520207A', 'DANG XET'),"
+            "('DUT012', 1, '7520130', 'DANG XET'),  ('DUT012', 2, '7520114', 'DANG XET'),"
+            "('DUT013', 1, '7520207A', 'DANG XET'), ('DUT013', 2, '7480201', 'DANG XET'),"
+            "('DUT014', 1, '7480201B', 'DANG XET'), ('DUT014', 2, '7520216', 'DANG XET');");
 
     return commit();
 }
