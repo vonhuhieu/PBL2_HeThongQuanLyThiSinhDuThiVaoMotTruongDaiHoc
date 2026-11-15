@@ -510,7 +510,7 @@ int main(int argc, char* argv[]) {
     // Khá»Ÿi táº¡o há»‡ quáº£n trá»‹ CSDL quan há»‡ vÃ  nghiá»‡p vá»¥ tuyá»ƒn sinh
     QuanLyThiSinh ql;
 
-    // Cháº¿ Ä‘á»™ kiá»ƒm thá»­ tá»± Ä‘á»™ng khÃ´ng giao diá»‡n
+    // Che do kiem thu tu dong khong giao dien
     if (argc > 1 && string(argv[1]) == "--test") {
         cout << "=== PBL2 MySQL Test Mode ===" << endl;
         cout << "MySQL Connected: " << (ql.isMySQLConnected() ? "YES" : "NO (Offline fallback active)") << endl;
@@ -519,6 +519,9 @@ int main(int argc, char* argv[]) {
         cout << "So luong gioi tinh: " << ql.getDanhSachGioiTinh().size() << endl;
         cout << "Diem chuan: " << ql.getDiemChuan() << endl;
         cout << "Diem liet: " << ql.getDiemLiet() << endl;
+        cout << "Chay thuat toan xet tuyen da nguyen vong DUT: ";
+        bool admOk = ql.chayThuatToanXetTuyenVaChotDiemChuan(ql.getNamTuyenSinhHienHanh());
+        cout << (admOk ? "THANH CONG" : "THAT BAI") << endl;
         bool ok = ql.xuatTatCaBaoCao();
         cout << "Xuat bao cao: " << (ok ? "THANH CONG" : "THAT BAI") << endl;
         return 0;

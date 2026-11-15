@@ -73,7 +73,7 @@ bool ThiSinh::kiemTraDiemLiet() const {
 
 // Đã trúng tuyển chưa
 bool ThiSinh::daTrungTuyen() const {
-    return (!maSinhVien.empty() && nguyenVongTrungTuyen > 0);
+    return (!nganhTrungTuyen.empty() && nguyenVongTrungTuyen > 0);
 }
 
 // Xét tuyển theo điểm sàn / điểm chuẩn

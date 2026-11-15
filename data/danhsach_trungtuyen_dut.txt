@@ -3,5 +3,19 @@
 ========================================================================================================================
  STT | Ma Sinh Vien |       Ho va Ten      |  Lop Sinh Hoat | Diem | NV |        Nganh Trung Tuyen       |    Khoa    |
 ------------------------------------------------------------------------------------------------------------------------
+   1 | 102260001    | Hoang Thi Ha         | 26TCLC_KHDL1   | 29.05 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   2 | 102260002    | Nguyen Van An        | 26TCLC_KHDL1   | 28.25 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   3 | 102260003    | Phan Thanh Tung      | 26TCLC_KHDL1   | 27.50 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   4 | 102260004    | Vo Huy Tuong         | 26TCLC_KHDL1   | 27.25 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   5 | 102260005    | Nguyen Thi Nhat Vy   | 26TCLC_KHDL1   | 27.25 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   6 | 102260001    | Tran Thi Bich        | 26T_DT1        | 26.25 |  1 | Cong nghe Thong tin (Chuong tr | CNTT       |
+   7 | 102260006    | Pham Thi Diem        | 26TCLC_KHDL1   | 26.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   8 | 105260001    | Bui Mai Linh         | 26TDH1         | 25.50 |  1 | Ky thuat Dieu khien & Tu dong  | DIEN       |
+   9 | 106260001    | Dinh Thao Quyen      | 26VM1          | 24.25 |  1 | Vi dien tu - Thiet ke vi mach  | DTVT       |
+  10 | 102260007    | Vo Nhu Hieu          | 26TCLC_KHDL1   | 24.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  11 | 105260001    | Le Hoang Cong        | 26D1           | 21.25 |  1 | Ky thuat Dien (He thong dien)  | DIEN       |
+  12 | 101260001    | Ngo Van Nam          | 26OTO1         | 20.75 |  1 | Ky thuat O to                  | CKHI       |
+  13 | 109260001    | Vo Minh Duc          | 26X1           | 17.75 |  1 | Ky thuat Xay dung              | XDDD       |
+  14 | 109260002    | Dang Quoc Khanh      | 26X1           | 15.00 |  1 | Ky thuat Xay dung              | XDDD       |
 ========================================================================================================================
-Tong so sinh vien trúng tuyển Khoa 2026: 0 sinh vien.
+Tong so sinh vien trúng tuyển Khoa 2026: 14 sinh vien.
