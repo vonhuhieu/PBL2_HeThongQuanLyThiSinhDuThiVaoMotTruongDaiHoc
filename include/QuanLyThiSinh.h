@@ -11,6 +11,25 @@
 
 using namespace std;
 
+// Cấu trúc tham số bộ lọc & phân trang Server-side
+struct FilterThiSinhParams {
+    int pageIndex;
+    int pageSize;
+    string keyword;
+    int filterStatus;      // 0: Tat ca, 1: Trung tuyen, 2: Khong dat
+    int filterNam;         // 0: Tat ca cac nam, hoac 2026, 2025...
+    string filterKhoa;    // "" (Tat ca), hoac "CNTT", "CKHI"...
+    string filterNganh;   // "" (Tat ca), hoac "7480201B"...
+    string filterLop;     // "" (Tat ca), hoac "26TCLC_KHDL1"...
+    int sortCol;           // Cot can sap xep (1: SBD, 2: CCCD, 3: Ten, 7: Toan, 8: Ly, 9: Hoa, 10: Tong diem, 11: Ket qua, 12: Nganh, 13: Lop, 14: MSV)
+    bool sortAsc;          // true: Tang dan, false: Giam dan
+
+    FilterThiSinhParams() 
+        : pageIndex(1), pageSize(10), keyword(""), filterStatus(0),
+          filterNam(0), filterKhoa(""), filterNganh(""), filterLop(""),
+          sortCol(1), sortAsc(true) {}
+};
+
 /**
  * @brief Lớp Quản trị hệ thống Cơ sở dữ liệu và Nghiệp vụ tuyển sinh Đại học Bách khoa (DUT)
  * PHIÊN BẢN ĐỘC LẬP: 100% CSDL QUAN HỆ MYSQL (LARAGON)
@@ -124,6 +143,7 @@ public:
     double getDiemLiet() const;
     void   setDiemLiet(double dl);
     double getDiemSanMacDinh() const;
+    double getDiemSan() const { return getDiemSanMacDinh(); }
     void   setDiemSanMacDinh(double ds);
     string getTenTruong() const;
     void   setTenTruong(const string& truong);
@@ -133,6 +153,7 @@ public:
     void tinhThongKePhoDiem(int& mucThap, int& mucTB, int& mucKha, int& mucCao, int& mucRatCao) const;
 
     // 8. Xuất các báo cáo dạng bảng kẻ khung chuyên biệt ra thư mục data/
+    bool xuatBaoCaoExcel(const string& filePath, const FilterThiSinhParams& params, const string& tenKhoaFilter = "", const string& tenNganhFilter = "") const;
     bool xuatBaoCaoXetTuyen(const string& path = "data/ketqua_xettuyen.txt", double diemChuan = 22.0, const string& keyword = "") const;
     bool xuatBaoCaoThuKhoa(const string& path = "data/thukhoa.txt") const;
     bool xuatBaoCaoPhoDiem(const string& path = "data/thongke_phodiem.txt") const;
@@ -154,6 +175,21 @@ public:
     const Vector<KhoaHoc>& getDanhSachKhoaHoc() const;
     Vector<NganhTheoKhoaHoc>& getDanhSachNganhTheoKhoaHoc();
     const Vector<NganhTheoKhoaHoc>& getDanhSachNganhTheoKhoaHoc() const;
+
+    // 10. Phân trang Server-side (SQL LIMIT/OFFSET trực tiếp trên MySQL Server, fallback In-Memory)
+    Vector<ThiSinh> layDanhSachThiSinhPhanTrang(const FilterThiSinhParams& params, int& totalRecords);
+
+    Vector<ThiSinh> layDanhSachThiSinhPhanTrang(
+        int pageIndex,
+        int pageSize,
+        const string& keyword,
+        int filterStatus,
+        int sortType,
+        int& totalRecords
+    );
+
+    // Lấy danh sách các lớp sinh hoạt DUT hiện có (hỗ trợ lọc phân cấp theo Khoa và Chuyên ngành)
+    Vector<string> layDanhSachLopSinhHoat(const string& maKhoa = "", const string& maNganh = "") const;
 };
 
 #endif // QUAN_LY_THI_SINH_H

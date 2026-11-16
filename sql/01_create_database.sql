@@ -111,6 +111,8 @@ CREATE TABLE `thisinh` (
     `lopSinhHoat`          VARCHAR(50)    DEFAULT NULL,
     `nganhTrungTuyen`      VARCHAR(20)    DEFAULT NULL,
     `nguyenVongTrungTuyen` INT            DEFAULT 0,
+    `ngayTao`              DATETIME       DEFAULT CURRENT_TIMESTAMP,
+    `ngaySua`              DATETIME       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`soBaoDanh`),
     CONSTRAINT `fk_thisinh_nguoi` 
         FOREIGN KEY (`soCCCD`) REFERENCES `nguoi` (`soCCCD`) 

@@ -77,6 +77,10 @@ if %ERRORLEVEL% equ 0 (
     echo [THANH CONG] Da bien dich xong file chuong trinh: QuanLyThiSinh_PBL2.exe
     echo ==============================================================================
     echo.
+    if "%~1"=="--no-run" exit /b 0
+    if "%~1"=="--build-only" exit /b 0
+    if "%~1"=="build" exit /b 0
+
     echo [1] Chay che do Giao dien Do hoa (Dear ImGui DirectX 9)
     echo [2] Chay che do Console UTF-8 dieu huong bang phim mui ten
     echo.
@@ -90,5 +94,8 @@ if %ERRORLEVEL% equ 0 (
     echo.
     echo [LOI] Qua trinh bien dich that bai! Vui long kiem tra lai ma nguon.
     echo.
+    if "%~1"=="--no-run" exit /b 1
+    if "%~1"=="--build-only" exit /b 1
+    if "%~1"=="build" exit /b 1
     pause
 )

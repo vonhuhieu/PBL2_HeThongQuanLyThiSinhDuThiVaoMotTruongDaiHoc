@@ -27,6 +27,8 @@ private:
     string lopSinhHoat;             // Lớp sinh hoạt DUT (DEFAULT "", cấp khi trúng tuyển: 26TCLC_KHDL1)
     string nganhTrungTuyen;         // Mã ngành trúng tuyển (DEFAULT "", vd: 7480201B)
     int nguyenVongTrungTuyen;       // Thứ tự nguyện vọng trúng tuyển (0: chưa/rớt, 1: NV1, 2: NV2, 3: NV3)
+    string ngayTao;                 // Thời điểm tạo hồ sơ (YYYY-MM-DD HH:MM:SS)
+    string ngaySua;                 // Thời điểm sửa hồ sơ gần nhất (YYYY-MM-DD HH:MM:SS)
 
     Vector<NguyenVong> dsNguyenVong; // Danh sách các nguyện vọng đăng ký xét tuyển
 
@@ -50,6 +52,8 @@ public:
     string getLopSinhHoat() const;
     string getNganhTrungTuyen() const;
     int getNguyenVongTrungTuyen() const;
+    string getNgayTao() const;
+    string getNgaySua() const;
     const Vector<NguyenVong>& getDsNguyenVong() const;
     Vector<NguyenVong>& getDsNguyenVong();
 
@@ -63,6 +67,8 @@ public:
     void setLopSinhHoat(const string& lsh);
     void setNganhTrungTuyen(const string& nt);
     void setNguyenVongTrungTuyen(int nv);
+    void setNgayTao(const string& nt);
+    void setNgaySua(const string& ns);
     void setDsNguyenVong(const Vector<NguyenVong>& ds);
 
     // Phương thức quản lý Nguyện vọng
@@ -70,10 +76,10 @@ public:
     void xoaTatCaNguyenVong();
 
     // Các phương thức tính toán nghiệp vụ tuyển sinh Đại học
-    double tinhTongDiem() const;                     // Tổng điểm = Toán + Lý + Hóa
-    bool kiemTraDiemLiet() const;                    // Có môn nào <= 1.00 điểm không
-    bool daTrungTuyen() const;                       // Đã được cấp Mã sinh viên hoặc ngành trúng tuyển
-    bool xetTrungTuyen(double diemChuan) const;       // Đạt điểm chuẩn và không bị điểm liệt
+    double tinhTongDiem() const;                                                    // Tổng điểm = Toán + Lý + Hóa
+    bool kiemTraDiemLiet(double threshold = AdmissionConst::DIEM_LIET) const;       // Kiểm tra môn thi <= ngưỡng điểm liệt
+    bool daTrungTuyen() const;                                                      // Đã được cấp Mã sinh viên hoặc ngành trúng tuyển
+    bool xetTrungTuyen(double diemChuan, double diemLiet = AdmissionConst::DIEM_LIET) const; // Đạt điểm chuẩn và không bị điểm liệt
 
     // Ghi đè phương thức nhập xuất đa hình (Polymorphism)
     virtual void nhap(istream& in = cin) override;

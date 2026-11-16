@@ -3,6 +3,7 @@
 #include <cctype>
 #include <sstream>
 #include <vector>
+#include <ctime>
 
 namespace Utils {
     string trim(const string& str) {
@@ -139,5 +140,19 @@ namespace Utils {
         } catch (...) {
             return defVal;
         }
+    }
+
+    string getCurrentDateTime() {
+        time_t now = time(nullptr);
+        tm* ltm = localtime(&now);
+        char buf[32];
+        if (ltm) {
+            sprintf(buf, "%04d-%02d-%02d %02d:%02d:%02d",
+                    1900 + ltm->tm_year, 1 + ltm->tm_mon, ltm->tm_mday,
+                    ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+        } else {
+            sprintf(buf, "2026-01-01 00:00:00");
+        }
+        return string(buf);
     }
 }

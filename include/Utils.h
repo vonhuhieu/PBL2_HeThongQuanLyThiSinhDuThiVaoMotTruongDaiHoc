@@ -42,6 +42,9 @@ namespace Utils {
     // Chuyển đổi an toàn chuỗi sang double / int
     double toDouble(const string& str, double defVal = 0.0);
     int toInt(const string& str, int defVal = 0);
+
+    // Lấy thời gian hiện tại chuẩn ISO YYYY-MM-DD HH:MM:SS
+    string getCurrentDateTime();
 }
 
 #endif // UTILS_H

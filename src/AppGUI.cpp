@@ -9,6 +9,7 @@
 #include <d3d9.h>
 #include <tchar.h>
 #include <windows.h>
+#include <shellapi.h>
 #include <sstream>
 #include <iomanip>
 #include <fstream>
@@ -44,6 +45,7 @@ static bool RenderSearchableComboTinhThanh(const char* comboId, const Vector<Tin
     }
 
     ImGui::SetNextItemWidth(-1);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(480.0f, 100.0f), ImVec2(650.0f, 350.0f));
     if (ImGui::BeginCombo(comboId, currentLabel.c_str())) {
         if (ImGui::IsWindowAppearing()) {
             filterBuf[0] = '\0';
@@ -95,6 +97,7 @@ static bool RenderComboGioiTinh(const char* comboId, const Vector<GioiTinh>& ds,
     }
 
     ImGui::SetNextItemWidth(-1);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(480.0f, 100.0f), ImVec2(650.0f, 350.0f));
     if (ImGui::BeginCombo(comboId, currentLabel.c_str())) {
         for (size_t i = 0; i < ds.size(); ++i) {
             bool isSelected = (Utils::toUpper(selectedMa) == Utils::toUpper(ds[i].ma));
@@ -113,8 +116,9 @@ static bool RenderComboGioiTinh(const char* comboId, const Vector<GioiTinh>& ds,
     return changed;
 }
 
-// Combobox chọn Ngành tuyển sinh DUT từ Danh mục ngành
-static bool RenderComboNganh(const char* comboId, const Vector<DanhMucNganh>& dsNganh, string& selectedMaNganh) {
+// Combobox chọn Ngành tuyển sinh DUT từ Danh mục ngành (hỗ trợ loại trừ/vô hiệu hóa các ngành đã chọn ở NV khác)
+static bool RenderComboNganh(const char* comboId, const Vector<DanhMucNganh>& dsNganh, string& selectedMaNganh,
+                             const string& exclude1 = "", const string& exclude2 = "") {
     bool changed = false;
     string currentLabel = "(Chua chon / Bo trong)";
     for (size_t i = 0; i < dsNganh.size(); ++i) {
@@ -125,25 +129,42 @@ static bool RenderComboNganh(const char* comboId, const Vector<DanhMucNganh>& ds
     }
 
     ImGui::SetNextItemWidth(-1);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(480.0f, 100.0f), ImVec2(650.0f, 350.0f));
     if (ImGui::BeginCombo(comboId, currentLabel.c_str())) {
         if (ImGui::Selectable("(Bo trong / Khong dang ky)", selectedMaNganh.empty())) {
             selectedMaNganh = "";
             changed = true;
         }
         for (size_t i = 0; i < dsNganh.size(); ++i) {
-            bool isSelected = (selectedMaNganh == dsNganh[i].maNganh);
-            string lbl = dsNganh[i].tenNganh + " [" + dsNganh[i].maNganh + "]";
-            if (ImGui::Selectable(lbl.c_str(), isSelected)) {
-                selectedMaNganh = dsNganh[i].maNganh;
-                changed = true;
-            }
-            if (isSelected) {
-                ImGui::SetItemDefaultFocus();
+            const string& ma = dsNganh[i].maNganh;
+            bool isSelected = (!selectedMaNganh.empty() && selectedMaNganh == ma);
+            bool isExcluded = (!exclude1.empty() && ma == exclude1) || (!exclude2.empty() && ma == exclude2);
+
+            if (isExcluded) {
+                string lblDisabled = dsNganh[i].tenNganh + " [" + ma + "] (Da chon o NV khac)";
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 0.6f));
+                ImGui::Selectable(lblDisabled.c_str(), false, ImGuiSelectableFlags_Disabled);
+                ImGui::PopStyleColor();
+            } else {
+                string lbl = dsNganh[i].tenNganh + " [" + ma + "]";
+                if (ImGui::Selectable(lbl.c_str(), isSelected)) {
+                    selectedMaNganh = ma;
+                    changed = true;
+                }
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus();
+                }
             }
         }
         ImGui::EndCombo();
     }
     return changed;
+}
+
+// Bổ sung hiệu ứng Hover nổi bật vào từng hàng cho toàn bộ các bảng trong ứng dụng
+static void RenderRowHover(const char* rowId, bool isSelected = false) {
+    ImGui::Selectable(rowId, isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap, ImVec2(0, 0));
+    ImGui::SameLine();
 }
 
 static int getDaysInMonth(int m, int y) {
@@ -283,9 +304,9 @@ static void SetupModernDarkTheme() {
     colors[ImGuiCol_Button]             = ImVec4(0.18f, 0.35f, 0.55f, 1.00f);
     colors[ImGuiCol_ButtonHovered]      = ImVec4(0.24f, 0.45f, 0.70f, 1.00f);
     colors[ImGuiCol_ButtonActive]       = ImVec4(0.28f, 0.55f, 0.85f, 1.00f);
-    colors[ImGuiCol_Header]             = ImVec4(0.20f, 0.26f, 0.35f, 1.00f);
-    colors[ImGuiCol_HeaderHovered]      = ImVec4(0.26f, 0.35f, 0.48f, 1.00f);
-    colors[ImGuiCol_HeaderActive]       = ImVec4(0.30f, 0.42f, 0.58f, 1.00f);
+    colors[ImGuiCol_Header]             = ImVec4(0.20f, 0.35f, 0.55f, 0.50f);
+    colors[ImGuiCol_HeaderHovered]      = ImVec4(0.26f, 0.44f, 0.70f, 0.65f); // Hieu ung hover hang sang ro, de theo doi du lieu
+    colors[ImGuiCol_HeaderActive]       = ImVec4(0.30f, 0.52f, 0.80f, 0.80f);
     colors[ImGuiCol_Tab]                = ImVec4(0.13f, 0.17f, 0.22f, 1.00f);
     colors[ImGuiCol_TabHovered]         = ImVec4(0.25f, 0.38f, 0.55f, 1.00f);
     colors[ImGuiCol_TabActive]          = ImVec4(0.20f, 0.32f, 0.48f, 1.00f);
@@ -341,9 +362,31 @@ int AppGUI::run(QuanLyThiSinh& ql) {
     // State cho ứng dụng
     static char filterBuf[128] = "";
     static int filterStatus = 0; // 0: Tat ca, 1: Trung tuyen, 2: Khong dat
+    static int filterNam = 2026; // Mac dinh lay nam hien hanh (2026)
+    static string filterKhoa = "";  // "" (Tat ca), "CNTT", "CKHI"...
+    static string filterNganh = ""; // "" (Tat ca), "7480201B"...
+    static string filterLop = "";   // "" (Tat ca), "26TCLC_KHDL1"...
+
     static int selectedRow = -1;
+    static string selectedSBD = "";
+
+    // State phân trang Server-side & Sorting Thead
+    static int currentPage = 1;
+    static int pageSizeIndex = 0; // 0: 10, 1: 25, 2: 50, 3: 100
+    static int sortCol = 0;       // 0: ngaySua DESC (moi tao/sua len dau), 1=SBD, 2=CCCD, 3=Ten...
+    static bool sortAsc = false;  // false: DESC (moi nhat truoc), true: ASC
+    static int targetJumpPage = 1;
+
+    // Track filter changes to reset to page 1
+    static char lastFilterBuf[128] = "";
+    static int lastFilterStatus = 0;
+    static int lastFilterNam = 2026;
+    static string lastFilterKhoa = "";
+    static string lastFilterNganh = "";
+    static string lastFilterLop = "";
 
     // State modals
+    static bool showDetailModal = false;
     static bool showAddModal = false;
     static bool showEditModal = false;
     static bool showDeleteModal = false;
@@ -480,21 +523,153 @@ int AppGUI::run(QuanLyThiSinh& ql) {
             if (ImGui::BeginTabItem("  1. Quan ly Ho so Thi sinh  ")) {
                 ImGui::Spacing();
 
+                // HÀNG BỘ LỌC 1: Tìm kiếm từ khóa, Kết quả, Năm tuyển sinh, Khoa đào tạo & Nút chức năng
                 ImGui::Text("Tim kiem:");
                 ImGui::SameLine();
-                ImGui::SetNextItemWidth(240);
-                ImGui::InputTextWithHint("##filter", "SBD, CCCD, Ho ten, Que quan...", filterBuf, IM_ARRAYSIZE(filterBuf));
+                ImGui::SetNextItemWidth(210);
+                ImGui::InputTextWithHint("##filter", "SBD, CCCD, Ho ten, Que...", filterBuf, IM_ARRAYSIZE(filterBuf));
 
+                // Năm tuyển sinh (được đưa lên trước Kết quả theo chuẩn phân cấp)
+                ImGui::SameLine();
+                ImGui::Text("Nam:");
+                ImGui::SameLine();
+                char currentNamLabel[32];
+                if (filterNam == 0) strcpy(currentNamLabel, "Tat ca nam");
+                else sprintf(currentNamLabel, "%d", filterNam);
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.20f, 0.28f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.22f, 0.32f, 0.45f, 1.0f));
+                if (ImGui::Button(currentNamLabel, ImVec2(95, 26))) {
+                    ImGui::OpenPopup("PopupYearPicker");
+                }
+                ImGui::PopStyleColor(2);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Click de mo hop thoai chon nam tuyen sinh");
+                }
+
+                if (ImGui::BeginPopup("PopupYearPicker")) {
+                    static int yearBase = 2024;
+                    ImGui::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1.0f), "CHON NAM TUYEN SINH");
+                    ImGui::Separator();
+                    ImGui::Spacing();
+
+                    if (ImGui::ArrowButton("##yPrev", ImGuiDir_Left)) {
+                        yearBase -= 6;
+                    }
+                    ImGui::SameLine();
+                    ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.4f, 1.0f), "  %d - %d  ", yearBase, yearBase + 5);
+                    ImGui::SameLine();
+                    if (ImGui::ArrowButton("##yNext", ImGuiDir_Right)) {
+                        yearBase += 6;
+                    }
+
+                    ImGui::Spacing();
+                    bool isAllYears = (filterNam == 0);
+                    if (isAllYears) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.35f, 1.0f));
+                    if (ImGui::Button("Tat Ca Cac Nam", ImVec2(170, 26))) {
+                        filterNam = 0;
+                        currentPage = 1;
+                        ImGui::CloseCurrentPopup();
+                    }
+                    if (isAllYears) ImGui::PopStyleColor();
+
+                    ImGui::Spacing();
+
+                    for (int y = yearBase; y < yearBase + 6; ++y) {
+                        if ((y - yearBase) % 2 != 0) ImGui::SameLine();
+
+                        bool isSelected = (filterNam == y);
+                        bool isCurrentSystemYear = (y == ql.getNamTuyenSinhHienHanh());
+
+                        if (isSelected) {
+                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.50f, 0.80f, 1.0f));
+                        } else if (isCurrentSystemYear) {
+                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.24f, 0.36f, 0.48f, 1.0f));
+                        }
+
+                        char yBtnId[32];
+                        sprintf(yBtnId, "%d##yp_%d", y, y);
+                        if (ImGui::Button(yBtnId, ImVec2(80, 28))) {
+                            filterNam = y;
+                            currentPage = 1;
+                            ImGui::CloseCurrentPopup();
+                        }
+
+                        if (isSelected || isCurrentSystemYear) {
+                            ImGui::PopStyleColor();
+                        }
+                    }
+
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                    if (ImGui::Button("Dong", ImVec2(170, 24))) {
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
+                }
+
+                // Kết quả tuyển sinh (0: Tất cả, 1: Trúng tuyển, 2: Không đạt)
                 ImGui::SameLine();
                 ImGui::Text("Ket qua:");
                 ImGui::SameLine();
-                ImGui::SetNextItemWidth(140);
+                ImGui::SetNextItemWidth(120);
                 const char* statusNames[] = { "Tat ca", "Trung tuyen", "Khong dat" };
-                ImGui::Combo("##filterStatus", &filterStatus, statusNames, 3);
+                if (ImGui::Combo("##filterStatus", &filterStatus, statusNames, 3)) {
+                    if (filterStatus == 2) {
+                        filterKhoa = "";
+                        filterNganh = "";
+                        filterLop = "";
+                    }
+                    currentPage = 1;
+                }
 
-                ImGui::SameLine(ImGui::GetWindowWidth() - 330);
+                ImGui::SameLine();
+                ImGui::Text("Khoa:");
+                ImGui::SameLine();
+
+                bool disableKhoa = (filterStatus == 2);
+                if (disableKhoa) {
+                    filterKhoa = "";
+                    ImGui::BeginDisabled();
+                }
+
+                string currentKhoaLabel = disableKhoa ? "(Khong ap dung)" : "Tat ca khoa";
+                if (!disableKhoa) {
+                    for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                        if (ql.getDanhSachKhoa()[k].maKhoa == filterKhoa) {
+                            currentKhoaLabel = ql.getDanhSachKhoa()[k].tenKhoa;
+                            break;
+                        }
+                    }
+                }
+                ImGui::SetNextItemWidth(140);
+                if (ImGui::BeginCombo("##filterKhoa", currentKhoaLabel.c_str())) {
+                    if (ImGui::Selectable("Tat ca khoa", filterKhoa.empty())) {
+                        filterKhoa = "";
+                        filterNganh = "";
+                        filterLop = "";
+                        currentPage = 1;
+                    }
+                    for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                        const Khoa& kh = ql.getDanhSachKhoa()[k];
+                        string label = kh.maKhoa + " - " + kh.tenKhoa;
+                        if (ImGui::Selectable(label.c_str(), filterKhoa == kh.maKhoa)) {
+                            filterKhoa = kh.maKhoa;
+                            filterNganh = "";
+                            filterLop = "";
+                            currentPage = 1;
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
+                if (disableKhoa) {
+                    ImGui::EndDisabled();
+                }
+
+                ImGui::SameLine(ImGui::GetWindowWidth() - 340);
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.34f, 1.0f));
-                if (ImGui::Button("[+] Them Thi Sinh", ImVec2(150, 30))) {
+                if (ImGui::Button("[+] Them Thi Sinh", ImVec2(145, 28))) {
                     showAddModal = true;
                     string autoSBD = ql.sinhSoBaoDanhMoi();
                     strcpy(bufSBD, autoSBD.c_str());
@@ -506,100 +681,365 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     formToan = 8.0f;
                     formLy = 8.0f;
                     formHoa = 8.0f;
+                    formNV1 = "7480201B";
+                    formNV2 = "7480201";
+                    formNV3 = "7520216";
                     formErrorMsg = "";
                 }
                 ImGui::PopStyleColor();
 
                 ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.45f, 0.70f, 1.0f));
-                if (ImGui::Button("[ Xuat Bao Cao ]", ImVec2(150, 30))) {
-                    string kw = Utils::trim(filterBuf);
-                    ql.xuatBaoCaoXetTuyen("data/ketqua_xettuyen.txt", ql.getDiemChuan(), kw);
-                    showToast = true;
-                    if (kw.empty()) {
-                        toastMsg = "Da xuat bao cao toan truong ra data/ketqua_xettuyen.txt!";
+                if (ImGui::Button("[ Xuat Bao Cao Excel ]", ImVec2(165, 28))) {
+                    // 1. Tạo timestamp thời gian thực YYYYMMDD_HHMMSS
+                    time_t now = time(nullptr);
+                    tm* ltm = localtime(&now);
+                    char tsBuf[32];
+                    strftime(tsBuf, sizeof(tsBuf), "%Y%m%d_%H%M%S", ltm);
+                    string ts = tsBuf;
+
+                    // 2. Sinh tên file Excel động theo Phương án 1 (ngữ cảnh bộ lọc)
+                    string fileName;
+                    if (!filterLop.empty()) {
+                        fileName = "BaoCao_ThiSinh_DUT_" + filterLop + "_" + ts + ".xls";
+                    } else if (!filterNganh.empty()) {
+                        fileName = "BaoCao_ThiSinh_DUT_" + filterNganh + "_" + ts + ".xls";
+                    } else if (!filterKhoa.empty()) {
+                        fileName = "BaoCao_ThiSinh_DUT_Khoa" + filterKhoa + "_" + ts + ".xls";
                     } else {
-                        toastMsg = "Da xuat bao cao (tu khoa: " + kw + ") ra data/ketqua_xettuyen.txt!";
+                        int namKhoa = (filterNam > 0) ? (filterNam % 100) : (ql.getNamTuyenSinhHienHanh() % 100);
+                        fileName = "BaoCao_DanhSach_ThiSinh_DUT_K" + to_string(namKhoa) + "_" + ts + ".xls";
+                    }
+                    string fullPath = "data/" + fileName;
+
+                    // 3. Chuẩn bị tên Khoa và Ngành đầy đủ
+                    string tenKhoaFilter = "";
+                    if (!filterKhoa.empty()) tenKhoaFilter = ql.layTenKhoa(filterKhoa);
+
+                    string tenNganhFilter = "";
+                    if (!filterNganh.empty()) tenNganhFilter = ql.layTenNganh(filterNganh);
+
+                    // 4. Lấy đầy đủ tham số bộ lọc hiện hành
+                    FilterThiSinhParams curFilterParams;
+                    curFilterParams.keyword = filterBuf;
+                    curFilterParams.filterStatus = filterStatus;
+                    curFilterParams.filterNam = filterNam;
+                    curFilterParams.filterKhoa = filterKhoa;
+                    curFilterParams.filterNganh = filterNganh;
+                    curFilterParams.filterLop = filterLop;
+                    curFilterParams.sortCol = sortCol;
+                    curFilterParams.sortAsc = sortAsc;
+
+                    // 5. Xuất báo cáo Excel
+                    bool ok = ql.xuatBaoCaoExcel(fullPath, curFilterParams, tenKhoaFilter, tenNganhFilter);
+                    showToast = true;
+                    if (ok) {
+                        toastMsg = "Da xuat Excel: " + fileName;
+                        // Mở file bằng Excel hoặc phần mềm mặc định của Windows
+                        ShellExecuteA(NULL, "open", fullPath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+                    } else {
+                        toastMsg = "Loi: Khong the xuat bao cao Excel ra " + fullPath;
                     }
                 }
                 ImGui::PopStyleColor();
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Xuat toan bo danh sach thoa bo loc hien tai ra file Excel (.xls) voi day du tieu de, thong tin loc va thead");
+                }
+
+                // HÀNG BỘ LỌC 2: Ngành trúng tuyển, Lớp sinh hoạt, Nút xóa lọc & Thông tin kết quả
+                ImGui::Spacing();
+                ImGui::Text("Nganh:");
+                ImGui::SameLine();
+
+                bool disableNganh = (filterStatus == 2) || filterKhoa.empty();
+                if (disableNganh) {
+                    filterNganh = "";
+                    ImGui::BeginDisabled();
+                }
+
+                // Tự động kiểm tra tính hợp lệ của filterNganh khi filterKhoa thay đổi
+                if (!filterKhoa.empty() && !filterNganh.empty()) {
+                    string mk = ql.layMaKhoaCuaNganh(filterNganh);
+                    if (mk != filterKhoa) {
+                        filterNganh = "";
+                        filterLop = "";
+                    }
+                }
+
+                string currentNganhLabel;
+                if (filterStatus == 2) {
+                    currentNganhLabel = "(Khong ap dung)";
+                } else if (filterKhoa.empty()) {
+                    currentNganhLabel = "(Chon khoa truoc)";
+                } else if (filterNganh.empty()) {
+                    currentNganhLabel = "Tat ca nganh";
+                } else {
+                    currentNganhLabel = "";
+                    for (size_t n = 0; n < ql.getDanhSachDanhMucNganh().size(); ++n) {
+                        if (ql.getDanhSachDanhMucNganh()[n].maNganh == filterNganh) {
+                            currentNganhLabel = ql.getDanhSachDanhMucNganh()[n].tenNganh;
+                            break;
+                        }
+                    }
+                }
+                ImGui::SetNextItemWidth(250);
+                if (ImGui::BeginCombo("##filterNganh", currentNganhLabel.c_str())) {
+                    if (ImGui::Selectable("Tat ca nganh", filterNganh.empty())) {
+                        filterNganh = "";
+                        filterLop = "";
+                        currentPage = 1;
+                    }
+                    for (size_t n = 0; n < ql.getDanhSachDanhMucNganh().size(); ++n) {
+                        const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[n];
+                        if (!filterKhoa.empty() && dmn.maKhoa != filterKhoa) continue;
+                        string label = dmn.maNganh + " - " + dmn.tenNganh;
+                        if (ImGui::Selectable(label.c_str(), filterNganh == dmn.maNganh)) {
+                            filterNganh = dmn.maNganh;
+                            filterKhoa = dmn.maKhoa; // Đồng bộ khoa trực thuộc
+                            filterLop = "";          // Reset lớp để nạp danh sách lớp của ngành mới
+                            currentPage = 1;
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
+                if (disableNganh) {
+                    ImGui::EndDisabled();
+                }
+
+                ImGui::SameLine();
+                ImGui::Text("Lop:");
+                ImGui::SameLine();
+
+                bool disableLop = (filterStatus == 2) || filterKhoa.empty() || filterNganh.empty();
+                if (disableLop) {
+                    filterLop = "";
+                    ImGui::BeginDisabled();
+                }
+
+                // Tải danh sách lớp sinh hoạt phân cấp theo Khoa và Ngành
+                Vector<string> dsLop;
+                if (!disableLop) {
+                    dsLop = ql.layDanhSachLopSinhHoat(filterKhoa, filterNganh);
+                    // Nếu lớp đang chọn không còn nằm trong dsLop của ngành/khoa mới thì tự động reset
+                    if (!filterLop.empty()) {
+                        bool lopHopLe = false;
+                        for (size_t l = 0; l < dsLop.size(); ++l) {
+                            if (dsLop[l] == filterLop) { lopHopLe = true; break; }
+                        }
+                        if (!lopHopLe) filterLop = "";
+                    }
+                }
+
+                string currentLopLabel;
+                if (filterStatus == 2) {
+                    currentLopLabel = "(Khong ap dung)";
+                } else if (filterKhoa.empty() || filterNganh.empty()) {
+                    currentLopLabel = "(Chon nganh truoc)";
+                } else if (filterLop.empty()) {
+                    currentLopLabel = "Tat ca lop";
+                } else {
+                    currentLopLabel = filterLop;
+                }
+                ImGui::SetNextItemWidth(140);
+                if (ImGui::BeginCombo("##filterLop", currentLopLabel.c_str())) {
+                    if (ImGui::Selectable("Tat ca lop", filterLop.empty())) {
+                        filterLop = "";
+                        currentPage = 1;
+                    }
+                    for (size_t l = 0; l < dsLop.size(); ++l) {
+                        if (ImGui::Selectable(dsLop[l].c_str(), filterLop == dsLop[l])) {
+                            filterLop = dsLop[l];
+                            currentPage = 1;
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
+                if (disableLop) {
+                    ImGui::EndDisabled();
+                }
+
+                ImGui::SameLine();
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.35f, 0.38f, 0.44f, 0.85f));
+                if (ImGui::Button("Xoa Bo Loc", ImVec2(90, 24))) {
+                    filterBuf[0] = '\0';
+                    filterStatus = 0;
+                    filterNam = ql.getNamTuyenSinhHienHanh();
+                    filterKhoa = "";
+                    filterNganh = "";
+                    filterLop = "";
+                    currentPage = 1;
+                    selectedRow = -1;
+                }
+                ImGui::PopStyleColor();
+
+                // Kiểm tra thay đổi bất kỳ bộ lọc nào để tự động reset về trang 1
+                if (filterStatus == 2) {
+                    filterKhoa = "";
+                    filterNganh = "";
+                    filterLop = "";
+                }
+                if (strcmp(filterBuf, lastFilterBuf) != 0 || filterStatus != lastFilterStatus ||
+                    filterNam != lastFilterNam || filterKhoa != lastFilterKhoa ||
+                    filterNganh != lastFilterNganh || filterLop != lastFilterLop) {
+                    strcpy(lastFilterBuf, filterBuf);
+                    lastFilterStatus = filterStatus;
+                    lastFilterNam = filterNam;
+                    lastFilterKhoa = filterKhoa;
+                    lastFilterNganh = filterNganh;
+                    lastFilterLop = filterLop;
+                    currentPage = 1;
+                }
+
+                int pageSize = AdmissionConst::PAGE_SIZE_OPTIONS[pageSizeIndex];
+                int totalRecords = 0;
+
+                FilterThiSinhParams filterParams;
+                filterParams.pageIndex = currentPage;
+                filterParams.pageSize = pageSize;
+                filterParams.keyword = filterBuf;
+                filterParams.filterStatus = filterStatus;
+                filterParams.filterNam = filterNam;
+                filterParams.filterKhoa = filterKhoa;
+                filterParams.filterNganh = filterNganh;
+                filterParams.filterLop = filterLop;
+                filterParams.sortCol = sortCol;
+                filterParams.sortAsc = sortAsc;
+
+                Vector<ThiSinh> pageData = ql.layDanhSachThiSinhPhanTrang(filterParams, totalRecords);
+
+                int totalPages = (totalRecords + pageSize - 1) / pageSize;
+                if (totalPages < 1) totalPages = 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+
+                ImGui::SameLine(ImGui::GetWindowWidth() - 410);
+                ImGui::TextColored(ImVec4(0.7f, 0.9f, 0.7f, 1.0f), "Ket qua loc: %d / %d thi sinh | Diem san: %.2f", 
+                    totalRecords, (int)ql.getDanhSach().size(), ql.getDiemSan());
 
                 ImGui::Separator();
 
-                ImGui::Text("Sap xep:");
-                ImGui::SameLine();
-                if (ImGui::SmallButton("Tong Diem Giam Dan")) {
-                    ql.sapXepTheoTongDiemGiamDan();
-                    selectedRow = -1;
-                }
-                ImGui::SameLine();
-                if (ImGui::SmallButton("Ten Thi Sinh A-Z")) {
-                    ql.sapXepTheoTenAZ();
-                    selectedRow = -1;
-                }
-                ImGui::SameLine();
-                if (ImGui::SmallButton("SBD Tang Dan")) {
-                    ql.sapXepTheoSBDTangDan();
-                    selectedRow = -1;
+                float maxTableHeight = ImGui::GetWindowHeight() - 305.0f;
+                if (maxTableHeight < 200.0f) maxTableHeight = 200.0f;
+
+                // Tự động tính toán và đo lường chiều cao bảng để ôm sát số lượng dòng thực tế
+                // Tránh tình trạng thanh phân trang bị đẩy dính tịt xuống đáy tạo khoảng trống mênh mông
+                float estimatedHeight = 27.0f + (float)(pageData.empty() ? 1 : pageData.size()) * 27.0f;
+                if (ImGui::GetContentRegionAvail().x < 1550.0f) {
+                    estimatedHeight += ImGui::GetStyle().ScrollbarSize;
                 }
 
-                ImGui::SameLine(ImGui::GetWindowWidth() - 320);
-                ImGui::TextColored(ImVec4(0.7f, 0.9f, 0.7f, 1.0f), "Tong so: %d thi sinh | Diem chuan: %.2f", 
-                    (int)ql.getDanhSach().size(), ql.getDiemChuan());
+                static float measuredTableHeight = 0.0f;
+                static int lastPageDataCount = -1;
+                static int lastCurrentPage = -1;
+                static int lastPageSize = -1;
+
+                if (lastPageDataCount != (int)pageData.size() || lastCurrentPage != currentPage || lastPageSize != pageSize) {
+                    measuredTableHeight = estimatedHeight;
+                    lastPageDataCount = (int)pageData.size();
+                    lastCurrentPage = currentPage;
+                    lastPageSize = pageSize;
+                }
+
+                bool needScrollY = (measuredTableHeight >= maxTableHeight);
+                float appliedTableHeight = needScrollY ? maxTableHeight : measuredTableHeight;
 
                 ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | 
-                                             ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY | 
-                                             ImGuiTableFlags_ScrollX;
+                                             ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollX | 
+                                             ImGuiTableFlags_Sortable;
+                if (needScrollY) tableFlags |= ImGuiTableFlags_ScrollY;
 
-                float tableHeight = ImGui::GetWindowHeight() - 230;
-                if (tableHeight < 250) tableHeight = 250;
-
-                if (ImGui::BeginTable("CandidatesTable", 16, tableFlags, ImVec2(0, tableHeight))) {
-                    ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 35);
-                    ImGui::TableSetupColumn("SBD (PK)", ImGuiTableColumnFlags_WidthFixed, 80);
-                    ImGui::TableSetupColumn("So CCCD (FK)", ImGuiTableColumnFlags_WidthFixed, 115);
+                if (ImGui::BeginTable("CandidatesTable", 17, tableFlags, ImVec2(0, appliedTableHeight))) {
+                    ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 38);
+                    ImGui::TableSetupColumn("SBD (PK)", ImGuiTableColumnFlags_WidthFixed, 85);
+                    ImGui::TableSetupColumn("So CCCD (FK)", ImGuiTableColumnFlags_WidthFixed, 120);
                     ImGui::TableSetupColumn("Ho va Ten", ImGuiTableColumnFlags_WidthStretch);
-                    ImGui::TableSetupColumn("Ngay Sinh", ImGuiTableColumnFlags_WidthFixed, 90);
+                    ImGui::TableSetupColumn("Ngay Sinh", ImGuiTableColumnFlags_WidthFixed, 95);
                     ImGui::TableSetupColumn("Que Quan", ImGuiTableColumnFlags_WidthFixed, 115);
-                    ImGui::TableSetupColumn("Gioi Tinh", ImGuiTableColumnFlags_WidthFixed, 65);
-                    ImGui::TableSetupColumn("Toan", ImGuiTableColumnFlags_WidthFixed, 50);
-                    ImGui::TableSetupColumn("Ly", ImGuiTableColumnFlags_WidthFixed, 50);
-                    ImGui::TableSetupColumn("Hoa", ImGuiTableColumnFlags_WidthFixed, 50);
-                    ImGui::TableSetupColumn("Tong Diem", ImGuiTableColumnFlags_WidthFixed, 75);
-                    ImGui::TableSetupColumn("Ket Qua", ImGuiTableColumnFlags_WidthFixed, 130);
+                    ImGui::TableSetupColumn("Gioi Tinh", ImGuiTableColumnFlags_WidthFixed, 75);
+                    ImGui::TableSetupColumn("Toan", ImGuiTableColumnFlags_WidthFixed, 60);
+                    ImGui::TableSetupColumn("Ly", ImGuiTableColumnFlags_WidthFixed, 60);
+                    ImGui::TableSetupColumn("Hoa", ImGuiTableColumnFlags_WidthFixed, 60);
+                    ImGui::TableSetupColumn("Tong Diem", ImGuiTableColumnFlags_WidthFixed, 90);
+                    ImGui::TableSetupColumn("Ket Qua", ImGuiTableColumnFlags_WidthFixed, 135);
+                    ImGui::TableSetupColumn("Khoa", ImGuiTableColumnFlags_WidthFixed, 140);
                     ImGui::TableSetupColumn("Nganh Trung Tuyen", ImGuiTableColumnFlags_WidthFixed, 180);
-                    ImGui::TableSetupColumn("Lop Sinh Hoat", ImGuiTableColumnFlags_WidthFixed, 110);
-                    ImGui::TableSetupColumn("Ma SV DUT", ImGuiTableColumnFlags_WidthFixed, 95);
-                    ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 105);
-                    ImGui::TableHeadersRow();
+                    ImGui::TableSetupColumn("Lop Sinh Hoat", ImGuiTableColumnFlags_WidthFixed, 120);
+                    ImGui::TableSetupColumn("Ma SV DUT", ImGuiTableColumnFlags_WidthFixed, 100);
+                    ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 155);
 
-                    string filterStr = Utils::toLower(Utils::trim(filterBuf));
+                    // Render Custom Thead: Luôn hiển thị biểu tượng vector mũi tên sắc nét ở mọi cột sortable
+                    ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+                    for (int col = 0; col < 17; col++) {
+                        if (!ImGui::TableSetColumnIndex(col)) continue;
+                        const char* colName = ImGui::TableGetColumnName(col);
+                        if (!colName || colName[0] == '\0') continue;
+                        ImGui::TableHeader(colName);
 
-                    int visibleCount = 0;
-                    for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
-                        const ThiSinh& ts = ql.getDanhSach()[i];
+                        if (col >= 1 && col <= 15) {
+                            ImVec2 rMin = ImGui::GetItemRectMin();
+                            ImVec2 rMax = ImGui::GetItemRectMax();
+                            ImDrawList* drawList = ImGui::GetWindowDrawList();
+                            float arrowX = rMax.x - 14.0f;
+                            float centerY = (rMin.y + rMax.y) * 0.5f;
+
+                            if (sortCol == col) {
+                                // Cột đang active sort: vẽ mũi tên màu vàng sáng rõ nét
+                                ImU32 activeColor = ImGui::GetColorU32(ImVec4(1.0f, 0.85f, 0.35f, 1.0f));
+                                if (sortAsc) {
+                                    // Mũi tên lên ▲ (ASC)
+                                    drawList->AddTriangleFilled(ImVec2(arrowX, centerY - 4.0f),
+                                                                ImVec2(arrowX - 4.0f, centerY + 2.0f),
+                                                                ImVec2(arrowX + 4.0f, centerY + 2.0f), activeColor);
+                                } else {
+                                    // Mũi tên xuống ▼ (DESC)
+                                    drawList->AddTriangleFilled(ImVec2(arrowX, centerY + 4.0f),
+                                                                ImVec2(arrowX - 4.0f, centerY - 2.0f),
+                                                                ImVec2(arrowX + 4.0f, centerY - 2.0f), activeColor);
+                                }
+                            } else {
+                                // Cột chưa sort: LUÔN HIỂN THỊ mũi tên kép 2 chiều vector mờ tinh tế ▲/▼
+                                ImU32 neutralColor = ImGui::GetColorU32(ImVec4(0.50f, 0.60f, 0.72f, 0.60f));
+                                drawList->AddTriangleFilled(ImVec2(arrowX, centerY - 4.0f),
+                                                            ImVec2(arrowX - 3.5f, centerY - 0.5f),
+                                                            ImVec2(arrowX + 3.5f, centerY - 0.5f), neutralColor);
+                                drawList->AddTriangleFilled(ImVec2(arrowX, centerY + 4.0f),
+                                                            ImVec2(arrowX - 3.5f, centerY + 0.5f),
+                                                            ImVec2(arrowX + 3.5f, centerY + 0.5f), neutralColor);
+                            }
+                        }
+                    }
+
+                    // Xử lý sự kiện click Thead để sắp xếp
+                    ImGuiTableSortSpecs* sortSpecs = ImGui::TableGetSortSpecs();
+                    if (sortSpecs && sortSpecs->SpecsDirty) {
+                        if (sortSpecs->SpecsCount > 0) {
+                            int newCol = sortSpecs->Specs[0].ColumnIndex;
+                            bool newAsc = (sortSpecs->Specs[0].SortDirection == ImGuiSortDirection_Ascending);
+                            if (newCol != sortCol || newAsc != sortAsc) {
+                                sortCol = newCol;
+                                sortAsc = newAsc;
+                                currentPage = 1;
+                            }
+                        }
+                        sortSpecs->SpecsDirty = false;
+                    }
+
+                    for (size_t i = 0; i < pageData.size(); ++i) {
+                        const ThiSinh& ts = pageData[i];
                         string tenQue = ql.layTenTinhThanh(ts.getQueQuan());
                         string tenGT  = ql.layTenGioiTinh(ts.getGioiTinh());
 
-                        if (!filterStr.empty()) {
-                            bool match = Utils::containsIgnoreCase(ts.getSoBaoDanh(), filterStr) ||
-                                         Utils::containsIgnoreCase(ts.getSoCCCD(), filterStr) ||
-                                         Utils::containsIgnoreCase(ts.getHoTen(), filterStr) ||
-                                         Utils::containsIgnoreCase(ts.getQueQuan(), filterStr) ||
-                                         Utils::containsIgnoreCase(tenQue, filterStr);
-                            if (!match) continue;
-                        }
-
-                        bool pass = ts.xetTrungTuyen(ql.getDiemChuan());
-
-                        if (filterStatus == 1 && !pass) continue;
-                        if (filterStatus == 2 && pass) continue;
-
-                        visibleCount++;
                         ImGui::TableNextRow();
 
+                        int stt = (currentPage - 1) * pageSize + (int)i + 1;
+
                         ImGui::TableSetColumnIndex(0);
-                        ImGui::Text("%d", visibleCount);
+                        char rId[32];
+                        sprintf(rId, "##row_ts_%d", (int)i);
+                        bool isRowSelected = (!selectedSBD.empty() && selectedSBD == ts.getSoBaoDanh()) || (selectedRow == (int)i);
+                        RenderRowHover(rId, isRowSelected);
+                        ImGui::Text("%d", stt);
 
                         ImGui::TableSetColumnIndex(1);
                         ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ts.getSoBaoDanh().c_str());
@@ -634,51 +1074,85 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                         ImGui::TableSetColumnIndex(11);
                         if (ts.daTrungTuyen()) {
                             ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "TRUNG TUYEN (NV%d)", ts.getNguyenVongTrungTuyen());
-                        } else if (ts.kiemTraDiemLiet()) {
-                            ImGui::TextColored(ImVec4(0.9f, 0.3f, 0.3f, 1.0f), "Diem liet");
-                        } else if (pass) {
-                            ImGui::TextColored(ImVec4(0.2f, 0.9f, 0.4f, 1.0f), "%s", AdmissionConst::KET_QUA_TRUNG_TUYEN.c_str());
+                        } else if (ts.kiemTraDiemLiet(ql.getDiemLiet())) {
+                            ImGui::TextColored(ImVec4(0.95f, 0.35f, 0.35f, 1.0f), "%s", AdmissionConst::KET_QUA_DIEM_LIET.c_str());
+                        } else if (ts.tinhTongDiem() < ql.getDiemSan()) {
+                            ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f), "%s", AdmissionConst::KET_QUA_KHONG_DAT_SAN.c_str());
                         } else {
-                            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", AdmissionConst::KET_QUA_KHONG_DAT.c_str());
+                            bool coNVDangXet = false;
+                            const Vector<NguyenVong>& nvList = ts.getDsNguyenVong();
+                            for (size_t k = 0; k < nvList.size(); ++k) {
+                                if (nvList[k].trangThai == AdmissionConst::TT_NV_DANG_XET) {
+                                    coNVDangXet = true;
+                                    break;
+                                }
+                            }
+                            if (coNVDangXet || nvList.empty()) {
+                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", AdmissionConst::KET_QUA_DANG_XET.c_str());
+                            } else {
+                                ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", AdmissionConst::KET_QUA_KHONG_DAT.c_str());
+                            }
                         }
 
-                        // CỘT 12: NGÀNH TRÚNG TUYỂN
+                        // CỘT 12: KHOA TRÚNG TUYỂN (BỔ SUNG MỚI)
                         ImGui::TableSetColumnIndex(12);
+                        if (ts.daTrungTuyen() && !ts.getNganhTrungTuyen().empty()) {
+                            string mk = ql.layMaKhoaCuaNganh(ts.getNganhTrungTuyen());
+                            string tenKhoa = ql.layTenKhoa(mk);
+                            ImGui::TextColored(ImVec4(0.9f, 0.85f, 0.4f, 1.0f), "%s", tenKhoa.c_str());
+                        } else {
+                            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
+                        }
+
+                        // CỘT 13: NGÀNH TRÚNG TUYỂN
+                        ImGui::TableSetColumnIndex(13);
                         if (!ts.getNganhTrungTuyen().empty()) {
                             ImGui::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1.0f), "%s", ql.layTenNganh(ts.getNganhTrungTuyen()).c_str());
                         } else {
                             ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
                         }
 
-                        // CỘT 13: LỚP SINH HOẠT
-                        ImGui::TableSetColumnIndex(13);
+                        // CỘT 14: LỚP SINH HOẠT
+                        ImGui::TableSetColumnIndex(14);
                         if (!ts.getLopSinhHoat().empty()) {
                             ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", ts.getLopSinhHoat().c_str());
                         } else {
                             ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
                         }
 
-                        // CỘT 14: MÃ SINH VIÊN DUT
-                        ImGui::TableSetColumnIndex(14);
+                        // CỘT 15: MÃ SINH VIÊN DUT
+                        ImGui::TableSetColumnIndex(15);
                         if (!ts.getMaSinhVien().empty()) {
                             ImGui::TextColored(ImVec4(0.35f, 0.95f, 0.75f, 1.0f), "%s", ts.getMaSinhVien().c_str());
                         } else {
                             ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
                         }
 
-                        // CỘT 15: THAO TÁC (SỬA & XÓA)
-                        ImGui::TableSetColumnIndex(15);
+                        // CỘT 16: THAO TÁC (XEM, SỬA & XÓA)
+                        ImGui::TableSetColumnIndex(16);
                         ImGui::PushID((int)i);
 
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.45f, 0.80f, 1.0f));
-                        if (ImGui::Button("Sua", ImVec2(45, 22))) {
-                            selectedRow = (int)i;
-                            const ThiSinh& sel = ql.getDanhSach()[i];
-                            strcpy(bufSBD, sel.getSoBaoDanh().c_str());
-                            strcpy(bufCCCD, sel.getSoCCCD().c_str());
-                            strcpy(bufHoTen, sel.getHoTen().c_str());
+                        // 1. Nút Xem chi tiết hồ sơ thí sinh
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.14f, 0.50f, 0.44f, 1.0f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.65f, 0.55f, 1.0f));
+                        if (ImGui::Button("Xem", ImVec2(42, 22))) {
+                            selectedSBD = ts.getSoBaoDanh();
+                            showDetailModal = true;
+                        }
+                        ImGui::PopStyleColor(2);
 
-                            string ns = sel.getNgaySinh();
+                        ImGui::SameLine();
+
+                        // 2. Nút Sửa hồ sơ
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.45f, 0.80f, 1.0f));
+                        if (ImGui::Button("Sua", ImVec2(42, 22))) {
+                            selectedRow = (int)i;
+                            selectedSBD = ts.getSoBaoDanh();
+                            strcpy(bufSBD, ts.getSoBaoDanh().c_str());
+                            strcpy(bufCCCD, ts.getSoCCCD().c_str());
+                            strcpy(bufHoTen, ts.getHoTen().c_str());
+
+                            string ns = ts.getNgaySinh();
                             if (ns.length() == 10) {
                                 try {
                                     formNgay = stoi(ns.substr(0, 2));
@@ -691,15 +1165,15 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 getCurrentSystemDate(formNgay, formThang, formNam);
                             }
 
-                            formQueQuanMa = sel.getQueQuan();
-                            formGioiTinhMa = sel.getGioiTinh();
-                            formToan = (float)sel.getDiemToan();
-                            formLy = (float)sel.getDiemLy();
-                            formHoa = (float)sel.getDiemHoa();
+                            formQueQuanMa = ts.getQueQuan();
+                            formGioiTinhMa = ts.getGioiTinh();
+                            formToan = (float)ts.getDiemToan();
+                            formLy = (float)ts.getDiemLy();
+                            formHoa = (float)ts.getDiemHoa();
                             formErrorMsg = "";
 
                             formNV1 = ""; formNV2 = ""; formNV3 = "";
-                            const Vector<NguyenVong>& dsNV = sel.getDsNguyenVong();
+                            const Vector<NguyenVong>& dsNV = ts.getDsNguyenVong();
                             for (size_t nvIdx = 0; nvIdx < dsNV.size(); ++nvIdx) {
                                 if (dsNV[nvIdx].thuTuNV == 1) formNV1 = dsNV[nvIdx].maNganh;
                                 else if (dsNV[nvIdx].thuTuNV == 2) formNV2 = dsNV[nvIdx].maNganh;
@@ -712,17 +1186,143 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                         ImGui::SameLine();
 
+                        // 3. Nút Xóa hồ sơ
                         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.25f, 0.25f, 1.0f));
-                        if (ImGui::Button("Xoa", ImVec2(45, 22))) {
+                        if (ImGui::Button("Xoa", ImVec2(42, 22))) {
                             selectedRow = (int)i;
+                            selectedSBD = ts.getSoBaoDanh();
                             showDeleteModal = true;
                         }
                         ImGui::PopStyleColor();
 
                         ImGui::PopID();
                     }
+
+                    if (pageData.empty()) {
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(3);
+                        ImGui::TextColored(ImVec4(0.8f, 0.4f, 0.4f, 1.0f), "Khong tim thay thi sinh nao phu hop!");
+                    }
+
+                    // Đo lường chính xác chiều cao thực tế của các hàng bên trong bảng
+                    float innerY = ImGui::GetCursorPosY();
+                    bool hasScrollX = (ImGui::GetScrollMaxX() > 0.0f);
+                    float scrollXHeight = hasScrollX ? ImGui::GetStyle().ScrollbarSize : 0.0f;
+                    float realTableHeight = innerY + scrollXHeight + 1.0f;
+
+                    if (!needScrollY && realTableHeight > 40.0f) {
+                        measuredTableHeight = realTableHeight;
+                    }
+
                     ImGui::EndTable();
                 }
+
+                // ==================== THANH ĐIỀU HƯỚNG PHÂN TRANG ====================
+                ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::Spacing();
+
+                // 1. Phân trang - Số bản ghi / trang
+                ImGui::Text("So ban ghi / trang:");
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(110);
+                const char* pageSizeLabels[] = { "10 / trang", "25 / trang", "50 / trang", "100 / trang" };
+                int oldPageSizeIdx = pageSizeIndex;
+                if (ImGui::Combo("##comboPageSize", &pageSizeIndex, pageSizeLabels, AdmissionConst::SO_LUONG_PAGE_SIZE_OPTIONS)) {
+                    if (pageSizeIndex != oldPageSizeIdx) {
+                        currentPage = 1;
+                    }
+                }
+
+                ImGui::SameLine();
+                int recordStart = (totalRecords == 0) ? 0 : ((currentPage - 1) * pageSize + 1);
+                int recordEnd = (currentPage * pageSize < totalRecords) ? (currentPage * pageSize) : totalRecords;
+                ImGui::TextColored(ImVec4(0.7f, 0.85f, 1.0f, 1.0f), " | Hien thi tu %d den %d tren tong so %d thi sinh",
+                    recordStart, recordEnd, totalRecords);
+
+                // 2. Nút điều hướng phân trang
+                ImGui::SameLine(ImGui::GetWindowWidth() - 440);
+
+                bool atFirstPage = (currentPage <= 1);
+                if (atFirstPage) ImGui::BeginDisabled();
+                if (ImGui::Button(" |<< Dau ")) {
+                    currentPage = 1;
+                    selectedRow = -1;
+                }
+                if (atFirstPage) ImGui::EndDisabled();
+
+                ImGui::SameLine();
+
+                if (atFirstPage) ImGui::BeginDisabled();
+                if (ImGui::Button(" < Truoc ")) {
+                    if (currentPage > 1) currentPage--;
+                    selectedRow = -1;
+                }
+                if (atFirstPage) ImGui::EndDisabled();
+
+                ImGui::SameLine();
+
+                // NÚT TRANG HIỆN TẠI (CLICK VÀO BẬT POPUP CHỌN TRANG ĐẾN)
+                char pageLabel[64];
+                sprintf(pageLabel, " Trang %d / %d ", currentPage, totalPages);
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.28f, 0.42f, 0.85f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.48f, 0.72f, 1.00f));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.90f, 0.35f, 1.0f));
+                if (ImGui::Button(pageLabel)) {
+                    targetJumpPage = currentPage;
+                    ImGui::OpenPopup("PopupChuyenTrang");
+                }
+                ImGui::PopStyleColor(3);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Click de chuyen nhanh den trang bat ky");
+                }
+
+                // POPUP NHẬP SỐ TRANG ĐỂ CHUYỂN
+                if (ImGui::BeginPopup("PopupChuyenTrang")) {
+                    ImGui::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1.0f), "Chuyen Den Trang");
+                    ImGui::Separator();
+                    ImGui::Spacing();
+
+                    ImGui::Text("Nhap so trang (1 - %d):", totalPages);
+                    ImGui::SetNextItemWidth(130);
+                    if (ImGui::InputInt("##jumpPageInput", &targetJumpPage, 1, 5)) {
+                        if (targetJumpPage < 1) targetJumpPage = 1;
+                        if (targetJumpPage > totalPages) targetJumpPage = totalPages;
+                    }
+
+                    ImGui::Spacing();
+                    if (ImGui::Button("Chuyen ngay", ImVec2(90, 26)) || ImGui::IsKeyPressed(ImGuiKey_Enter)) {
+                        if (targetJumpPage >= 1 && targetJumpPage <= totalPages) {
+                            currentPage = targetJumpPage;
+                            selectedRow = -1;
+                        }
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Dong", ImVec2(60, 26))) {
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
+                }
+
+                ImGui::SameLine();
+
+                bool atLastPage = (currentPage >= totalPages);
+                if (atLastPage) ImGui::BeginDisabled();
+                if (ImGui::Button(" Sau > ")) {
+                    if (currentPage < totalPages) currentPage++;
+                    selectedRow = -1;
+                }
+                if (atLastPage) ImGui::EndDisabled();
+
+                ImGui::SameLine();
+
+                if (atLastPage) ImGui::BeginDisabled();
+                if (ImGui::Button(" Cuoi >>| ")) {
+                    currentPage = totalPages;
+                    selectedRow = -1;
+                }
+                if (atLastPage) ImGui::EndDisabled();
 
                 ImGui::EndTabItem();
             }
@@ -752,6 +1352,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const ThiSinh& ts = ql.getDanhSach()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_ng_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", ts.getSoCCCD().c_str());
@@ -793,6 +1394,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const ThiSinh& ts = ql.getDanhSach()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_tsr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ts.getSoBaoDanh().c_str());
@@ -843,6 +1445,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                     sttNV++;
                                     ImGui::TableNextRow();
                                     ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_nvr_%d", sttNV); RenderRowHover(rId);
                                     ImGui::Text("%d", sttNV);
                                     ImGui::TableSetColumnIndex(1);
                                     ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ts.getSoBaoDanh().c_str());
@@ -884,6 +1487,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const Khoa& k = ql.getDanhSachKhoa()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_kr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", k.maKhoa.c_str());
@@ -915,6 +1519,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_dmnr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", dmn.maNganh.c_str());
@@ -949,6 +1554,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_ntkr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::Text("%d", ntk.namTuyenSinh);
@@ -987,6 +1593,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const KhoaHoc& kh = ql.getDanhSachKhoaHoc()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_khr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%d", kh.namTuyenSinh);
@@ -1017,6 +1624,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_ttr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", tt.maTinh.c_str());
@@ -1047,6 +1655,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_gtr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", gt.maGioiTinh.c_str());
@@ -1192,6 +1801,9 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.60f, 0.35f, 1.0f));
                     if (ImGui::Button("[ >> CHAY XET TUYEN & CHOT DIEM CHUAN DUT << ]", ImVec2(380, 32))) {
                         ql.chayThuatToanXetTuyenVaChotDiemChuan(ql.getNamTuyenSinhHienHanh());
+                        sortCol = 10;   // Tự động sắp xếp theo cột Tổng điểm
+                        sortAsc = false; // Điểm cao nhất từ trên xuống dưới
+                        currentPage = 1;
                         showToast = true;
                         toastMsg = "Da xet tuyen, chot diem chuan va cap MSSV DUT thanh cong!";
                     }
@@ -1265,6 +1877,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_dcn_%d", stt); RenderRowHover(rId);
                                 ImGui::Text("%d", stt);
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ntk.maNganh.c_str());
@@ -1321,6 +1934,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                                     ImGui::TableNextRow();
                                     ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_tsv_%d", sttAdmitted); RenderRowHover(rId);
                                     ImGui::Text("%d", sttAdmitted);
                                     ImGui::TableSetColumnIndex(1);
                                     ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.2f, 1.0f), "%s", ts.getMaSinhVien().c_str());
@@ -1368,6 +1982,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 for (size_t i = 0; i < dsTK.size(); ++i) {
                                     ImGui::TableNextRow();
                                     ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_tk_%d", (int)i); RenderRowHover(rId);
                                     ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", dsTK[i].getSoBaoDanh().c_str());
                                     ImGui::TableSetColumnIndex(1);
                                     ImGui::Text("%s", dsTK[i].getHoTen().c_str());
@@ -1446,6 +2061,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const Khoa& k = ql.getDanhSachKhoa()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_kr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", k.maKhoa.c_str());
@@ -1480,6 +2096,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_dmnr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", dmn.maNganh.c_str());
@@ -1555,6 +2172,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_mntk_%d", sttQ); RenderRowHover(rId);
                                 ImGui::Text("%d", sttQ);
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ntk.maNganh.c_str());
@@ -1656,6 +2274,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_ttr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", tt.maTinh.c_str());
@@ -1758,6 +2377,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
                                 ImGui::TableNextRow();
                                 ImGui::TableSetColumnIndex(0);
+                                char rId[32]; sprintf(rId, "##row_gtr_%d", (int)i); RenderRowHover(rId);
                                 ImGui::Text("%d", (int)(i + 1));
                                 ImGui::TableSetColumnIndex(1);
                                 ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", gt.maGioiTinh.c_str());
@@ -1973,13 +2593,14 @@ int AppGUI::run(QuanLyThiSinh& ql) {
         if (showAddModal) {
             ImGui::OpenPopup("Them Thi Sinh Moi");
         }
+        ImGui::SetNextWindowSize(ImVec2(720.0f, 0.0f), ImGuiCond_Always);
         if (ImGui::BeginPopupModal("Them Thi Sinh Moi", &showAddModal, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "NHAP HO SO VA DIEM THI THI SINH");
             ImGui::Separator();
             ImGui::Spacing();
 
             if (ImGui::BeginTable("FormAddTable", 2, ImGuiTableFlags_SizingFixedFit)) {
-                ImGui::TableSetupColumn("ColLabel", ImGuiTableColumnFlags_WidthFixed, 200.0f);
+                ImGui::TableSetupColumn("ColLabel", ImGuiTableColumnFlags_WidthFixed, 195.0f);
                 ImGui::TableSetupColumn("ColInput", ImGuiTableColumnFlags_WidthStretch);
 
                 ImGui::TableNextRow();
@@ -2093,7 +2714,12 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::AlignTextToFramePadding();
                 ImGui::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1.0f), "Nguyen Vong 1 (NV1)*:");
                 ImGui::TableSetColumnIndex(1);
-                RenderComboNganh("##comboNV1Add", ql.getDanhSachDanhMucNganh(), formNV1);
+                if (RenderComboNganh("##comboNV1Add", ql.getDanhSachDanhMucNganh(), formNV1, formNV2, formNV3)) {
+                    if (!formNV1.empty()) {
+                        if (formNV2 == formNV1) formNV2.clear();
+                        if (formNV3 == formNV1) formNV3.clear();
+                    }
+                }
 
                 // Row 11: Nguyện vọng 2
                 ImGui::TableNextRow();
@@ -2101,7 +2727,12 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::AlignTextToFramePadding();
                 ImGui::Text("Nguyen Vong 2 (NV2):");
                 ImGui::TableSetColumnIndex(1);
-                RenderComboNganh("##comboNV2Add", ql.getDanhSachDanhMucNganh(), formNV2);
+                if (RenderComboNganh("##comboNV2Add", ql.getDanhSachDanhMucNganh(), formNV2, formNV1, formNV3)) {
+                    if (!formNV2.empty()) {
+                        if (formNV1 == formNV2) formNV1.clear();
+                        if (formNV3 == formNV2) formNV3.clear();
+                    }
+                }
 
                 // Row 12: Nguyện vọng 3
                 ImGui::TableNextRow();
@@ -2109,7 +2740,12 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::AlignTextToFramePadding();
                 ImGui::Text("Nguyen Vong 3 (NV3):");
                 ImGui::TableSetColumnIndex(1);
-                RenderComboNganh("##comboNV3Add", ql.getDanhSachDanhMucNganh(), formNV3);
+                if (RenderComboNganh("##comboNV3Add", ql.getDanhSachDanhMucNganh(), formNV3, formNV1, formNV2)) {
+                    if (!formNV3.empty()) {
+                        if (formNV1 == formNV3) formNV1.clear();
+                        if (formNV2 == formNV3) formNV2.clear();
+                    }
+                }
 
                 ImGui::EndTable();
             }
@@ -2119,10 +2755,18 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
             double tongDiem = formToan + formLy + formHoa;
             bool liet = (formToan <= ql.getDiemLiet() || formLy <= ql.getDiemLiet() || formHoa <= ql.getDiemLiet());
-            bool pass = (!liet && tongDiem >= ql.getDiemChuan());
+            bool duSan = (!liet && tongDiem >= ql.getDiemSan());
 
-            ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "Tong Diem: %.2f  |  Ket Qua: %s", 
-                tongDiem, (pass ? AdmissionConst::KET_QUA_TRUNG_TUYEN.c_str() : (liet ? "BI DIEM LIET" : AdmissionConst::KET_QUA_KHONG_DAT.c_str())));
+            if (liet) {
+                ImGui::TextColored(ImVec4(1.0f, 0.35f, 0.35f, 1.0f), "Tong Diem: %.2f  |  Trang Thai: [!] BI DIEM LIET (Co mon <= %.2f - Khong du dieu kien)",
+                    tongDiem, ql.getDiemLiet());
+            } else if (!duSan) {
+                ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f), "Tong Diem: %.2f  |  Trang Thai: [!] KHONG DAT DIEM SAN (Toi thieu %.2f - Khong du dieu kien)",
+                    tongDiem, ql.getDiemSan());
+            } else {
+                ImGui::TextColored(ImVec4(0.35f, 0.95f, 0.55f, 1.0f), "Tong Diem: %.2f  |  Trang Thai: [OK] DU DIEU KIEN XET TUYEN (San >= %.2f - Dang cho quet)",
+                    tongDiem, ql.getDiemSan());
+            }
 
             if (!formErrorMsg.empty()) {
                 ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", formErrorMsg.c_str());
@@ -2150,20 +2794,33 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     formErrorMsg = "Ho va ten phai co it nhat 2 ky tu!";
                 } else if (!Utils::kiemTraNgaySinh(ns)) {
                     formErrorMsg = "Ngay sinh khong hop le!";
+                } else if (formNV1.empty()) {
+                    formErrorMsg = "Nguyen Vong 1 (NV1) la bat buoc, vui long chon nganh!";
+                } else if (!formNV1.empty() && !formNV2.empty() && formNV1 == formNV2) {
+                    formErrorMsg = "Nguyen Vong 2 khong duoc trung nganh voi Nguyen Vong 1!";
+                } else if (!formNV1.empty() && !formNV3.empty() && formNV1 == formNV3) {
+                    formErrorMsg = "Nguyen Vong 3 khong duoc trung nganh voi Nguyen Vong 1!";
+                } else if (!formNV2.empty() && !formNV3.empty() && formNV2 == formNV3) {
+                    formErrorMsg = "Nguyen Vong 3 khong duoc trung nganh voi Nguyen Vong 2!";
                 } else {
                     ThiSinh moi(cccd, hoten, ns, formQueQuanMa, formGioiTinhMa, sbd, (double)formToan, (double)formLy, (double)formHoa, ql.getNamTuyenSinhHienHanh());
+                    string nvTrangThai = duSan ? AdmissionConst::TT_NV_DANG_XET : AdmissionConst::TT_NV_KHONG_TRUNG;
                     Vector<NguyenVong> dsNV;
-                    if (!formNV1.empty()) dsNV.push_back(NguyenVong(0, sbd, 1, formNV1, AdmissionConst::TT_NV_DANG_XET));
-                    if (!formNV2.empty()) dsNV.push_back(NguyenVong(0, sbd, 2, formNV2, AdmissionConst::TT_NV_DANG_XET));
-                    if (!formNV3.empty()) dsNV.push_back(NguyenVong(0, sbd, 3, formNV3, AdmissionConst::TT_NV_DANG_XET));
+                    if (!formNV1.empty()) dsNV.push_back(NguyenVong(0, sbd, 1, formNV1, nvTrangThai));
+                    if (!formNV2.empty()) dsNV.push_back(NguyenVong(0, sbd, 2, formNV2, nvTrangThai));
+                    if (!formNV3.empty()) dsNV.push_back(NguyenVong(0, sbd, 3, formNV3, nvTrangThai));
                     moi.setDsNguyenVong(dsNV);
 
                     if (ql.themThiSinh(moi)) {
                         reportContent.clear();
+                        sortCol = 0; // Sắp xếp theo ngày sửa/tạo mới nhất
+                        sortAsc = false;
+                        currentPage = 1;
+                        selectedSBD = sbd;
                         showAddModal = false;
                         ImGui::CloseCurrentPopup();
                         showToast = true;
-                        toastMsg = "Them thi sinh moi thanh cong!";
+                        toastMsg = "Them thi sinh moi thanh cong! Ho so da duoc dua len dau bang.";
                     } else {
                         formErrorMsg = "Loi rang buoc tham chieu Que quan hoac Gioi tinh!";
                     }
@@ -2182,13 +2839,14 @@ int AppGUI::run(QuanLyThiSinh& ql) {
         if (showEditModal) {
             ImGui::OpenPopup("Cap Nhat Thong Tin Thi Sinh");
         }
+        ImGui::SetNextWindowSize(ImVec2(720.0f, 0.0f), ImGuiCond_Always);
         if (ImGui::BeginPopupModal("Cap Nhat Thong Tin Thi Sinh", &showEditModal, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "CAP NHAT THONG TIN THI SINH (SBD: %s)", bufSBD);
             ImGui::Separator();
             ImGui::Spacing();
 
             if (ImGui::BeginTable("FormEditTable", 2, ImGuiTableFlags_SizingFixedFit)) {
-                ImGui::TableSetupColumn("ColLabelEd", ImGuiTableColumnFlags_WidthFixed, 200.0f);
+                ImGui::TableSetupColumn("ColLabelEd", ImGuiTableColumnFlags_WidthFixed, 195.0f);
                 ImGui::TableSetupColumn("ColInputEd", ImGuiTableColumnFlags_WidthStretch);
 
                 ImGui::TableNextRow();
@@ -2302,7 +2960,12 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::AlignTextToFramePadding();
                 ImGui::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1.0f), "Nguyen Vong 1 (NV1)*:");
                 ImGui::TableSetColumnIndex(1);
-                RenderComboNganh("##comboNV1Edit", ql.getDanhSachDanhMucNganh(), formNV1);
+                if (RenderComboNganh("##comboNV1Edit", ql.getDanhSachDanhMucNganh(), formNV1, formNV2, formNV3)) {
+                    if (!formNV1.empty()) {
+                        if (formNV2 == formNV1) formNV2.clear();
+                        if (formNV3 == formNV1) formNV3.clear();
+                    }
+                }
 
                 // Row 11: Nguyện vọng 2
                 ImGui::TableNextRow();
@@ -2310,7 +2973,12 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::AlignTextToFramePadding();
                 ImGui::Text("Nguyen Vong 2 (NV2):");
                 ImGui::TableSetColumnIndex(1);
-                RenderComboNganh("##comboNV2Edit", ql.getDanhSachDanhMucNganh(), formNV2);
+                if (RenderComboNganh("##comboNV2Edit", ql.getDanhSachDanhMucNganh(), formNV2, formNV1, formNV3)) {
+                    if (!formNV2.empty()) {
+                        if (formNV1 == formNV2) formNV1.clear();
+                        if (formNV3 == formNV2) formNV3.clear();
+                    }
+                }
 
                 // Row 12: Nguyện vọng 3
                 ImGui::TableNextRow();
@@ -2318,9 +2986,32 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::AlignTextToFramePadding();
                 ImGui::Text("Nguyen Vong 3 (NV3):");
                 ImGui::TableSetColumnIndex(1);
-                RenderComboNganh("##comboNV3Edit", ql.getDanhSachDanhMucNganh(), formNV3);
+                if (RenderComboNganh("##comboNV3Edit", ql.getDanhSachDanhMucNganh(), formNV3, formNV1, formNV2)) {
+                    if (!formNV3.empty()) {
+                        if (formNV1 == formNV3) formNV1.clear();
+                        if (formNV2 == formNV3) formNV2.clear();
+                    }
+                }
 
                 ImGui::EndTable();
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            double tongDiemEd = formToan + formLy + formHoa;
+            bool lietEd = (formToan <= ql.getDiemLiet() || formLy <= ql.getDiemLiet() || formHoa <= ql.getDiemLiet());
+            bool duSanEd = (!lietEd && tongDiemEd >= ql.getDiemSan());
+
+            if (lietEd) {
+                ImGui::TextColored(ImVec4(1.0f, 0.35f, 0.35f, 1.0f), "Tong Diem: %.2f  |  Trang Thai: [!] BI DIEM LIET (Co mon <= %.2f - Khong du dieu kien)",
+                    tongDiemEd, ql.getDiemLiet());
+            } else if (!duSanEd) {
+                ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f), "Tong Diem: %.2f  |  Trang Thai: [!] KHONG DAT DIEM SAN (Toi thieu %.2f - Khong du dieu kien)",
+                    tongDiemEd, ql.getDiemSan());
+            } else {
+                ImGui::TextColored(ImVec4(0.35f, 0.95f, 0.55f, 1.0f), "Tong Diem: %.2f  |  Trang Thai: [OK] DU DIEU KIEN XET TUYEN (San >= %.2f - Dang cho quet)",
+                    tongDiemEd, ql.getDiemSan());
             }
 
             if (!formErrorMsg.empty()) {
@@ -2342,27 +3033,39 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     formErrorMsg = "Ho va ten phai co it nhat 2 ky tu!";
                 } else if (!Utils::kiemTraNgaySinh(ns)) {
                     formErrorMsg = "Ngay sinh khong hop le!";
+                } else if (formNV1.empty()) {
+                    formErrorMsg = "Nguyen Vong 1 (NV1) la bat buoc, vui long chon nganh!";
+                } else if (!formNV1.empty() && !formNV2.empty() && formNV1 == formNV2) {
+                    formErrorMsg = "Nguyen Vong 2 khong duoc trung nganh voi Nguyen Vong 1!";
+                } else if (!formNV1.empty() && !formNV3.empty() && formNV1 == formNV3) {
+                    formErrorMsg = "Nguyen Vong 3 khong duoc trung nganh voi Nguyen Vong 1!";
+                } else if (!formNV2.empty() && !formNV3.empty() && formNV2 == formNV3) {
+                    formErrorMsg = "Nguyen Vong 3 khong duoc trung nganh voi Nguyen Vong 2!";
                 } else {
                     int namTS = (selectedRow >= 0 && selectedRow < (int)ql.getDanhSach().size()) ? ql.getDanhSach()[selectedRow].getNamTuyenSinh() : ql.getNamTuyenSinhHienHanh();
                     ThiSinh capNhat(cccd, hoten, ns, formQueQuanMa, formGioiTinhMa, bufSBD, (double)formToan, (double)formLy, (double)formHoa, namTS);
-                    if (selectedRow >= 0 && selectedRow < (int)ql.getDanhSach().size()) {
-                        capNhat.setMaSinhVien(ql.getDanhSach()[selectedRow].getMaSinhVien());
-                        capNhat.setLopSinhHoat(ql.getDanhSach()[selectedRow].getLopSinhHoat());
-                        capNhat.setNganhTrungTuyen(ql.getDanhSach()[selectedRow].getNganhTrungTuyen());
-                        capNhat.setNguyenVongTrungTuyen(ql.getDanhSach()[selectedRow].getNguyenVongTrungTuyen());
-                    }
+                    capNhat.setMaSinhVien("");
+                    capNhat.setLopSinhHoat("");
+                    capNhat.setNganhTrungTuyen("");
+                    capNhat.setNguyenVongTrungTuyen(0);
+
+                    string nvTrangThaiEd = duSanEd ? AdmissionConst::TT_NV_DANG_XET : AdmissionConst::TT_NV_KHONG_TRUNG;
                     Vector<NguyenVong> dsNV;
-                    if (!formNV1.empty()) dsNV.push_back(NguyenVong(0, bufSBD, 1, formNV1, AdmissionConst::TT_NV_DANG_XET));
-                    if (!formNV2.empty()) dsNV.push_back(NguyenVong(0, bufSBD, 2, formNV2, AdmissionConst::TT_NV_DANG_XET));
-                    if (!formNV3.empty()) dsNV.push_back(NguyenVong(0, bufSBD, 3, formNV3, AdmissionConst::TT_NV_DANG_XET));
+                    if (!formNV1.empty()) dsNV.push_back(NguyenVong(0, bufSBD, 1, formNV1, nvTrangThaiEd));
+                    if (!formNV2.empty()) dsNV.push_back(NguyenVong(0, bufSBD, 2, formNV2, nvTrangThaiEd));
+                    if (!formNV3.empty()) dsNV.push_back(NguyenVong(0, bufSBD, 3, formNV3, nvTrangThaiEd));
                     capNhat.setDsNguyenVong(dsNV);
 
                     if (ql.capNhatThiSinh(capNhat)) {
                         reportContent.clear();
+                        sortCol = 0; // Sắp xếp theo ngày cập nhật mới nhất
+                        sortAsc = false;
+                        currentPage = 1;
+                        selectedSBD = bufSBD;
                         showEditModal = false;
                         ImGui::CloseCurrentPopup();
                         showToast = true;
-                        toastMsg = "Cap nhat ho so thi sinh thanh cong!";
+                        toastMsg = "Cap nhat ho so thi sinh thanh cong! Ho so da duoc dua len dau bang.";
                     } else {
                         formErrorMsg = "Trung so CCCD voi thi sinh khac hoac loi tham chieu!";
                     }
@@ -2382,8 +3085,9 @@ int AppGUI::run(QuanLyThiSinh& ql) {
             ImGui::OpenPopup("Xac Nhan Xoa Thi Sinh");
         }
         if (ImGui::BeginPopupModal("Xac Nhan Xoa Thi Sinh", &showDeleteModal, ImGuiWindowFlags_AlwaysAutoResize)) {
-            if (selectedRow >= 0 && selectedRow < (int)ql.getDanhSach().size()) {
-                const ThiSinh& sel = ql.getDanhSach()[selectedRow];
+            int delIdx = ql.timViTriTheoSBD(selectedSBD);
+            if (delIdx != -1) {
+                const ThiSinh& sel = ql.getDanhSach()[delIdx];
                 ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "BAN CO CHAC CHAN MUON XOA THI SINH NAY KHOI CSDL?");
                 ImGui::Separator();
                 ImGui::Text("SBD     : %s", sel.getSoBaoDanh().c_str());
@@ -2396,6 +3100,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     ql.xoaThiSinh(sel.getSoBaoDanh());
                     reportContent.clear();
                     selectedRow = -1;
+                    selectedSBD = "";
                     showDeleteModal = false;
                     ImGui::CloseCurrentPopup();
                     showToast = true;
@@ -2403,11 +3108,253 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("Huy Bo", ImVec2(100, 30))) {
+                    selectedSBD = "";
                     showDeleteModal = false;
                     ImGui::CloseCurrentPopup();
                 }
             } else {
+                selectedSBD = "";
                 showDeleteModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: XEM CHI TIẾT HỒ SƠ THÍ SINH DUT ====================
+        if (showDetailModal) {
+            ImGui::OpenPopup("Chi Tiet Ho So Thi Sinh DUT");
+        }
+        ImGui::SetNextWindowSize(ImVec2(720.0f, 0.0f), ImGuiCond_Always);
+        if (ImGui::BeginPopupModal("Chi Tiet Ho So Thi Sinh DUT", &showDetailModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            int detIdx = ql.timViTriTheoSBD(selectedSBD);
+            if (detIdx != -1) {
+                const ThiSinh& sel = ql.getDanhSach()[detIdx];
+                string sbdDet = sel.getSoBaoDanh();
+                string cccdDet = sel.getSoCCCD();
+                string hoTenDet = sel.getHoTen();
+                string ngaySinhDet = sel.getNgaySinh();
+                string queQuanDet = sel.getQueQuan();
+                string gioiTinhDet = sel.getGioiTinh();
+                float toanDet = (float)sel.getDiemToan();
+                float lyDet = (float)sel.getDiemLy();
+                float hoaDet = (float)sel.getDiemHoa();
+
+                string nv1Det = "", nv2Det = "", nv3Det = "";
+                const Vector<NguyenVong>& dsNV = sel.getDsNguyenVong();
+                for (size_t nvIdx = 0; nvIdx < dsNV.size(); ++nvIdx) {
+                    if (dsNV[nvIdx].thuTuNV == 1) nv1Det = dsNV[nvIdx].maNganh;
+                    else if (dsNV[nvIdx].thuTuNV == 2) nv2Det = dsNV[nvIdx].maNganh;
+                    else if (dsNV[nvIdx].thuTuNV == 3) nv3Det = dsNV[nvIdx].maNganh;
+                }
+
+                int dDet = 1, mDet = 1, yDet = 2008;
+                if (ngaySinhDet.length() == 10) {
+                    try {
+                        dDet = stoi(ngaySinhDet.substr(0, 2));
+                        mDet = stoi(ngaySinhDet.substr(3, 2));
+                        yDet = stoi(ngaySinhDet.substr(6, 4));
+                    } catch (...) {}
+                }
+
+                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "CHI TIET HO SO VA DIEM THI THI SINH (SBD: %s)", sbdDet.c_str());
+                ImGui::Separator();
+                ImGui::Spacing();
+
+                ImGui::BeginDisabled();
+                if (ImGui::BeginTable("FormDetailTable", 2, ImGuiTableFlags_SizingFixedFit)) {
+                    ImGui::TableSetupColumn("ColLabelDt", ImGuiTableColumnFlags_WidthFixed, 195.0f);
+                    ImGui::TableSetupColumn("ColInputDt", ImGuiTableColumnFlags_WidthStretch);
+
+                    // Row 1: SBD
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("So Bao Danh:");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(260.0f);
+                    char bufSBDDt[32]; strcpy(bufSBDDt, sbdDet.c_str());
+                    ImGui::InputText("##sbdDt", bufSBDDt, sizeof(bufSBDDt));
+
+                    // Row 2: CCCD
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("So CCCD:");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(260.0f);
+                    char bufCCCDDt[32]; strcpy(bufCCCDDt, cccdDet.c_str());
+                    ImGui::InputText("##cccdDt", bufCCCDDt, sizeof(bufCCCDDt));
+
+                    // Row 3: Họ và Tên
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Ho va Ten:");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(260.0f);
+                    char bufHoTenDt[64]; strcpy(bufHoTenDt, hoTenDet.c_str());
+                    ImGui::InputText("##hoTenDt", bufHoTenDt, sizeof(bufHoTenDt));
+
+                    // Row 4: Ngày sinh
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Ngay Sinh (dd/mm/yyyy):");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(50.0f);
+                    ImGui::InputInt("##dayDt", &dDet, 0, 0);
+                    ImGui::SameLine(); ImGui::Text("/"); ImGui::SameLine();
+                    ImGui::SetNextItemWidth(50.0f);
+                    ImGui::InputInt("##monthDt", &mDet, 0, 0);
+                    ImGui::SameLine(); ImGui::Text("/"); ImGui::SameLine();
+                    ImGui::SetNextItemWidth(70.0f);
+                    ImGui::InputInt("##yearDt", &yDet, 0, 0);
+
+                    // Row 5: Quê quán
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Que Quan (Tinh/TP):");
+                    ImGui::TableSetColumnIndex(1);
+                    RenderSearchableComboTinhThanh("##comboQueQuanDt", ql.getDanhSachTinhThanh(), queQuanDet);
+
+                    // Row 6: Giới tính
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Gioi Tinh:");
+                    ImGui::TableSetColumnIndex(1);
+                    RenderComboGioiTinh("##comboGioiTinhDt", ql.getDanhSachGioiTinh(), gioiTinhDet);
+
+                    // Row 7: Điểm Toán
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Diem Toan (0.00 - 10.00):");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(140.0f);
+                    ImGui::InputFloat("##toanDt", &toanDet, 0.0f, 0.0f, "%.2f");
+
+                    // Row 8: Điểm Lý
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Diem Ly (0.00 - 10.00):");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(140.0f);
+                    ImGui::InputFloat("##lyDt", &lyDet, 0.0f, 0.0f, "%.2f");
+
+                    // Row 9: Điểm Hóa
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Diem Hoa (0.00 - 10.00):");
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::SetNextItemWidth(140.0f);
+                    ImGui::InputFloat("##hoaDt", &hoaDet, 0.0f, 0.0f, "%.2f");
+
+                    // Row 10: Nguyện vọng 1
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1.0f), "Nguyen Vong 1 (NV1):");
+                    ImGui::TableSetColumnIndex(1);
+                    RenderComboNganh("##comboNV1Dt", ql.getDanhSachDanhMucNganh(), nv1Det, nv2Det, nv3Det);
+
+                    // Row 11: Nguyện vọng 2
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Nguyen Vong 2 (NV2):");
+                    ImGui::TableSetColumnIndex(1);
+                    RenderComboNganh("##comboNV2Dt", ql.getDanhSachDanhMucNganh(), nv2Det, nv1Det, nv3Det);
+
+                    // Row 12: Nguyện vọng 3
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::AlignTextToFramePadding();
+                    ImGui::Text("Nguyen Vong 3 (NV3):");
+                    ImGui::TableSetColumnIndex(1);
+                    RenderComboNganh("##comboNV3Dt", ql.getDanhSachDanhMucNganh(), nv3Det, nv1Det, nv2Det);
+
+                    // Row 13: Kết quả DUT (nếu trúng tuyển)
+                    if (sel.daTrungTuyen()) {
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "Trung Tuyen Nganh:");
+                        ImGui::TableSetColumnIndex(1);
+                        char bufTT[128];
+                        sprintf(bufTT, "%s (%s)", ql.layTenNganh(sel.getNganhTrungTuyen()).c_str(), sel.getNganhTrungTuyen().c_str());
+                        ImGui::InputText("##ttNganhDt", bufTT, sizeof(bufTT));
+
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "Lop Sinh Hoat DUT:");
+                        ImGui::TableSetColumnIndex(1);
+                        char bufLSH[64]; strcpy(bufLSH, sel.getLopSinhHoat().c_str());
+                        ImGui::InputText("##lshDt", bufLSH, sizeof(bufLSH));
+
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+                        ImGui::AlignTextToFramePadding();
+                        ImGui::TextColored(ImVec4(0.35f, 0.95f, 0.75f, 1.0f), "Ma Sinh Vien DUT:");
+                        ImGui::TableSetColumnIndex(1);
+                        char bufMSV[32]; strcpy(bufMSV, sel.getMaSinhVien().c_str());
+                        ImGui::InputText("##msvDt", bufMSV, sizeof(bufMSV));
+                    }
+
+                    ImGui::EndTable();
+                }
+                ImGui::EndDisabled();
+
+                ImGui::Spacing();
+                ImGui::Separator();
+
+                double tongDiemDt = sel.tinhTongDiem();
+                bool lietDt = sel.kiemTraDiemLiet(ql.getDiemLiet());
+                bool duSanDt = (!lietDt && tongDiemDt >= ql.getDiemSan());
+
+                string kqStr;
+                ImVec4 kqColor;
+                if (sel.daTrungTuyen()) {
+                    kqStr = "TRUNG TUYEN (Nguyen Vong " + to_string(sel.getNguyenVongTrungTuyen()) + ")";
+                    kqColor = ImVec4(0.2f, 0.95f, 0.4f, 1.0f);
+                } else if (lietDt) {
+                    kqStr = "BI DIEM LIET";
+                    kqColor = ImVec4(1.0f, 0.35f, 0.35f, 1.0f);
+                } else if (!duSanDt) {
+                    kqStr = "KHONG DAT DIEM SAN";
+                    kqColor = ImVec4(1.0f, 0.65f, 0.25f, 1.0f);
+                } else {
+                    bool coNVDangXet = false;
+                    const Vector<NguyenVong>& nvList = sel.getDsNguyenVong();
+                    for (size_t k = 0; k < nvList.size(); ++k) {
+                        if (nvList[k].trangThai == AdmissionConst::TT_NV_DANG_XET) {
+                            coNVDangXet = true;
+                            break;
+                        }
+                    }
+                    if (coNVDangXet || nvList.empty()) {
+                        kqStr = "DANG XET TUYEN (Dang cho quet)";
+                        kqColor = ImVec4(0.35f, 0.95f, 0.55f, 1.0f);
+                    } else {
+                        kqStr = "KHONG TRUNG TUYEN";
+                        kqColor = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+                    }
+                }
+
+                ImGui::TextColored(kqColor, "Tong Diem: %.2f  |  Ket Qua: %s", 
+                    tongDiemDt, kqStr.c_str());
+
+                ImGui::Separator();
+                if (ImGui::Button("Dong", ImVec2(100, 30))) {
+                    showDetailModal = false;
+                    ImGui::CloseCurrentPopup();
+                }
+            } else {
+                showDetailModal = false;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();

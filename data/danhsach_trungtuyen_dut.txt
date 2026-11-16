@@ -3,19 +3,102 @@
 ========================================================================================================================
  STT | Ma Sinh Vien |       Ho va Ten      |  Lop Sinh Hoat | Diem | NV |        Nganh Trung Tuyen       |    Khoa    |
 ------------------------------------------------------------------------------------------------------------------------
-   1 | 102260001    | Hoang Thi Ha         | 26TCLC_KHDL1   | 29.05 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
-   2 | 102260002    | Nguyen Van An        | 26TCLC_KHDL1   | 28.25 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
-   3 | 102260003    | Phan Thanh Tung      | 26TCLC_KHDL1   | 27.50 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
-   4 | 102260004    | Vo Huy Tuong         | 26TCLC_KHDL1   | 27.25 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
-   5 | 102260005    | Nguyen Thi Nhat Vy   | 26TCLC_KHDL1   | 27.25 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
-   6 | 102260001    | Tran Thi Bich        | 26T_DT1        | 26.25 |  1 | Cong nghe Thong tin (Chuong tr | CNTT       |
-   7 | 102260006    | Pham Thi Diem        | 26TCLC_KHDL1   | 26.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
-   8 | 105260001    | Bui Mai Linh         | 26TDH1         | 25.50 |  1 | Ky thuat Dieu khien & Tu dong  | DIEN       |
-   9 | 106260001    | Dinh Thao Quyen      | 26VM1          | 24.25 |  1 | Vi dien tu - Thiet ke vi mach  | DTVT       |
-  10 | 102260007    | Vo Nhu Hieu          | 26TCLC_KHDL1   | 24.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
-  11 | 105260001    | Le Hoang Cong        | 26D1           | 21.25 |  1 | Ky thuat Dien (He thong dien)  | DIEN       |
-  12 | 101260001    | Ngo Van Nam          | 26OTO1         | 20.75 |  1 | Ky thuat O to                  | CKHI       |
-  13 | 109260001    | Vo Minh Duc          | 26X1           | 17.75 |  1 | Ky thuat Xay dung              | XDDD       |
-  14 | 109260002    | Dang Quoc Khanh      | 26X1           | 15.00 |  1 | Ky thuat Xay dung              | XDDD       |
+   1 | 102260001    | Nguyen Hoang Minh Qu | 26T_N1         | 29.20 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+   2 | 102260002    | Tran Le Thao Vy      | 26T_N1         | 28.75 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+   3 | 102260003    | Vo Nhu Hieu          | 26T_N1         | 28.10 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+   4 | 102260001    | Vo Duy Vu            | 26TCLC_KHDL1   | 28.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   5 | 102260002    | Do Cong Hai          | 26TCLC_KHDL1   | 27.88 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   6 | 102260004    | Cao Dinh Son         | 26T_N1         | 27.76 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+   7 | 102260005    | Tran Anh Hoa         | 26T_N1         | 27.64 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+   8 | 102260003    | Truong Bao Huy       | 26TCLC_KHDL1   | 27.52 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+   9 | 102260004    | Luu Minh Thong       | 26TCLC_KHDL1   | 27.40 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  10 | 102260006    | Dinh Trong Quang     | 26T_N1         | 27.28 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  11 | 102260005    | Trinh Phuong Yen     | 26TCLC_KHDL1   | 27.16 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  12 | 102260007    | Cao Cam Ha           | 26T_N1         | 27.04 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  13 | 102260008    | Mai Phuoc Tien       | 26T_N1         | 26.92 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  14 | 102260006    | Nguyen Quang Nhan    | 26TCLC_KHDL1   | 26.80 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  15 | 102260009    | Lam Bao Tu           | 26T_N1         | 26.68 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  16 | 102260010    | Do Cong Vu           | 26T_N1         | 26.50 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  17 | 102260011    | Hoang Bao Thuan      | 26T_N1         | 26.42 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  18 | 102260007    | Dang Dinh Hieu       | 26TCLC_KHDL1   | 26.34 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  19 | 102260012    | Ngo Phuoc Viet       | 26T_N1         | 26.26 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  20 | 102260008    | Phan Quynh Hien      | 26TCLC_KHDL1   | 26.18 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  21 | 102260009    | Cao Quoc Thang       | 26TCLC_KHDL1   | 26.10 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  22 | 102260010    | Trinh Minh Toan      | 26TCLC_KHDL1   | 26.02 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  23 | 102260011    | Bui Huu Thinh        | 26TCLC_KHDL1   | 25.94 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  24 | 102260012    | Bui Thu Thuy         | 26TCLC_KHDL1   | 25.86 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  25 | 102260013    | Dinh Ngoc Dat        | 26T_N1         | 25.78 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  26 | 102260014    | Lam Xuan Son         | 26T_N1         | 25.70 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  27 | 102260015    | Tran Thuy Thao       | 26T_N1         | 25.62 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  28 | 102260016    | Vu Trong An          | 26T_N1         | 25.54 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  29 | 102260017    | Nguyen Trong Vinh    | 26T_N1         | 25.46 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  30 | 102260018    | Trinh Tuan Lam       | 26T_N1         | 25.38 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  31 | 102260019    | Ngo Cong Hoang       | 26T_N1         | 25.30 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  32 | 102260020    | Nguyen Xuan Khanh    | 26T_N1         | 25.22 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  33 | 102260021    | Trinh Hong Linh      | 26T_N1         | 25.14 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  34 | 102260013    | Ha Duy Nhan          | 26TCLC_KHDL1   | 25.06 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  35 | 102260014    | Bui Bao Sang         | 26TCLC_KHDL1   | 24.98 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  36 | 102260022    | Doan Xuan Nhat       | 26T_N1         | 24.90 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  37 | 102260015    | Doan Duy Lam         | 26TCLC_KHDL1   | 24.82 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  38 | 102260023    | Duong Kim Thuong     | 26T_N1         | 24.74 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  39 | 102260016    | Vo Dinh Thang        | 26TCLC_KHDL1   | 24.66 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  40 | 102260017    | Le Yen Thao          | 26TCLC_KHDL1   | 24.58 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  41 | 102260024    | Doan Mai Duyen       | 26T_N1         | 24.50 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  42 | 102260025    | Tran Diem Diep       | 26T_N1         | 24.42 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  43 | 102260026    | Lam Duc Thong        | 26T_N1         | 24.34 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  44 | 102260027    | Ngo Gia Nhan         | 26T_N1         | 24.26 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  45 | 102260028    | Do Duy Dung          | 26T_N1         | 24.18 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  46 | 102260029    | Do Gia Tuan          | 26T_N1         | 24.00 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  47 | 102260030    | Do Minh Phong        | 26T_N1         | 23.90 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  48 | 102260018    | Le Xuan Tri          | 26TCLC_KHDL1   | 23.80 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  49 | 102260031    | Ta Minh Tuan         | 26T_N2         | 23.70 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  50 | 102260032    | Pham Hoang Vu        | 26T_N2         | 23.60 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  51 | 102260019    | Vo Trong Dung        | 26TCLC_KHDL1   | 23.50 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  52 | 102260033    | Le Quoc Long         | 26T_N2         | 23.40 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  53 | 102260020    | Luu Cam Huong        | 26TCLC_KHDL1   | 23.30 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  54 | 102260021    | Do Khanh My          | 26TCLC_KHDL1   | 23.20 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  55 | 102260034    | Ly Quang Toan        | 26T_N2         | 23.10 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  56 | 102260035    | Dang My Mai          | 26T_N2         | 23.00 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  57 | 102260036    | Phan Hong Nhung      | 26T_N2         | 22.90 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  58 | 102260037    | Doan Huu Tung        | 26T_N2         | 22.80 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  59 | 102260038    | Dinh Cong Tung       | 26T_N2         | 22.70 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  60 | 102260039    | Luu Thao Chi         | 26T_N2         | 22.60 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  61 | 102260040    | Phan Ha Huyen        | 26T_N2         | 22.50 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  62 | 102260022    | Cao Minh Binh        | 26TCLC_KHDL1   | 22.40 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  63 | 102260041    | Truong Thao Thuy     | 26T_N2         | 22.30 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  64 | 102260042    | Ha Dinh Cuong        | 26T_N2         | 22.20 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  65 | 102260043    | Lam Thanh Tung       | 26T_N2         | 22.10 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  66 | 102260044    | Vu Ha Ha             | 26T_N2         | 22.00 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  67 | 102260045    | Lam Dinh Thong       | 26T_N2         | 21.90 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  68 | 102260046    | Mai Hoang Nghia      | 26T_N2         | 21.80 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  69 | 102260047    | Pham Ngoc Ha         | 26T_N2         | 21.70 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  70 | 102260023    | Duong Bao Tai        | 26TCLC_KHDL1   | 21.60 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  71 | 102260048    | Trinh Minh Thang     | 26T_N2         | 21.50 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  72 | 102260049    | Luu Thu Thi          | 26T_N2         | 21.40 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  73 | 102260050    | Trinh Duy Tien       | 26T_N2         | 21.30 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  74 | 102260051    | Ta Phuong Chi        | 26T_N2         | 21.20 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  75 | 102260024    | Lam Hong Nhu         | 26TCLC_KHDL1   | 21.10 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  76 | 102260052    | Trinh Thanh Thuy     | 26T_N2         | 21.00 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  77 | 102260053    | Truong Quoc Minh     | 26T_N2         | 20.75 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  78 | 102260054    | Ha Duc Cuong         | 26T_N2         | 20.50 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  79 | 102260055    | Vu Gia Thang         | 26T_N2         | 20.25 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  80 | 102260025    | Pham Xuan Long       | 26TCLC_KHDL1   | 20.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  81 | 102260056    | Vo Cong Phong        | 26T_N2         | 19.75 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  82 | 102260057    | Ta Duy Tri           | 26T_N2         | 19.50 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  83 | 102260026    | Doan Huu Khoa        | 26TCLC_KHDL1   | 19.25 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  84 | 102260058    | Lam Dinh Hoang       | 26T_N2         | 19.00 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  85 | 102260059    | Trinh Tan Nhan       | 26T_N2         | 18.75 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  86 | 102260060    | Nguyen Tan Nghia     | 26T_N2         | 18.50 |  1 | Cong nghe Thong tin (Dinh huon | CNTT       |
+  87 | 102260001    | Cao Duc Quang        | 26T_DT1        | 18.25 |  2 | Cong nghe Thong tin (Chuong tr | CNTT       |
+  88 | 102260027    | Ly Kim Ngan          | 26TCLC_KHDL1   | 18.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  89 | 102260002    | Dinh Duc Lam         | 26T_DT1        | 17.75 |  2 | Cong nghe Thong tin (Chuong tr | CNTT       |
+  90 | 102260003    | Vo Phuoc Khang       | 26T_DT1        | 17.50 |  2 | Cong nghe Thong tin (Chuong tr | CNTT       |
+  91 | 102260004    | Nguyen Duc Dung      | 26T_DT1        | 17.25 |  2 | Cong nghe Thong tin (Chuong tr | CNTT       |
+  92 | 102260028    | Vo Anh Huyen         | 26TCLC_KHDL1   | 17.00 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  93 | 102260029    | Le Ngoc Ngoc         | 26TCLC_KHDL1   | 16.50 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  94 | 102260005    | Dinh Mai Dung        | 26T_DT1        | 16.15 |  2 | Cong nghe Thong tin (Chuong tr | CNTT       |
+  95 | 102260006    | Ly Cam Thao          | 26T_DT1        | 15.80 |  2 | Cong nghe Thong tin (Chuong tr | CNTT       |
+  96 | 102260030    | Phan Minh Binh       | 26TCLC_KHDL1   | 15.45 |  1 | CNTT (Khoa hoc Du lieu & Tri t | CNTT       |
+  97 | 102260007    | Bui Yen Dung         | 26T_DT1        | 15.10 |  2 | Cong nghe Thong tin (Chuong tr | CNTT       |
 ========================================================================================================================
-Tong so sinh vien trúng tuyển Khoa 2026: 14 sinh vien.
+Tong so sinh vien trúng tuyển Khoa 2026: 97 sinh vien.

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <ctime>
 
 // Comparator sắp xếp tổng điểm giảm dần
 static bool cmpTongDiemGiam(const ThiSinh& a, const ThiSinh& b) {
@@ -194,7 +195,8 @@ bool QuanLyThiSinh::docDuLieuTuMySQL() {
     MYSQL_RES* resTS = db.query(
         "SELECT ts.soBaoDanh, n.soCCCD, n.hoTen, n.ngaySinh, n.queQuan, n.gioiTinh, "
         "       ts.namTuyenSinh, ts.diemToan, ts.diemLy, ts.diemHoa, "
-        "       ts.maSinhVien, ts.lopSinhHoat, ts.nganhTrungTuyen, ts.nguyenVongTrungTuyen "
+        "       ts.maSinhVien, ts.lopSinhHoat, ts.nganhTrungTuyen, ts.nguyenVongTrungTuyen, "
+        "       ts.ngayTao, ts.ngaySua "
         "FROM `thisinh` ts "
         "JOIN `nguoi` n ON ts.soCCCD = n.soCCCD "
         "ORDER BY ts.soBaoDanh ASC;"
@@ -217,12 +219,16 @@ bool QuanLyThiSinh::docDuLieuTuMySQL() {
             string lsh   = row[11] ? row[11] : "";
             string ntt   = row[12] ? row[12] : "";
             int nvtt     = row[13] ? atoi(row[13]) : 0;
+            string nt    = row[14] ? row[14] : "";
+            string nsua  = row[15] ? row[15] : "";
 
             ThiSinh ts(cccd, ten, ns, que, gt, sbd, dToan, dLy, dHoa, nam);
             ts.setMaSinhVien(msv);
             ts.setLopSinhHoat(lsh);
             ts.setNganhTrungTuyen(ntt);
             ts.setNguyenVongTrungTuyen(nvtt);
+            ts.setNgayTao(nt);
+            ts.setNgaySua(nsua);
             dsThiSinh.push_back(ts);
         }
         db.freeResult(resTS);
@@ -538,8 +544,11 @@ bool QuanLyThiSinh::themThiSinh(const ThiSinh& ts) {
     string maGT = layMaGioiTinh(ts.getGioiTinh());
     chuanHoa.setQueQuan(maQue);
     chuanHoa.setGioiTinh(maGT);
+    string curTime = Utils::getCurrentDateTime();
+    chuanHoa.setNgayTao(curTime);
+    chuanHoa.setNgaySua(curTime);
 
-    dsThiSinh.push_back(chuanHoa);
+    dsThiSinh.insert(0, chuanHoa);
 
     if (isMySQLConnected()) {
         db.beginTransaction();
@@ -565,13 +574,13 @@ bool QuanLyThiSinh::themThiSinh(const ThiSinh& ts) {
         string nvttVal = to_string(chuanHoa.getNguyenVongTrungTuyen());
 
         string sqlTS = "INSERT INTO `thisinh` (`soBaoDanh`, `soCCCD`, `namTuyenSinh`, `diemToan`, `diemLy`, `diemHoa`, "
-                       "`maSinhVien`, `lopSinhHoat`, `nganhTrungTuyen`, `nguyenVongTrungTuyen`) VALUES ('" +
+                       "`maSinhVien`, `lopSinhHoat`, `nganhTrungTuyen`, `nguyenVongTrungTuyen`, `ngayTao`, `ngaySua`) VALUES ('" +
                        db.escape(chuanHoa.getSoBaoDanh()) + "', '" +
                        db.escape(chuanHoa.getSoCCCD()) + "', " +
                        ssNam.str() + ", " +
                        ssToan.str() + ", " + ssLy.str() + ", " + ssHoa.str() + ", " +
-                       msvVal + ", " + lshVal + ", " + nttVal + ", " + nvttVal + ") " +
-                       "ON DUPLICATE KEY UPDATE `diemToan`=VALUES(`diemToan`), `diemLy`=VALUES(`diemLy`), `diemHoa`=VALUES(`diemHoa`);";
+                       msvVal + ", " + lshVal + ", " + nttVal + ", " + nvttVal + ", NOW(), NOW()) " +
+                       "ON DUPLICATE KEY UPDATE `diemToan`=VALUES(`diemToan`), `diemLy`=VALUES(`diemLy`), `diemHoa`=VALUES(`diemHoa`), `ngaySua`=NOW();";
         db.execute(sqlTS);
 
         // Lưu Nguyện vọng
@@ -612,8 +621,10 @@ bool QuanLyThiSinh::capNhatThiSinh(const ThiSinh& ts) {
     string maGT = layMaGioiTinh(ts.getGioiTinh());
     chuanHoa.setQueQuan(maQue);
     chuanHoa.setGioiTinh(maGT);
+    chuanHoa.setNgaySua(Utils::getCurrentDateTime());
 
-    dsThiSinh[idx] = chuanHoa;
+    dsThiSinh.erase(idx);
+    dsThiSinh.insert(0, chuanHoa);
 
     if (isMySQLConnected()) {
         db.beginTransaction();
@@ -640,7 +651,8 @@ bool QuanLyThiSinh::capNhatThiSinh(const ThiSinh& ts) {
                        "`maSinhVien`=" + msvVal + ", " +
                        "`lopSinhHoat`=" + lshVal + ", " +
                        "`nganhTrungTuyen`=" + nttVal + ", " +
-                       "`nguyenVongTrungTuyen`=" + to_string(chuanHoa.getNguyenVongTrungTuyen()) + " " +
+                       "`nguyenVongTrungTuyen`=" + to_string(chuanHoa.getNguyenVongTrungTuyen()) + ", " +
+                       "`ngaySua`=NOW() " +
                        "WHERE `soBaoDanh`='" + db.escape(chuanHoa.getSoBaoDanh()) + "';";
         db.execute(sqlTS);
 
@@ -722,7 +734,7 @@ bool QuanLyThiSinh::themTinhThanh(const TinhThanh& tt) {
     for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
         if (dsTinhThanh[i].maTinh == tt.maTinh) return false;
     }
-    dsTinhThanh.push_back(tt);
+    dsTinhThanh.insert(0, tt);
 
     if (isMySQLConnected()) {
         string sql = "INSERT INTO `tinh_thanh` (`maTinh`, `tenTinh`, `loai`) VALUES ('" +
@@ -737,7 +749,8 @@ bool QuanLyThiSinh::themTinhThanh(const TinhThanh& tt) {
 bool QuanLyThiSinh::capNhatTinhThanh(const TinhThanh& tt) {
     for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
         if (dsTinhThanh[i].maTinh == tt.maTinh) {
-            dsTinhThanh[i] = tt;
+            dsTinhThanh.erase(i);
+            dsTinhThanh.insert(0, tt);
             if (isMySQLConnected()) {
                 string sql = "UPDATE `tinh_thanh` SET `tenTinh`='" + db.escape(tt.tenTinh) + "', " +
                              "`loai`='" + db.escape(tt.loai) + "' WHERE `maTinh`='" + db.escape(tt.maTinh) + "';";
@@ -770,7 +783,7 @@ bool QuanLyThiSinh::themGioiTinh(const GioiTinh& gt) {
     for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
         if (Utils::toUpper(dsGioiTinh[i].maGioiTinh) == Utils::toUpper(gt.maGioiTinh)) return false;
     }
-    dsGioiTinh.push_back(gt);
+    dsGioiTinh.insert(0, gt);
 
     if (isMySQLConnected()) {
         string sql = "INSERT INTO `gioi_tinh` (`maGioiTinh`, `tenGioiTinh`) VALUES ('" +
@@ -785,7 +798,8 @@ bool QuanLyThiSinh::themGioiTinh(const GioiTinh& gt) {
 bool QuanLyThiSinh::capNhatGioiTinh(const GioiTinh& gt) {
     for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
         if (Utils::toUpper(dsGioiTinh[i].maGioiTinh) == Utils::toUpper(gt.maGioiTinh)) {
-            dsGioiTinh[i] = gt;
+            dsGioiTinh.erase(i);
+            dsGioiTinh.insert(0, gt);
             if (isMySQLConnected()) {
                 string sql = "UPDATE `gioi_tinh` SET `tenGioiTinh`='" + db.escape(gt.tenGioiTinh) + "' " +
                              "WHERE `maGioiTinh`='" + db.escape(gt.maGioiTinh) + "';";
@@ -1152,6 +1166,386 @@ void QuanLyThiSinh::tinhThongKePhoDiem(int& mucThap, int& mucTB, int& mucKha, in
 // 8. XUẤT CÁC BÁO CÁO DẠNG BẢNG KẺ KHUNG (RA THƯ MỤC data/)
 // ==============================================================================
 
+// Hàm hỗ trợ thoát ký tự đặc biệt trong XML để bảo toàn định dạng UTF-8
+static string escapeXml(const string& str) {
+    string res;
+    res.reserve(str.size());
+    for (char c : str) {
+        if (c == '&') res += "&amp;";
+        else if (c == '<') res += "&lt;";
+        else if (c == '>') res += "&gt;";
+        else if (c == '"') res += "&quot;";
+        else if (c == '\'') res += "&apos;";
+        else res += c;
+    }
+    return res;
+}
+
+bool QuanLyThiSinh::xuatBaoCaoExcel(const string& filePath, const FilterThiSinhParams& params, const string& tenKhoaFilter, const string& tenNganhFilter) const {
+    // 1. Lấy danh sách đầy đủ thỏa mãn bộ lọc hiện hành (không bị giới hạn phân trang)
+    FilterThiSinhParams exportParams = params;
+    exportParams.pageIndex = 1;
+    exportParams.pageSize = 100000; // Lấy toàn bộ bản ghi
+    int totalRecs = 0;
+    Vector<ThiSinh> list = const_cast<QuanLyThiSinh*>(this)->layDanhSachThiSinhPhanTrang(exportParams, totalRecs);
+
+    // 2. Mở file xuất
+    ofstream fout(filePath);
+    if (!fout.is_open()) return false;
+
+    // 3. Chuẩn bị thông tin ngày giờ xuất và mô tả bộ lọc
+    time_t now = time(nullptr);
+    tm* ltm = localtime(&now);
+    char dtBuf[64];
+    strftime(dtBuf, sizeof(dtBuf), "%d/%m/%Y %H:%M:%S", ltm);
+
+    string strKeyword = params.keyword.empty() ? "(Tat ca)" : params.keyword;
+    string strNam;
+    if (params.filterNam == 0) strNam = "Tat ca cac nam";
+    else strNam = to_string(params.filterNam) + " (Khoa K" + to_string(params.filterNam % 100) + ")";
+
+    string strKetQua;
+    if (params.filterStatus == 1) strKetQua = "Trung tuyen";
+    else if (params.filterStatus == 2) strKetQua = "Khong dat";
+    else strKetQua = "Tat ca";
+
+    string strKhoa;
+    if (params.filterStatus == 2) strKhoa = "(Khong ap dung)";
+    else if (!tenKhoaFilter.empty()) strKhoa = tenKhoaFilter;
+    else if (!params.filterKhoa.empty()) strKhoa = layTenKhoa(params.filterKhoa);
+    else strKhoa = "Tat ca khoa";
+
+    string strNganh;
+    if (params.filterStatus == 2) strNganh = "(Khong ap dung)";
+    else if (!tenNganhFilter.empty()) strNganh = tenNganhFilter;
+    else if (!params.filterNganh.empty()) strNganh = layTenNganh(params.filterNganh);
+    else strNganh = "Tat ca nganh";
+
+    string strLop;
+    if (params.filterStatus == 2) strLop = "(Khong ap dung)";
+    else if (!params.filterLop.empty()) strLop = params.filterLop;
+    else strLop = "Tat ca lop";
+
+    // 4. Ghi cấu trúc XML Spreadsheet 2003 (Chuẩn Microsoft Office UTF-8)
+    fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    fout << "<?mso-application progid=\"Excel.Sheet\"?>\n";
+    fout << "<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\"\n";
+    fout << " xmlns:o=\"urn:schemas-microsoft-com:office:office\"\n";
+    fout << " xmlns:x=\"urn:schemas-microsoft-com:office:excel\"\n";
+    fout << " xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\"\n";
+    fout << " xmlns:html=\"http://www.w3.org/TR/REC-html40\">\n";
+
+    // Khai báo Styles định dạng
+    fout << " <Styles>\n";
+    fout << "  <Style ss:ID=\"Default\" ss:Name=\"Normal\">\n";
+    fout << "   <Alignment ss:Vertical=\"Center\"/>\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"11\" ss:Color=\"#000000\"/>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"TitleUni\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"15\" ss:Bold=\"1\" ss:Color=\"#1F4E79\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"TitleReport\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"12\" ss:Bold=\"1\" ss:Color=\"#333333\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"FilterInfoCenter\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"11\" ss:Italic=\"1\" ss:Color=\"#333333\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"FilterTotalCenter\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"11\" ss:Bold=\"1\" ss:Color=\"#1F4E79\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"HeaderCol\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"11\" ss:Bold=\"1\" ss:Color=\"#FFFFFF\"/>\n";
+    fout << "   <Interior ss:Color=\"#1F4E79\" ss:Pattern=\"Solid\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\" ss:WrapText=\"1\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#000000\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#000000\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#000000\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#000000\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataCenter\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataCenterBold\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"11\" ss:Bold=\"1\" ss:Color=\"#002060\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataLeft\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Left\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataScore\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <NumberFormat ss:Format=\"0.00\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataScoreTotal\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"11\" ss:Bold=\"1\" ss:Color=\"#C00000\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <NumberFormat ss:Format=\"0.00\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataPass\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"10\" ss:Bold=\"1\" ss:Color=\"#006100\"/>\n";
+    fout << "   <Interior ss:Color=\"#C6EFCE\" ss:Pattern=\"Solid\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataFail\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"10\" ss:Color=\"#9C0006\"/>\n";
+    fout << "   <Interior ss:Color=\"#FFC7CE\" ss:Pattern=\"Solid\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << "  <Style ss:ID=\"DataPending\">\n";
+    fout << "   <Font ss:FontName=\"Calibri\" ss:Size=\"10\" ss:Color=\"#9C6500\"/>\n";
+    fout << "   <Interior ss:Color=\"#FFEB9C\" ss:Pattern=\"Solid\"/>\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D9D9D9\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "  </Style>\n";
+
+    fout << " </Styles>\n";
+
+    // Khởi tạo Worksheet
+    fout << " <Worksheet ss:Name=\"DanhSachThiSinh\">\n";
+    fout << "  <Table>\n";
+
+    // 16 Cột với độ rộng pixel chuẩn mực
+    fout << "   <Column ss:Width=\"35\"/>\n";  // 1. STT
+    fout << "   <Column ss:Width=\"75\"/>\n";  // 2. SBD
+    fout << "   <Column ss:Width=\"105\"/>\n"; // 3. CCCD
+    fout << "   <Column ss:Width=\"160\"/>\n"; // 4. Họ tên
+    fout << "   <Column ss:Width=\"80\"/>\n";  // 5. Ngày sinh
+    fout << "   <Column ss:Width=\"115\"/>\n"; // 6. Quê quán
+    fout << "   <Column ss:Width=\"60\"/>\n";  // 7. Giới tính
+    fout << "   <Column ss:Width=\"65\"/>\n";  // 8. Toán
+    fout << "   <Column ss:Width=\"65\"/>\n";  // 9. Lý
+    fout << "   <Column ss:Width=\"65\"/>\n";  // 10. Hóa
+    fout << "   <Column ss:Width=\"75\"/>\n";  // 11. Tổng điểm
+    fout << "   <Column ss:Width=\"140\"/>\n"; // 12. Kết quả
+    fout << "   <Column ss:Width=\"150\"/>\n"; // 13. Khoa
+    fout << "   <Column ss:Width=\"220\"/>\n"; // 14. Ngành trúng tuyển
+    fout << "   <Column ss:Width=\"110\"/>\n"; // 15. Lớp sinh hoạt
+    fout << "   <Column ss:Width=\"95\"/>\n";  // 16. Mã SV DUT
+
+    // THÀNH PHẦN 1: TIÊU ĐỀ IN HOA VÀ IN ĐẬM (ĐÃ HOÁN ĐỔI SIZE: TRƯỜNG TO, BÁO CÁO NHỎ)
+    fout << "   <Row ss:Height=\"28\">\n";
+    fout << "    <Cell ss:StyleID=\"TitleUni\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << escapeXml(tenTruong) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"22\">\n";
+    fout << "    <Cell ss:StyleID=\"TitleReport\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">"
+         << "BAO CAO HO SO THI SINH &amp; KET QUA XET TUYEN DAI HOC</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"6\"/>\n";
+
+    // THÀNH PHẦN 2 & 3: BỘ LỌC, NGÀY XUẤT VÀ TỔNG HỒ SƠ (MỖI THÀNH PHẦN 1 HÀNG RIÊNG VÀ CĂN GIỮA)
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Nam tuyen sinh: " << escapeXml(strNam) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Ket qua xet tuyen: " << escapeXml(strKetQua) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Khoa dao tao: " << escapeXml(strKhoa) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Nganh trung tuyen: " << escapeXml(strNganh) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Lop sinh hoat: " << escapeXml(strLop) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Tu khoa tim kiem: " << escapeXml(strKeyword) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Ngay xuat bao cao: " << dtBuf << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"22\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterTotalCenter\" ss:MergeAcross=\"15\"><Data ss:Type=\"String\">" 
+         << "Tong so ho so phu hop: " << to_string(list.size()) << " thi sinh</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"8\"/>\n";
+
+    // THÀNH PHẦN 4: BẢNG DỮ LIỆU DANH SÁCH (THEAD BÔI ĐẬM, CĂN GIỮA, KHÔNG CÓ CỘT THAO TÁC)
+    fout << "   <Row ss:Height=\"26\">\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">STT</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">So Bao Danh</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">So CCCD</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Ho va Ten</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Ngay Sinh</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Que Quan</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Gioi Tinh</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Toan</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Ly</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Hoa</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Tong Diem</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Ket Qua</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Khoa</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Nganh Trung Tuyen</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Lop Sinh Hoat</Data></Cell>\n";
+    fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">Ma SV DUT</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    // CÁC DÒNG DỮ LIỆU
+    for (size_t i = 0; i < list.size(); ++i) {
+        const ThiSinh& ts = list[i];
+        fout << "   <Row ss:Height=\"20\">\n";
+        
+        // 1. STT
+        fout << "    <Cell ss:StyleID=\"DataCenter\"><Data ss:Type=\"Number\">" << (i + 1) << "</Data></Cell>\n";
+        // 2. SBD
+        fout << "    <Cell ss:StyleID=\"DataCenterBold\"><Data ss:Type=\"String\">" << escapeXml(ts.getSoBaoDanh()) << "</Data></Cell>\n";
+        // 3. Số CCCD (Type="String" để giữ nguyên số 0 ở đầu)
+        fout << "    <Cell ss:StyleID=\"DataCenter\"><Data ss:Type=\"String\">" << escapeXml(ts.getSoCCCD()) << "</Data></Cell>\n";
+        // 4. Họ và Tên
+        fout << "    <Cell ss:StyleID=\"DataLeft\"><Data ss:Type=\"String\">" << escapeXml(ts.getHoTen()) << "</Data></Cell>\n";
+        // 5. Ngày Sinh
+        fout << "    <Cell ss:StyleID=\"DataCenter\"><Data ss:Type=\"String\">" << escapeXml(ts.getNgaySinh()) << "</Data></Cell>\n";
+        // 6. Quê Quán
+        fout << "    <Cell ss:StyleID=\"DataLeft\"><Data ss:Type=\"String\">" << escapeXml(layTenTinhThanh(ts.getQueQuan())) << "</Data></Cell>\n";
+        // 7. Giới Tính
+        fout << "    <Cell ss:StyleID=\"DataCenter\"><Data ss:Type=\"String\">" << escapeXml(layTenGioiTinh(ts.getGioiTinh())) << "</Data></Cell>\n";
+        // 8. Toán
+        fout << "    <Cell ss:StyleID=\"DataScore\"><Data ss:Type=\"Number\">" << fixed << setprecision(2) << ts.getDiemToan() << "</Data></Cell>\n";
+        // 9. Lý
+        fout << "    <Cell ss:StyleID=\"DataScore\"><Data ss:Type=\"Number\">" << fixed << setprecision(2) << ts.getDiemLy() << "</Data></Cell>\n";
+        // 10. Hóa
+        fout << "    <Cell ss:StyleID=\"DataScore\"><Data ss:Type=\"Number\">" << fixed << setprecision(2) << ts.getDiemHoa() << "</Data></Cell>\n";
+        // 11. Tổng Điểm
+        fout << "    <Cell ss:StyleID=\"DataScoreTotal\"><Data ss:Type=\"Number\">" << fixed << setprecision(2) << ts.tinhTongDiem() << "</Data></Cell>\n";
+        
+        // 12. Kết Quả
+        string kqStyle = "DataCenter";
+        string kqText = "Dang xet tuyen";
+        if (ts.daTrungTuyen()) {
+            kqStyle = "DataPass";
+            kqText = "TRUNG TUYEN (NV" + to_string(ts.getNguyenVongTrungTuyen()) + ")";
+        } else if (ts.kiemTraDiemLiet()) {
+            kqStyle = "DataFail";
+            kqText = "Diem liet";
+        } else if (ts.tinhTongDiem() < getDiemSanMacDinh()) {
+            kqStyle = "DataFail";
+            kqText = "Khong dat diem san";
+        } else {
+            kqStyle = "DataPending";
+            kqText = "Khong trung tuyen";
+        }
+        fout << "    <Cell ss:StyleID=\"" << kqStyle << "\"><Data ss:Type=\"String\">" << escapeXml(kqText) << "</Data></Cell>\n";
+
+        // 13. Khoa
+        string maKhoaTs = layMaKhoaCuaNganh(ts.getNganhTrungTuyen());
+        string tenKhoaTs = ts.daTrungTuyen() ? layTenKhoa(maKhoaTs) : "-";
+        fout << "    <Cell ss:StyleID=\"DataLeft\"><Data ss:Type=\"String\">" << escapeXml(tenKhoaTs) << "</Data></Cell>\n";
+
+        // 14. Ngành Trúng Tuyển
+        string tenNganhTs = ts.daTrungTuyen() ? layTenNganh(ts.getNganhTrungTuyen()) : "-";
+        fout << "    <Cell ss:StyleID=\"DataLeft\"><Data ss:Type=\"String\">" << escapeXml(tenNganhTs) << "</Data></Cell>\n";
+
+        // 15. Lớp Sinh Hoạt
+        string lopTs = ts.daTrungTuyen() ? ts.getLopSinhHoat() : "-";
+        fout << "    <Cell ss:StyleID=\"DataCenter\"><Data ss:Type=\"String\">" << escapeXml(lopTs) << "</Data></Cell>\n";
+
+        // 16. Mã SV DUT
+        string msvTs = ts.daTrungTuyen() ? ts.getMaSinhVien() : "-";
+        fout << "    <Cell ss:StyleID=\"DataCenterBold\"><Data ss:Type=\"String\">" << escapeXml(msvTs) << "</Data></Cell>\n";
+
+        fout << "   </Row>\n";
+    }
+
+    fout << "  </Table>\n";
+    fout << " </Worksheet>\n";
+    fout << "</Workbook>\n";
+
+    fout.close();
+
+    // Đồng thời cập nhật vào tệp shortcut mới nhất data/BaoCao_DanhSach_ThiSinh_DUT_MoiNhat.xls
+    ifstream src(filePath, ios::binary);
+    ofstream dst("data/BaoCao_DanhSach_ThiSinh_DUT_MoiNhat.xls", ios::binary);
+    if (src.is_open() && dst.is_open()) {
+        dst << src.rdbuf();
+    }
+
+    return true;
+}
+
 bool QuanLyThiSinh::xuatBaoCaoXetTuyen(const string& path, double diemChuan, const string& keyword) const {
     ofstream fout(path);
     if (!fout.is_open()) return false;
@@ -1355,3 +1749,336 @@ Vector<KhoaHoc>& QuanLyThiSinh::getDanhSachKhoaHoc() { return dsKhoaHoc; }
 const Vector<KhoaHoc>& QuanLyThiSinh::getDanhSachKhoaHoc() const { return dsKhoaHoc; }
 Vector<NganhTheoKhoaHoc>& QuanLyThiSinh::getDanhSachNganhTheoKhoaHoc() { return dsNganhTheoKhoaHoc; }
 const Vector<NganhTheoKhoaHoc>& QuanLyThiSinh::getDanhSachNganhTheoKhoaHoc() const { return dsNganhTheoKhoaHoc; }
+
+// ==============================================================================
+// 10. PHÂN TRANG SERVER-SIDE (SQL LIMIT/OFFSET TRỰC TIẾP TRÊN MYSQL SERVER)
+// ==============================================================================
+Vector<ThiSinh> QuanLyThiSinh::layDanhSachThiSinhPhanTrang(const FilterThiSinhParams& params, int& totalRecords) {
+    Vector<ThiSinh> result;
+    int pageIndex = params.pageIndex;
+    int pageSize = params.pageSize;
+    if (pageIndex < 1) pageIndex = 1;
+    if (pageSize <= 0) pageSize = AdmissionConst::PAGE_SIZE_DEFAULT;
+
+    string kw = Utils::trim(params.keyword);
+
+    if (db.isConnected()) {
+        // --- XÂY DỰNG TRUY VẤN SERVER-SIDE MYSQL ---
+        string whereClause = "WHERE 1=1 ";
+        if (!kw.empty()) {
+            string escKw = db.escape(kw);
+            whereClause += "AND (ts.soBaoDanh LIKE '%" + escKw + "%' "
+                           "OR n.soCCCD LIKE '%" + escKw + "%' "
+                           "OR n.hoTen LIKE '%" + escKw + "%' "
+                           "OR n.queQuan LIKE '%" + escKw + "%' "
+                           "OR tt.tenTinh LIKE '%" + escKw + "%') ";
+        }
+
+        // 1. Lọc theo trạng thái kết quả (1: Trúng tuyển, 2: Không đạt)
+        if (params.filterStatus == 1) {
+            whereClause += "AND (ts.nganhTrungTuyen IS NOT NULL AND ts.nganhTrungTuyen != '' AND ts.nguyenVongTrungTuyen > 0) ";
+        } else if (params.filterStatus == 2) {
+            whereClause += "AND (ts.nganhTrungTuyen IS NULL OR ts.nganhTrungTuyen = '' OR ts.nguyenVongTrungTuyen = 0) ";
+        }
+
+        // 2. Lọc theo Năm tuyển sinh
+        if (params.filterNam > 0) {
+            whereClause += "AND ts.namTuyenSinh = " + to_string(params.filterNam) + " ";
+        }
+
+        // 3. Lọc theo Khoa (ngành trúng tuyển thuộc khoa)
+        if (!params.filterKhoa.empty()) {
+            whereClause += "AND dmn.maKhoa = '" + db.escape(params.filterKhoa) + "' ";
+        }
+
+        // 4. Lọc theo Ngành
+        if (!params.filterNganh.empty()) {
+            whereClause += "AND ts.nganhTrungTuyen = '" + db.escape(params.filterNganh) + "' ";
+        }
+
+        // 5. Lọc theo Lớp sinh hoạt
+        if (!params.filterLop.empty()) {
+            whereClause += "AND ts.lopSinhHoat = '" + db.escape(params.filterLop) + "' ";
+        }
+
+        string fromJoinClause = "FROM `thisinh` ts "
+                               "JOIN `nguoi` n ON ts.soCCCD = n.soCCCD "
+                               "LEFT JOIN `tinh_thanh` tt ON n.queQuan = tt.maTinh "
+                               "LEFT JOIN `danh_muc_nganh` dmn ON ts.nganhTrungTuyen = dmn.maNganh ";
+
+        // Đếm tổng số bản ghi thỏa điều kiện trên Server
+        string countSql = "SELECT COUNT(*) " + fromJoinClause + whereClause + ";";
+        MYSQL_RES* resCount = db.query(countSql);
+        totalRecords = 0;
+        if (resCount) {
+            MYSQL_ROW rCount = mysql_fetch_row(resCount);
+            if (rCount && rCount[0]) totalRecords = atoi(rCount[0]);
+            db.freeResult(resCount);
+        }
+
+        if (totalRecords == 0) return result;
+
+        int totalPages = (totalRecords + pageSize - 1) / pageSize;
+        if (pageIndex > totalPages) pageIndex = totalPages;
+        int offset = (pageIndex - 1) * pageSize;
+
+        // Xây dựng mệnh đề ORDER BY động
+        string sortDir = params.sortAsc ? "ASC" : "DESC";
+        string sortColName = "ts.ngaySua";
+        switch (params.sortCol) {
+            case 0: sortColName = "ts.ngaySua"; break;
+            case 1: sortColName = "ts.soBaoDanh"; break;
+            case 2: sortColName = "n.soCCCD"; break;
+            case 3: sortColName = "n.hoTen"; break;
+            case 4: sortColName = "n.ngaySinh"; break;
+            case 5: sortColName = "n.queQuan"; break;
+            case 6: sortColName = "n.gioiTinh"; break;
+            case 7: sortColName = "ts.diemToan"; break;
+            case 8: sortColName = "ts.diemLy"; break;
+            case 9: sortColName = "ts.diemHoa"; break;
+            case 10: sortColName = "(ts.diemToan + ts.diemLy + ts.diemHoa)"; break;
+            case 11: sortColName = "ts.nguyenVongTrungTuyen"; break;
+            case 12: sortColName = "dmn.maKhoa"; break;
+            case 13: sortColName = "ts.nganhTrungTuyen"; break;
+            case 14: sortColName = "ts.lopSinhHoat"; break;
+            case 15: sortColName = "ts.maSinhVien"; break;
+            default: sortColName = "ts.ngaySua"; break;
+        }
+        string orderBy;
+        if (params.sortCol == 0) {
+            orderBy = "ORDER BY ts.ngaySua DESC, ts.ngayTao DESC, ts.soBaoDanh ASC ";
+        } else {
+            orderBy = "ORDER BY " + sortColName + " " + sortDir + ", ts.soBaoDanh ASC ";
+        }
+
+        stringstream ssQuery;
+        ssQuery << "SELECT ts.soBaoDanh, n.soCCCD, n.hoTen, n.ngaySinh, n.queQuan, n.gioiTinh, "
+                << "       ts.namTuyenSinh, ts.diemToan, ts.diemLy, ts.diemHoa, "
+                << "       ts.maSinhVien, ts.lopSinhHoat, ts.nganhTrungTuyen, ts.nguyenVongTrungTuyen, "
+                << "       ts.ngayTao, ts.ngaySua "
+                << fromJoinClause
+                << whereClause
+                << orderBy
+                << "LIMIT " << pageSize << " OFFSET " << offset << ";";
+
+        MYSQL_RES* resPage = db.query(ssQuery.str());
+        if (resPage) {
+            MYSQL_ROW row;
+            string inSBDList = "";
+            while ((row = mysql_fetch_row(resPage))) {
+                string sbd   = row[0] ? row[0] : "";
+                string cccd  = row[1] ? row[1] : "";
+                string ten   = row[2] ? row[2] : "";
+                string ns    = row[3] ? row[3] : "";
+                string que   = row[4] ? row[4] : "";
+                string gt    = row[5] ? row[5] : "";
+                int nam      = row[6] ? atoi(row[6]) : AdmissionConst::NAM_TUYEN_SINH_MAC_DINH;
+                double dToan = row[7] ? Utils::toDouble(row[7]) : 0.0;
+                double dLy   = row[8] ? Utils::toDouble(row[8]) : 0.0;
+                double dHoa  = row[9] ? Utils::toDouble(row[9]) : 0.0;
+                string msv   = row[10] ? row[10] : "";
+                string lsh   = row[11] ? row[11] : "";
+                string ntt   = row[12] ? row[12] : "";
+                int nvtt     = row[13] ? atoi(row[13]) : 0;
+                string nt    = row[14] ? row[14] : "";
+                string nsua  = row[15] ? row[15] : "";
+
+                ThiSinh ts(cccd, ten, ns, que, gt, sbd, dToan, dLy, dHoa, nam);
+                ts.setMaSinhVien(msv);
+                ts.setLopSinhHoat(lsh);
+                ts.setNganhTrungTuyen(ntt);
+                ts.setNguyenVongTrungTuyen(nvtt);
+                ts.setNgayTao(nt);
+                ts.setNgaySua(nsua);
+                result.push_back(ts);
+
+                if (!inSBDList.empty()) inSBDList += ",";
+                inSBDList += "'" + db.escape(sbd) + "'";
+            }
+            db.freeResult(resPage);
+
+            // Nạp nguyện vọng cho các thí sinh của trang hiện tại
+            if (!inSBDList.empty()) {
+                string nvSql = "SELECT `id`, `soBaoDanh`, `thuTuNV`, `maNganh`, `trangThai` FROM `nguyen_vong` "
+                               "WHERE `soBaoDanh` IN (" + inSBDList + ") "
+                               "ORDER BY `soBaoDanh` ASC, `thuTuNV` ASC;";
+                MYSQL_RES* resNV = db.query(nvSql);
+                if (resNV) {
+                    MYSQL_ROW rowNV;
+                    while ((rowNV = mysql_fetch_row(resNV))) {
+                        int nvId   = rowNV[0] ? atoi(rowNV[0]) : 0;
+                        string sbd = rowNV[1] ? rowNV[1] : "";
+                        int thuTu  = rowNV[2] ? atoi(rowNV[2]) : 1;
+                        string mn  = rowNV[3] ? rowNV[3] : "";
+                        string tt  = rowNV[4] ? rowNV[4] : AdmissionConst::TT_NV_DANG_XET;
+
+                        for (size_t ri = 0; ri < result.size(); ++ri) {
+                            if (result[ri].getSoBaoDanh() == sbd) {
+                                result[ri].themNguyenVong(NguyenVong(nvId, sbd, thuTu, mn, tt));
+                                break;
+                            }
+                        }
+                    }
+                    db.freeResult(resNV);
+                }
+            }
+        }
+        return result;
+    }
+
+    // --- FALLBACK IN-MEMORY (KHI CHẠY OFFLINE HOẶC MẤT KẾT NỐI MYSQL) ---
+    Vector<ThiSinh> filtered;
+    string filterStr = Utils::toLower(kw);
+
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        const ThiSinh& ts = dsThiSinh[i];
+        string tenQue = layTenTinhThanh(ts.getQueQuan());
+
+        if (!filterStr.empty()) {
+            bool match = Utils::containsIgnoreCase(ts.getSoBaoDanh(), filterStr) ||
+                         Utils::containsIgnoreCase(ts.getSoCCCD(), filterStr) ||
+                         Utils::containsIgnoreCase(ts.getHoTen(), filterStr) ||
+                         Utils::containsIgnoreCase(ts.getQueQuan(), filterStr) ||
+                         Utils::containsIgnoreCase(tenQue, filterStr);
+            if (!match) continue;
+        }
+
+        bool pass = ts.daTrungTuyen();
+        if (params.filterStatus == 1 && !pass) continue;
+        if (params.filterStatus == 2 && pass) continue;
+
+        if (params.filterNam > 0 && ts.getNamTuyenSinh() != params.filterNam) continue;
+
+        if (!params.filterKhoa.empty()) {
+            string mk = layMaKhoaCuaNganh(ts.getNganhTrungTuyen());
+            if (mk != params.filterKhoa) continue;
+        }
+
+        if (!params.filterNganh.empty() && ts.getNganhTrungTuyen() != params.filterNganh) continue;
+
+        if (!params.filterLop.empty() && ts.getLopSinhHoat() != params.filterLop) continue;
+
+        filtered.push_back(ts);
+    }
+
+    // Sắp xếp động In-Memory
+    for (size_t i = 0; i + 1 < filtered.size(); ++i) {
+        for (size_t j = i + 1; j < filtered.size(); ++j) {
+            bool shouldSwap = false;
+            switch (params.sortCol) {
+                case 0: shouldSwap = (filtered[i].getNgaySua() < filtered[j].getNgaySua()); break;
+                case 1: shouldSwap = params.sortAsc ? (filtered[i].getSoBaoDanh() > filtered[j].getSoBaoDanh()) : (filtered[i].getSoBaoDanh() < filtered[j].getSoBaoDanh()); break;
+                case 2: shouldSwap = params.sortAsc ? (filtered[i].getSoCCCD() > filtered[j].getSoCCCD()) : (filtered[i].getSoCCCD() < filtered[j].getSoCCCD()); break;
+                case 3: shouldSwap = params.sortAsc ? (filtered[i].getHoTen() > filtered[j].getHoTen()) : (filtered[i].getHoTen() < filtered[j].getHoTen()); break;
+                case 4: shouldSwap = params.sortAsc ? (filtered[i].getNgaySinh() > filtered[j].getNgaySinh()) : (filtered[i].getNgaySinh() < filtered[j].getNgaySinh()); break;
+                case 5: shouldSwap = params.sortAsc ? (filtered[i].getQueQuan() > filtered[j].getQueQuan()) : (filtered[i].getQueQuan() < filtered[j].getQueQuan()); break;
+                case 6: shouldSwap = params.sortAsc ? (filtered[i].getGioiTinh() > filtered[j].getGioiTinh()) : (filtered[i].getGioiTinh() < filtered[j].getGioiTinh()); break;
+                case 7: shouldSwap = params.sortAsc ? (filtered[i].getDiemToan() > filtered[j].getDiemToan()) : (filtered[i].getDiemToan() < filtered[j].getDiemToan()); break;
+                case 8: shouldSwap = params.sortAsc ? (filtered[i].getDiemLy() > filtered[j].getDiemLy()) : (filtered[i].getDiemLy() < filtered[j].getDiemLy()); break;
+                case 9: shouldSwap = params.sortAsc ? (filtered[i].getDiemHoa() > filtered[j].getDiemHoa()) : (filtered[i].getDiemHoa() < filtered[j].getDiemHoa()); break;
+                case 10: shouldSwap = params.sortAsc ? (filtered[i].tinhTongDiem() > filtered[j].tinhTongDiem()) : (filtered[i].tinhTongDiem() < filtered[j].tinhTongDiem()); break;
+                case 11: shouldSwap = params.sortAsc ? (filtered[i].getNguyenVongTrungTuyen() > filtered[j].getNguyenVongTrungTuyen()) : (filtered[i].getNguyenVongTrungTuyen() < filtered[j].getNguyenVongTrungTuyen()); break;
+                case 12: {
+                    string mk1 = layMaKhoaCuaNganh(filtered[i].getNganhTrungTuyen());
+                    string mk2 = layMaKhoaCuaNganh(filtered[j].getNganhTrungTuyen());
+                    shouldSwap = params.sortAsc ? (mk1 > mk2) : (mk1 < mk2);
+                    break;
+                }
+                case 13: shouldSwap = params.sortAsc ? (filtered[i].getNganhTrungTuyen() > filtered[j].getNganhTrungTuyen()) : (filtered[i].getNganhTrungTuyen() < filtered[j].getNganhTrungTuyen()); break;
+                case 14: shouldSwap = params.sortAsc ? (filtered[i].getLopSinhHoat() > filtered[j].getLopSinhHoat()) : (filtered[i].getLopSinhHoat() < filtered[j].getLopSinhHoat()); break;
+                case 15: shouldSwap = params.sortAsc ? (filtered[i].getMaSinhVien() > filtered[j].getMaSinhVien()) : (filtered[i].getMaSinhVien() < filtered[j].getMaSinhVien()); break;
+                default: shouldSwap = params.sortAsc ? (filtered[i].getSoBaoDanh() > filtered[j].getSoBaoDanh()) : (filtered[i].getSoBaoDanh() < filtered[j].getSoBaoDanh()); break;
+            }
+            if (shouldSwap) {
+                ThiSinh tmp = filtered[i];
+                filtered[i] = filtered[j];
+                filtered[j] = tmp;
+            }
+        }
+    }
+
+    totalRecords = (int)filtered.size();
+    if (totalRecords == 0) return result;
+
+    int totalPages = (totalRecords + pageSize - 1) / pageSize;
+    if (pageIndex > totalPages) pageIndex = totalPages;
+    int offset = (pageIndex - 1) * pageSize;
+    int endIdx = offset + pageSize;
+    if (endIdx > totalRecords) endIdx = totalRecords;
+
+    for (int i = offset; i < endIdx; ++i) {
+        result.push_back(filtered[i]);
+    }
+
+    return result;
+}
+
+Vector<ThiSinh> QuanLyThiSinh::layDanhSachThiSinhPhanTrang(
+    int pageIndex,
+    int pageSize,
+    const string& keyword,
+    int filterStatus,
+    int sortType,
+    int& totalRecords
+) {
+    FilterThiSinhParams params;
+    params.pageIndex = pageIndex;
+    params.pageSize = pageSize;
+    params.keyword = keyword;
+    params.filterStatus = filterStatus;
+    if (sortType == 1) {
+        params.sortCol = 10;
+        params.sortAsc = false;
+    } else if (sortType == 2) {
+        params.sortCol = 3;
+        params.sortAsc = true;
+    } else {
+        params.sortCol = 1;
+        params.sortAsc = true;
+    }
+    return layDanhSachThiSinhPhanTrang(params, totalRecords);
+}
+
+Vector<string> QuanLyThiSinh::layDanhSachLopSinhHoat(const string& maKhoa, const string& maNganh) const {
+    Vector<string> dsLop;
+    if (db.isConnected()) {
+        string sql = "SELECT DISTINCT ts.`lopSinhHoat` FROM `thisinh` ts ";
+        if (!maKhoa.empty() && maNganh.empty()) {
+            sql += "JOIN `danh_muc_nganh` dmn ON ts.`nganhTrungTuyen` = dmn.`maNganh` ";
+        }
+        sql += "WHERE ts.`lopSinhHoat` IS NOT NULL AND ts.`lopSinhHoat` != '' ";
+        if (!maNganh.empty()) {
+            sql += "AND ts.`nganhTrungTuyen` = '" + const_cast<MySQLConnector&>(db).escape(maNganh) + "' ";
+        } else if (!maKhoa.empty()) {
+            sql += "AND dmn.`maKhoa` = '" + const_cast<MySQLConnector&>(db).escape(maKhoa) + "' ";
+        }
+        sql += "ORDER BY ts.`lopSinhHoat` ASC;";
+
+        MYSQL_RES* res = const_cast<MySQLConnector&>(db).query(sql);
+        if (res) {
+            MYSQL_ROW row;
+            while ((row = mysql_fetch_row(res))) {
+                if (row[0]) dsLop.push_back(string(row[0]));
+            }
+            const_cast<MySQLConnector&>(db).freeResult(res);
+            return dsLop;
+        }
+    }
+
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        string lop = dsThiSinh[i].getLopSinhHoat();
+        if (lop.empty()) continue;
+        string ntt = dsThiSinh[i].getNganhTrungTuyen();
+        if (!maNganh.empty() && ntt != maNganh) continue;
+        if (!maKhoa.empty()) {
+            string mk = layMaKhoaCuaNganh(ntt);
+            if (mk != maKhoa) continue;
+        }
+        bool exists = false;
+        for (size_t j = 0; j < dsLop.size(); ++j) {
+            if (dsLop[j] == lop) { exists = true; break; }
+        }
+        if (!exists) dsLop.push_back(lop);
+    }
+    return dsLop;
+}

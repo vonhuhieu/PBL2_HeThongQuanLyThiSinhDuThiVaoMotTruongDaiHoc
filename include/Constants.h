@@ -16,6 +16,8 @@ namespace AdmissionConst {
     const std::string KET_QUA_TRUNG_TUYEN = "TRUNG TUYEN";
     const std::string KET_QUA_KHONG_DAT   = "Khong dat";
     const std::string KET_QUA_DIEM_LIET   = "Diem liet";
+    const std::string KET_QUA_DANG_XET    = "Dang xet tuyen";
+    const std::string KET_QUA_KHONG_DAT_SAN = "Khong dat diem san";
     
     const std::string TT_NV_TRUNG_TUYEN   = "TRUNG TUYEN";
     const std::string TT_NV_KHONG_TRUNG   = "KHONG TRUNG TUYEN";
@@ -45,6 +47,11 @@ namespace AdmissionConst {
     const std::string GT_NU             = "NU";   // Nữ
     const std::string GT_KHAC           = "KHAC"; // Khác
     const std::string MA_TINH_MAC_DINH  = "48";   // TP. Đà Nẵng
+
+    // 6. Cấu hình phân trang (Pagination Server-side / Client-side)
+    const int PAGE_SIZE_DEFAULT         = 10;                     // Mặc định 10 bản ghi mỗi trang
+    const int PAGE_SIZE_OPTIONS[4]      = { 10, 25, 50, 100 };    // Các mức lựa chọn số bản ghi
+    const int SO_LUONG_PAGE_SIZE_OPTIONS = 4;
 }
 
 #endif // CONSTANTS_H

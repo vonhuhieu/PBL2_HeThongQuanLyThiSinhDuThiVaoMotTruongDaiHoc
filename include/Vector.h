@@ -167,6 +167,21 @@ public:
         }
     }
 
+    // Chèn phần tử vào vị trí index (chèn vào đầu index = 0)
+    void insert(size_t index, const T& element) {
+        if (index > m_size) {
+            index = m_size;
+        }
+        if (m_size >= m_capacity) {
+            reallocate(m_capacity == 0 ? 10 : m_capacity * 2);
+        }
+        for (size_t i = m_size; i > index; --i) {
+            data[i] = std::move(data[i - 1]);
+        }
+        data[index] = element;
+        m_size++;
+    }
+
     // Xóa phần tử tại vị trí index
     void erase(size_t index) {
         if (index >= m_size) {

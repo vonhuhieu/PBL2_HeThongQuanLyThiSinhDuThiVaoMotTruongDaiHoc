@@ -5,14 +5,16 @@
 ThiSinh::ThiSinh() 
     : Nguoi(), soBaoDanh(""), namTuyenSinh(AdmissionConst::NAM_TUYEN_SINH_MAC_DINH),
       diemToan(0.0), diemLy(0.0), diemHoa(0.0),
-      maSinhVien(""), lopSinhHoat(""), nganhTrungTuyen(""), nguyenVongTrungTuyen(0) {}
+      maSinhVien(""), lopSinhHoat(""), nganhTrungTuyen(""), nguyenVongTrungTuyen(0),
+      ngayTao(""), ngaySua("") {}
 
 // 2. Constructor có tham số đầy đủ
 ThiSinh::ThiSinh(const string& cccd, const string& ten, const string& ns, const string& que, const string& gt,
                  const string& sbd, double toan, double ly, double hoa, int nam)
     : Nguoi(cccd, ten, ns, que, gt), soBaoDanh(sbd), namTuyenSinh(nam),
       diemToan(toan), diemLy(ly), diemHoa(hoa),
-      maSinhVien(""), lopSinhHoat(""), nganhTrungTuyen(""), nguyenVongTrungTuyen(0) {}
+      maSinhVien(""), lopSinhHoat(""), nganhTrungTuyen(""), nguyenVongTrungTuyen(0),
+      ngayTao(""), ngaySua("") {}
 
 // 3. Copy constructor
 ThiSinh::ThiSinh(const ThiSinh& other)
@@ -20,6 +22,7 @@ ThiSinh::ThiSinh(const ThiSinh& other)
       diemToan(other.diemToan), diemLy(other.diemLy), diemHoa(other.diemHoa),
       maSinhVien(other.maSinhVien), lopSinhHoat(other.lopSinhHoat),
       nganhTrungTuyen(other.nganhTrungTuyen), nguyenVongTrungTuyen(other.nguyenVongTrungTuyen),
+      ngayTao(other.ngayTao), ngaySua(other.ngaySua),
       dsNguyenVong(other.dsNguyenVong) {}
 
 // 4. Destructor
@@ -35,6 +38,8 @@ string ThiSinh::getMaSinhVien() const { return maSinhVien; }
 string ThiSinh::getLopSinhHoat() const { return lopSinhHoat; }
 string ThiSinh::getNganhTrungTuyen() const { return nganhTrungTuyen; }
 int ThiSinh::getNguyenVongTrungTuyen() const { return nguyenVongTrungTuyen; }
+string ThiSinh::getNgayTao() const { return ngayTao; }
+string ThiSinh::getNgaySua() const { return ngaySua; }
 const Vector<NguyenVong>& ThiSinh::getDsNguyenVong() const { return dsNguyenVong; }
 Vector<NguyenVong>& ThiSinh::getDsNguyenVong() { return dsNguyenVong; }
 
@@ -48,6 +53,8 @@ void ThiSinh::setMaSinhVien(const string& msv) { maSinhVien = msv; }
 void ThiSinh::setLopSinhHoat(const string& lsh) { lopSinhHoat = lsh; }
 void ThiSinh::setNganhTrungTuyen(const string& nt) { nganhTrungTuyen = nt; }
 void ThiSinh::setNguyenVongTrungTuyen(int nv) { nguyenVongTrungTuyen = nv; }
+void ThiSinh::setNgayTao(const string& nt) { ngayTao = nt; }
+void ThiSinh::setNgaySua(const string& ns) { ngaySua = ns; }
 void ThiSinh::setDsNguyenVong(const Vector<NguyenVong>& ds) { dsNguyenVong = ds; }
 
 // Quản lý Nguyện vọng
@@ -64,11 +71,11 @@ double ThiSinh::tinhTongDiem() const {
     return diemToan + diemLy + diemHoa;
 }
 
-// Kiểm tra điểm liệt
-bool ThiSinh::kiemTraDiemLiet() const {
-    return (diemToan <= AdmissionConst::DIEM_LIET || 
-            diemLy   <= AdmissionConst::DIEM_LIET || 
-            diemHoa  <= AdmissionConst::DIEM_LIET);
+// Kiểm tra điểm liệt theo ngưỡng động
+bool ThiSinh::kiemTraDiemLiet(double threshold) const {
+    return (diemToan <= threshold || 
+            diemLy   <= threshold || 
+            diemHoa  <= threshold);
 }
 
 // Đã trúng tuyển chưa
@@ -76,9 +83,9 @@ bool ThiSinh::daTrungTuyen() const {
     return (!nganhTrungTuyen.empty() && nguyenVongTrungTuyen > 0);
 }
 
-// Xét tuyển theo điểm sàn / điểm chuẩn
-bool ThiSinh::xetTrungTuyen(double diemChuan) const {
-    if (kiemTraDiemLiet()) return false;
+// Xét tuyển theo điểm sàn / điểm chuẩn và điểm liệt
+bool ThiSinh::xetTrungTuyen(double diemChuan, double diemLiet) const {
+    if (kiemTraDiemLiet(diemLiet)) return false;
     return (tinhTongDiem() >= diemChuan);
 }
 
@@ -139,6 +146,8 @@ ThiSinh& ThiSinh::operator=(const ThiSinh& other) {
         lopSinhHoat = other.lopSinhHoat;
         nganhTrungTuyen = other.nganhTrungTuyen;
         nguyenVongTrungTuyen = other.nguyenVongTrungTuyen;
+        ngayTao = other.ngayTao;
+        ngaySua = other.ngaySua;
         dsNguyenVong = other.dsNguyenVong;
     }
     return *this;
