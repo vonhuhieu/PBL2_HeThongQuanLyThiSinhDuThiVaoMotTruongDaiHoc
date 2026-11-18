@@ -74,6 +74,7 @@ public:
     bool dongBoTuMySQL() { return docDuLieuTuMySQL(); }
     bool dongBoLenMySQL() { return luuDuLieuVaoMySQL(); }
     bool khoiTaoDuLieuMauMySQL();
+    bool importDuLieuMau100(const string& filePath = "sql/05_seed_sample_data.sql");
 
     // 2. Tra cứu & Sinh mã tự động
     string sinhSoBaoDanhMoi() const;              // Tự động tăng SBD (DUT001 -> DUT015...)

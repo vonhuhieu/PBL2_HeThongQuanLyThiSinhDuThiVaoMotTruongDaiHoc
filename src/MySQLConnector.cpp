@@ -1,5 +1,7 @@
 #include "../include/MySQLConnector.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 MySQLConnector::MySQLConnector() : conn(nullptr), connected(false) {}
 
@@ -401,122 +403,60 @@ bool MySQLConnector::seedDefaultData() {
             "('diemLiet', '1.00', 'Muc diem liet theo quy che'),"
             "('diemSanMacDinh', '15.00', 'Diem san toi thieu nhan ho so xet tuyen');");
 
-    // 8. Seed Nguoi (36 thi sinh tieu bieu chuan DUT)
-    execute("INSERT IGNORE INTO `nguoi` (`soCCCD`, `hoTen`, `ngaySinh`, `queQuan`, `gioiTinh`) VALUES "
-            "('048003001234', 'Vo Nhu Hieu',            '04/03/2003', '48', 'NAM'),"
-            "('048208001567', 'Nguyen Hoang Minh Quan', '15/01/2008', '48', 'NAM'),"
-            "('048308002341', 'Tran Le Thao Vy',        '22/04/2008', '48', 'NU'),"
-            "('046208003412', 'Le Nguyen Bao Nam',      '10/08/2008', '46', 'NAM'),"
-            "('051208004523', 'Pham Gia Huy',           '05/03/2008', '51', 'NAM'),"
-            "('040308005634', 'Hoang Thi Khanh Huyen',  '18/06/2008', '40', 'NU'),"
-            "('042208006745', 'Dang Dinh Phuc',         '12/09/2008', '42', 'NAM'),"
-            "('001308007856', 'Nguyen Ngoc Mai Anh',    '25/02/2008', '01', 'NU'),"
-            "('045208008967', 'Bui Quang Thinh',        '30/10/2008', '45', 'NAM'),"
-            "('056308009078', 'Do Thuy Duong',          '14/07/2008', '56', 'NU'),"
-            "('048208010189', 'Phan Quoc Tuan',         '08/11/2008', '48', 'NAM'),"
-            "('046208011290', 'Ho Thanh Phong',         '03/05/2008', '46', 'NAM'),"
-            "('051308012301', 'Nguyen Thi Cam Tu',      '19/08/2008', '51', 'NU'),"
-            "('038208013412', 'Vu Dinh Trong',          '27/03/2008', '38', 'NAM'),"
-            "('079308014523', 'Trinh Hong Ngoc',        '11/12/2008', '79', 'NU'),"
-            "('048208015634', 'Ngo Gia Khiem',          '16/09/2008', '48', 'NAM'),"
-            "('064208016745', 'Duong Van Tai',          '20/02/2008', '64', 'NAM'),"
-            "('066308017856', 'Bui Thi Kim Ngan',       '07/04/2008', '66', 'NU'),"
-            "('048208018967', 'Ly Minh Tri',            '23/06/2008', '48', 'NAM'),"
-            "('042308019078', 'Dinh Thi Phuong Thao',   '09/01/2008', '42', 'NU'),"
-            "('045208020189', 'Truong Cong Danh',       '17/05/2008', '45', 'NAM'),"
-            "('040208021290', 'Nguyen Duc Manh',        '28/08/2008', '40', 'NAM'),"
-            "('048308022301', 'Vo Thi Yen Nhi',         '14/10/2008', '48', 'NU'),"
-            "('031208023412', 'Cao Xuan Bach',          '02/09/2008', '31', 'NAM'),"
-            "('051208024523', 'Mai Van Tien',           '21/07/2008', '51', 'NAM'),"
-            "('079308025634', 'Lam Gia Han',            '06/11/2008', '79', 'NU'),"
-            "('048208026745', 'Ta Dinh Quang',          '13/03/2008', '48', 'NAM'),"
-            "('046208027856', 'Hoang Van Dung',         '29/04/2008', '46', 'NAM'),"
-            "('042308028967', 'Nguyen Thi Thu Ha',      '15/08/2008', '42', 'NU'),"
-            "('045208029078', 'Pham Quoc Bao',          '18/12/2008', '45', 'NAM'),"
-            "('040208030189', 'Vuong Dinh Khoi',        '04/02/2008', '40', 'NAM'),"
-            "('038208031290', 'Tran Dinh Trong',        '24/06/2008', '38', 'NAM'),"
-            "('051308032301', 'Le Thi Thanh Thuy',      '01/10/2008', '51', 'NU'),"
-            "('048208033412', 'Nguyen Cong Hoang',      '12/07/2008', '48', 'NAM'),"
-            "('046208034523', 'Doan Minh Quan',         '19/09/2008', '46', 'NAM'),"
-            "('042208035634', 'Ha Van Kiet',            '05/11/2008', '42', 'NAM');");
+    // LƯU Ý: Khởi tạo ban đầu danh sách thí sinh là RỖNG (0 bản ghi).
+    // Người dùng sẽ chủ động bấm nút [Import Dữ Liệu Mẫu (100)] trên giao diện khi cần nạp dữ liệu.
+    return commit();
+}
 
-    // 9. Seed Thi Sinh (36 thi sinh)
-    execute("INSERT IGNORE INTO `thisinh` (`soBaoDanh`, `soCCCD`, `namTuyenSinh`, `diemToan`, `diemLy`, `diemHoa`) VALUES "
-            "('DUT001', '048003001234', 2026, 9.20, 9.00, 9.50),"
-            "('DUT002', '048208001567', 2026, 9.80, 9.60, 9.80),"
-            "('DUT003', '048308002341', 2026, 9.60, 9.40, 9.75),"
-            "('DUT004', '046208003412', 2026, 9.40, 9.60, 9.25),"
-            "('DUT005', '051208004523', 2026, 9.20, 9.00, 9.40),"
-            "('DUT006', '040308005634', 2026, 9.00, 9.25, 9.00),"
-            "('DUT007', '042208006745', 2026, 9.00, 8.80, 9.20),"
-            "('DUT008', '001308007856', 2026, 8.80, 9.00, 8.80),"
-            "('DUT009', '045208008967', 2026, 8.60, 8.80, 9.00),"
-            "('DUT010', '056308009078', 2026, 8.60, 8.50, 9.00),"
-            "('DUT011', '048208010189', 2026, 8.40, 8.80, 8.60),"
-            "('DUT012', '046208011290', 2026, 8.50, 8.50, 8.50),"
-            "('DUT013', '051308012301', 2026, 8.40, 8.60, 8.25),"
-            "('DUT014', '038208013412', 2026, 8.20, 8.40, 8.50),"
-            "('DUT015', '079308014523', 2026, 8.00, 8.60, 8.40),"
-            "('DUT016', '048208015634', 2026, 8.20, 8.20, 8.20),"
-            "('DUT017', '064208016745', 2026, 8.00, 8.25, 8.00),"
-            "('DUT018', '066308017856', 2026, 8.00, 8.00, 8.00),"
-            "('DUT019', '048208018967', 2026, 7.80, 8.00, 8.00),"
-            "('DUT020', '042308019078', 2026, 7.80, 7.80, 7.80),"
-            "('DUT021', '045208020189', 2026, 7.60, 7.80, 7.60),"
-            "('DUT022', '040208021290', 2026, 7.50, 7.60, 7.50),"
-            "('DUT023', '048308022301', 2026, 7.40, 7.50, 7.50),"
-            "('DUT024', '031208023412', 2026, 7.20, 7.40, 7.50),"
-            "('DUT025', '051208024523', 2026, 7.00, 7.20, 7.60),"
-            "('DUT026', '079308025634', 2026, 7.00, 7.25, 7.00),"
-            "('DUT027', '048208026745', 2026, 7.00, 6.80, 6.80),"
-            "('DUT028', '046208027856', 2026, 6.80, 6.60, 6.80),"
-            "('DUT029', '042308028967', 2026, 6.50, 6.50, 6.75),"
-            "('DUT030', '045208029078', 2026, 6.40, 6.50, 6.20),"
-            "('DUT031', '040208030189', 2026, 6.20, 6.00, 6.40),"
-            "('DUT032', '038208031290', 2026, 6.00, 5.80, 6.20),"
-            "('DUT033', '051308032301', 2026, 5.60, 5.80, 5.80),"
-            "('DUT034', '048208033412', 2026, 5.50, 5.50, 5.50),"
-            "('DUT035', '046208034523', 2026, 4.50, 4.80, 4.50),"
-            "('DUT036', '042208035634', 2026, 9.00, 8.50, 1.00);");
+bool MySQLConnector::executeScript(const std::string& filePath) {
+    if (!isConnected()) {
+        lastError = "Chua ket noi MySQL";
+        return false;
+    }
 
-    // 10. Seed Nguyen Vong (Dang ky toi da 3 NV moi thi sinh)
-    execute("INSERT IGNORE INTO `nguyen_vong` (`soBaoDanh`, `thuTuNV`, `maNganh`, `trangThai`) VALUES "
-            "('DUT001', 1, '7480201B', 'DANG XET'), ('DUT001', 2, '7480201', 'DANG XET'), ('DUT001', 3, '7480106', 'DANG XET'),"
-            "('DUT002', 1, '7480201B', 'DANG XET'), ('DUT002', 2, '7520207A', 'DANG XET'), ('DUT002', 3, '7480201', 'DANG XET'),"
-            "('DUT003', 1, '7480201B', 'DANG XET'), ('DUT003', 2, '7480201', 'DANG XET'),"
-            "('DUT004', 1, '7520207A', 'DANG XET'), ('DUT004', 2, '7520207', 'DANG XET'), ('DUT004', 3, '7520216', 'DANG XET'),"
-            "('DUT005', 1, '7520216', 'DANG XET'), ('DUT005', 2, '7520201', 'DANG XET'), ('DUT005', 3, '7520114', 'DANG XET'),"
-            "('DUT006', 1, '7480201', 'DANG XET'),  ('DUT006', 2, '7480201B', 'DANG XET'),"
-            "('DUT007', 1, '7520130', 'DANG XET'),  ('DUT007', 2, '7520114', 'DANG XET'),"
-            "('DUT008', 1, '7480201B', 'DANG XET'), ('DUT008', 2, '7480201A', 'DANG XET'),"
-            "('DUT009', 1, '7520207A', 'DANG XET'), ('DUT009', 2, '7480106', 'DANG XET'),"
-            "('DUT010', 1, '7480201', 'DANG XET'),  ('DUT010', 2, '7480106', 'DANG XET'),"
-            "('DUT011', 1, '7520216', 'DANG XET'),  ('DUT011', 2, '7520207A', 'DANG XET'),"
-            "('DUT012', 1, '7520114', 'DANG XET'),  ('DUT012', 2, '7520130', 'DANG XET'),"
-            "('DUT013', 1, '7520301', 'DANG XET'),  ('DUT013', 2, '7580201', 'DANG XET'),"
-            "('DUT014', 1, '7480106', 'DANG XET'),  ('DUT014', 2, '7480201', 'DANG XET'),"
-            "('DUT015', 1, '7480201A', 'DANG XET'), ('DUT015', 2, '7480201', 'DANG XET'),"
-            "('DUT016', 1, '7520201', 'DANG XET'),  ('DUT016', 2, '7520216', 'DANG XET'),"
-            "('DUT017', 1, '7520130', 'DANG XET'),  ('DUT017', 2, '7520114', 'DANG XET'),"
-            "('DUT018', 1, '7520207', 'DANG XET'),  ('DUT018', 2, '7520207A', 'DANG XET'),"
-            "('DUT019', 1, '7480201B', 'DANG XET'), ('DUT019', 2, '7480201', 'DANG XET'), ('DUT019', 3, '7480106', 'DANG XET'),"
-            "('DUT020', 1, '7520301', 'DANG XET'),  ('DUT020', 2, '7580201', 'DANG XET'),"
-            "('DUT021', 1, '7580201', 'DANG XET'),  ('DUT021', 2, '7520114', 'DANG XET'),"
-            "('DUT022', 1, '7520201', 'DANG XET'),  ('DUT022', 2, '7520130', 'DANG XET'),"
-            "('DUT023', 1, '7480201A', 'DANG XET'), ('DUT023', 2, '7480106', 'DANG XET'),"
-            "('DUT024', 1, '7520114', 'DANG XET'),  ('DUT024', 2, '7520216', 'DANG XET'),"
-            "('DUT025', 1, '7520207', 'DANG XET'),  ('DUT025', 2, '7520201', 'DANG XET'),"
-            "('DUT026', 1, '7480201', 'DANG XET'),  ('DUT026', 2, '7520207A', 'DANG XET'),"
-            "('DUT027', 1, '7520130', 'DANG XET'),  ('DUT027', 2, '7580201', 'DANG XET'),"
-            "('DUT028', 1, '7580201', 'DANG XET'),  ('DUT028', 2, '7520301', 'DANG XET'),"
-            "('DUT029', 1, '7520301', 'DANG XET'),  ('DUT029', 2, '7580201', 'DANG XET'),"
-            "('DUT030', 1, '7520201', 'DANG XET'),  ('DUT030', 2, '7580201', 'DANG XET'),"
-            "('DUT031', 1, '7580201', 'DANG XET'),  ('DUT031', 2, '7520301', 'DANG XET'),"
-            "('DUT032', 1, '7520301', 'DANG XET'),  ('DUT032', 2, '7580201', 'DANG XET'),"
-            "('DUT033', 1, '7580201', 'DANG XET'),  ('DUT033', 2, '7520301', 'DANG XET'),"
-            "('DUT034', 1, '7580201', 'DANG XET'),"
-            "('DUT035', 1, '7580201', 'DANG XET'),  ('DUT035', 2, '7520301', 'DANG XET'),"
-            "('DUT036', 1, '7520201', 'DANG XET'),  ('DUT036', 2, '7580201', 'DANG XET');");
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        lastError = "Khong the mo file SQL: " + filePath;
+        return false;
+    }
+
+    std::string sqlFull;
+    std::string line;
+    while (std::getline(file, line)) {
+        // Loại bỏ comment dòng --
+        size_t firstNonSpace = line.find_first_not_of(" \t\r\n");
+        if (firstNonSpace != std::string::npos && line.substr(firstNonSpace, 2) == "--") {
+            continue;
+        }
+        sqlFull += line + "\n";
+    }
+    file.close();
+
+    beginTransaction();
+
+    // Xóa sạch dữ liệu thí sinh cũ trước khi nạp để đảm bảo đúng bộ 100 thí sinh sạch sẽ
+    execute("DELETE FROM `nguyen_vong`;");
+    execute("DELETE FROM `thisinh`;");
+    execute("DELETE FROM `nguoi`;");
+
+    std::stringstream ss(sqlFull);
+    std::string statement;
+    while (std::getline(ss, statement, ';')) {
+        size_t start = statement.find_first_not_of(" \t\r\n");
+        if (start == std::string::npos) continue;
+        size_t end = statement.find_last_not_of(" \t\r\n");
+        std::string queryStr = statement.substr(start, end - start + 1);
+
+        if (queryStr.empty()) continue;
+
+        // Bỏ qua lệnh USE database
+        if (queryStr.find("USE ") == 0 || queryStr.find("use ") == 0) continue;
+
+        if (!execute(queryStr)) {
+            rollback();
+            return false;
+        }
+    }
 
     return commit();
 }

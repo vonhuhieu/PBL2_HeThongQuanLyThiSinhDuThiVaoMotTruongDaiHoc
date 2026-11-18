@@ -340,6 +340,15 @@ bool QuanLyThiSinh::khoiTaoDuLieuMauMySQL() {
     return ok;
 }
 
+bool QuanLyThiSinh::importDuLieuMau100(const string& filePath) {
+    if (!db.isConnected()) return false;
+    bool ok = db.executeScript(filePath);
+    if (ok) {
+        docDuLieuTuMySQL();
+    }
+    return ok;
+}
+
 // ==============================================================================
 // 2. TRA CỨU & SINH MÃ TỰ ĐỘNG
 // ==============================================================================

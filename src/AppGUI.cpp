@@ -167,6 +167,151 @@ static void RenderRowHover(const char* rowId, bool isSelected = false) {
     ImGui::SameLine();
 }
 
+// ------------------------------------------------------------------------------
+// CÁC HÀM RENDER ICON BUTTONS VECTOR CHO CỘT THAO TÁC (XEM, SỬA, XÓA)
+// Độc lập hoàn toàn với font chữ, vẽ trực tiếp bằng ImDrawList sắc nét ở mọi độ phân giải
+// ------------------------------------------------------------------------------
+static bool RenderIconButtonView(const char* id, ImVec2 size = ImVec2(26, 22)) {
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.14f, 0.50f, 0.44f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.65f, 0.55f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.10f, 0.40f, 0.35f, 1.0f));
+    bool clicked = ImGui::Button(id, size);
+    ImGui::PopStyleColor(3);
+
+    // Vẽ icon con mắt vector cách điệu lên button
+    ImVec2 bMin = ImGui::GetItemRectMin();
+    ImVec2 bMax = ImGui::GetItemRectMax();
+    ImVec2 center = ImVec2((bMin.x + bMax.x) * 0.5f, (bMin.y + bMax.y) * 0.5f);
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImU32 iconColor = ImGui::GetColorU32(ImVec4(0.95f, 0.98f, 1.0f, 1.0f));
+
+    float rX = 6.5f;
+    float rY = 4.0f;
+    // Đường cong mí mắt trên
+    dl->AddBezierQuadratic(ImVec2(center.x - rX, center.y), ImVec2(center.x, center.y - rY * 1.4f), ImVec2(center.x + rX, center.y), iconColor, 1.5f);
+    // Đường cong mí mắt dưới
+    dl->AddBezierQuadratic(ImVec2(center.x - rX, center.y), ImVec2(center.x, center.y + rY * 1.4f), ImVec2(center.x + rX, center.y), iconColor, 1.5f);
+    // Tròng mắt ở giữa
+    dl->AddCircleFilled(center, 2.0f, iconColor);
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Xem chi tiet ho so thi sinh");
+    }
+    return clicked;
+}
+
+static bool RenderIconButtonEdit(const char* id, ImVec2 size = ImVec2(26, 22)) {
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.45f, 0.80f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.55f, 0.92f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.12f, 0.35f, 0.70f, 1.0f));
+    bool clicked = ImGui::Button(id, size);
+    ImGui::PopStyleColor(3);
+
+    // Vẽ icon chiếc bút chì vector nghiêng 45 độ
+    ImVec2 bMin = ImGui::GetItemRectMin();
+    ImVec2 bMax = ImGui::GetItemRectMax();
+    ImVec2 center = ImVec2((bMin.x + bMax.x) * 0.5f, (bMin.y + bMax.y) * 0.5f);
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImU32 iconColor = ImGui::GetColorU32(ImVec4(0.95f, 0.98f, 1.0f, 1.0f));
+
+    // Thân bút chì
+    dl->AddLine(ImVec2(center.x - 3.5f, center.y + 3.5f), ImVec2(center.x + 4.0f, center.y - 4.0f), iconColor, 2.2f);
+    // Ngòi bút chì
+    dl->AddTriangleFilled(ImVec2(center.x - 3.5f, center.y + 3.5f),
+                          ImVec2(center.x - 6.5f, center.y + 5.0f),
+                          ImVec2(center.x - 4.5f, center.y + 6.5f), iconColor);
+    // Đuôi tẩy
+    dl->AddCircleFilled(ImVec2(center.x + 4.2f, center.y - 4.2f), 1.6f, iconColor);
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Sua thong tin ho so");
+    }
+    return clicked;
+}
+
+static bool RenderIconButtonDelete(const char* id, ImVec2 size = ImVec2(26, 22)) {
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.25f, 0.25f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.88f, 0.32f, 0.32f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.60f, 0.18f, 0.18f, 1.0f));
+    bool clicked = ImGui::Button(id, size);
+    ImGui::PopStyleColor(3);
+
+    // Vẽ icon thùng rác vector
+    ImVec2 bMin = ImGui::GetItemRectMin();
+    ImVec2 bMax = ImGui::GetItemRectMax();
+    ImVec2 center = ImVec2((bMin.x + bMax.x) * 0.5f, (bMin.y + bMax.y) * 0.5f);
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImU32 iconColor = ImGui::GetColorU32(ImVec4(0.95f, 0.98f, 1.0f, 1.0f));
+
+    // Nắp thùng rác
+    dl->AddLine(ImVec2(center.x - 5.0f, center.y - 3.5f), ImVec2(center.x + 5.0f, center.y - 3.5f), iconColor, 1.4f);
+    // Quai nắp
+    dl->AddLine(ImVec2(center.x - 2.0f, center.y - 5.5f), ImVec2(center.x + 2.0f, center.y - 5.5f), iconColor, 1.4f);
+    // Thân thùng rác (hình thang nhỏ dần xuống đáy)
+    dl->AddLine(ImVec2(center.x - 4.0f, center.y - 2.0f), ImVec2(center.x - 3.0f, center.y + 5.5f), iconColor, 1.4f);
+    dl->AddLine(ImVec2(center.x + 4.0f, center.y - 2.0f), ImVec2(center.x + 3.0f, center.y + 5.5f), iconColor, 1.4f);
+    dl->AddLine(ImVec2(center.x - 3.0f, center.y + 5.5f), ImVec2(center.x + 3.0f, center.y + 5.5f), iconColor, 1.4f);
+    // Nan thùng
+    dl->AddLine(ImVec2(center.x - 1.2f, center.y - 1.0f), ImVec2(center.x - 1.0f, center.y + 4.0f), iconColor, 1.0f);
+    dl->AddLine(ImVec2(center.x + 1.2f, center.y - 1.0f), ImVec2(center.x + 1.0f, center.y + 4.0f), iconColor, 1.0f);
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Xoa ho so thi sinh");
+    }
+    return clicked;
+}
+
+// ------------------------------------------------------------------------------
+// CÁC HÀM CĂN CHỈNH NỘI DUNG CELL: CĂN GIỮA DỌC, CANH PHẢI CHO TEXT, CANH GIỮA CHO CÒN LẠI
+// ------------------------------------------------------------------------------
+static void AlignAndRenderCenter(int colIdx, const string& text, const ImVec4& color, float minH) {
+    ImGui::TableSetColumnIndex(colIdx);
+    float availW = ImGui::GetContentRegionAvail().x;
+    float textW = ImGui::CalcTextSize(text.c_str()).x;
+    float textH = ImGui::GetTextLineHeight();
+
+    // Căn giữa theo chiều dọc
+    float padY = (minH - textH) * 0.5f;
+    if (padY > 0.0f) {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
+    }
+
+    // Căn giữa theo chiều ngang
+    if (availW > textW) {
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - textW) * 0.5f);
+    }
+    ImGui::TextColored(color, "%s", text.c_str());
+}
+
+static void AlignAndRenderTextRight(int colIdx, const string& text, const ImVec4& color, float minH) {
+    ImGui::TableSetColumnIndex(colIdx);
+    float availW = ImGui::GetContentRegionAvail().x;
+    float wrapW = (availW > 20.0f) ? availW : 120.0f;
+
+    // Tính kích thước chuỗi text khi có wrap
+    ImVec2 textSize = ImGui::CalcTextSize(text.c_str(), nullptr, false, wrapW);
+
+    // Căn giữa theo chiều dọc
+    float padY = (minH - textSize.y) * 0.5f;
+    if (padY > 0.0f) {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
+    }
+
+    // Căn phải theo chiều ngang
+    if (textSize.y <= ImGui::GetTextLineHeight() * 1.35f) {
+        // Text ngắn nằm trên 1 dòng duy nhất: dịch con trỏ sang phải để canh phải
+        if (availW > textSize.x) {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - textSize.x));
+        }
+        ImGui::TextColored(color, "%s", text.c_str());
+    } else {
+        // Text dài xuống dòng (nhiều dòng): bọc wrap
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + wrapW);
+        ImGui::TextColored(color, "%s", text.c_str());
+        ImGui::PopTextWrapPos();
+    }
+}
+
 static int getDaysInMonth(int m, int y) {
     if (m == 2) {
         bool leap = (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
@@ -667,7 +812,12 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     ImGui::EndDisabled();
                 }
 
-                ImGui::SameLine(ImGui::GetWindowWidth() - 340);
+                float rightBtnWidth = 545.0f;
+                if (ImGui::GetWindowWidth() > 950.0f) {
+                    ImGui::SameLine(ImGui::GetWindowWidth() - rightBtnWidth);
+                } else {
+                    ImGui::SameLine();
+                }
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.34f, 1.0f));
                 if (ImGui::Button("[+] Them Thi Sinh", ImVec2(145, 28))) {
                     showAddModal = true;
@@ -744,6 +894,27 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 ImGui::PopStyleColor();
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip("Xuat toan bo danh sach thoa bo loc hien tai ra file Excel (.xls) voi day du tieu de, thong tin loc va thead");
+                }
+
+                // NÚT IMPORT DỮ LIỆU MẪU (100 THÍ SINH)
+                ImGui::SameLine();
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.78f, 0.42f, 0.15f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.88f, 0.50f, 0.20f, 1.0f));
+                if (ImGui::Button("[+] Import 100 Thi Sinh Mau", ImVec2(195, 28))) {
+                    bool ok = ql.importDuLieuMau100("sql/05_seed_sample_data.sql");
+                    showToast = true;
+                    if (ok) {
+                        currentPage = 1;
+                        selectedRow = -1;
+                        selectedSBD = "";
+                        toastMsg = "Da import thanh cong 100 thi sinh mau xet tuyen CNTT Nhat (K26)!";
+                    } else {
+                        toastMsg = "Loi: Khong the import du lieu mau tu file sql/05_seed_sample_data.sql!";
+                    }
+                }
+                ImGui::PopStyleColor(2);
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Nap 100 ho so thi sinh mau chuan xet tuyen Nganh 7480201A (CNTT - Ngoai ngu Nhat) vao he thong");
                 }
 
                 // HÀNG BỘ LỌC 2: Ngành trúng tuyển, Lớp sinh hoạt, Nút xóa lọc & Thông tin kết quả
@@ -945,28 +1116,28 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                 float appliedTableHeight = needScrollY ? maxTableHeight : measuredTableHeight;
 
                 ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | 
-                                             ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollX | 
-                                             ImGuiTableFlags_Sortable;
+                                             ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable | 
+                                             ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings;
                 if (needScrollY) tableFlags |= ImGuiTableFlags_ScrollY;
 
-                if (ImGui::BeginTable("CandidatesTable", 17, tableFlags, ImVec2(0, appliedTableHeight))) {
-                    ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 38);
-                    ImGui::TableSetupColumn("SBD (PK)", ImGuiTableColumnFlags_WidthFixed, 85);
-                    ImGui::TableSetupColumn("So CCCD (FK)", ImGuiTableColumnFlags_WidthFixed, 120);
-                    ImGui::TableSetupColumn("Ho va Ten", ImGuiTableColumnFlags_WidthStretch);
-                    ImGui::TableSetupColumn("Ngay Sinh", ImGuiTableColumnFlags_WidthFixed, 95);
-                    ImGui::TableSetupColumn("Que Quan", ImGuiTableColumnFlags_WidthFixed, 115);
-                    ImGui::TableSetupColumn("Gioi Tinh", ImGuiTableColumnFlags_WidthFixed, 75);
-                    ImGui::TableSetupColumn("Toan", ImGuiTableColumnFlags_WidthFixed, 60);
-                    ImGui::TableSetupColumn("Ly", ImGuiTableColumnFlags_WidthFixed, 60);
-                    ImGui::TableSetupColumn("Hoa", ImGuiTableColumnFlags_WidthFixed, 60);
-                    ImGui::TableSetupColumn("Tong Diem", ImGuiTableColumnFlags_WidthFixed, 90);
-                    ImGui::TableSetupColumn("Ket Qua", ImGuiTableColumnFlags_WidthFixed, 135);
-                    ImGui::TableSetupColumn("Khoa", ImGuiTableColumnFlags_WidthFixed, 140);
-                    ImGui::TableSetupColumn("Nganh Trung Tuyen", ImGuiTableColumnFlags_WidthFixed, 180);
-                    ImGui::TableSetupColumn("Lop Sinh Hoat", ImGuiTableColumnFlags_WidthFixed, 120);
-                    ImGui::TableSetupColumn("Ma SV DUT", ImGuiTableColumnFlags_WidthFixed, 100);
-                    ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 155);
+                if (ImGui::BeginTable("CandidatesTable_v2", 17, tableFlags, ImVec2(0, appliedTableHeight))) {
+                    ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 34.0f);
+                    ImGui::TableSetupColumn("SBD (PK)", ImGuiTableColumnFlags_WidthFixed, 75.0f);
+                    ImGui::TableSetupColumn("So CCCD (FK)", ImGuiTableColumnFlags_WidthFixed, 108.0f);
+                    ImGui::TableSetupColumn("Ho va Ten", ImGuiTableColumnFlags_WidthStretch, 1.4f);
+                    ImGui::TableSetupColumn("Ngay Sinh", ImGuiTableColumnFlags_WidthFixed, 86.0f);
+                    ImGui::TableSetupColumn("Que Quan", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+                    ImGui::TableSetupColumn("Gioi Tinh", ImGuiTableColumnFlags_WidthFixed, 55.0f);
+                    ImGui::TableSetupColumn("Toan", ImGuiTableColumnFlags_WidthFixed, 42.0f);
+                    ImGui::TableSetupColumn("Ly", ImGuiTableColumnFlags_WidthFixed, 42.0f);
+                    ImGui::TableSetupColumn("Hoa", ImGuiTableColumnFlags_WidthFixed, 42.0f);
+                    ImGui::TableSetupColumn("Tong Diem", ImGuiTableColumnFlags_WidthFixed, 58.0f);
+                    ImGui::TableSetupColumn("Ket Qua", ImGuiTableColumnFlags_WidthStretch, 1.1f);
+                    ImGui::TableSetupColumn("Khoa", ImGuiTableColumnFlags_WidthStretch, 0.9f);
+                    ImGui::TableSetupColumn("Nganh Trung Tuyen", ImGuiTableColumnFlags_WidthStretch, 1.3f);
+                    ImGui::TableSetupColumn("Lop Sinh Hoat", ImGuiTableColumnFlags_WidthFixed, 92.0f);
+                    ImGui::TableSetupColumn("Ma SV DUT", ImGuiTableColumnFlags_WidthFixed, 88.0f);
+                    ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 98.0f);
 
                     // Render Custom Thead: Luôn hiển thị biểu tượng vector mũi tên sắc nét ở mọi cột sortable
                     ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
@@ -1025,59 +1196,65 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                         sortSpecs->SpecsDirty = false;
                     }
 
+                    float rowMinH = 42.0f;
+
                     for (size_t i = 0; i < pageData.size(); ++i) {
                         const ThiSinh& ts = pageData[i];
                         string tenQue = ql.layTenTinhThanh(ts.getQueQuan());
                         string tenGT  = ql.layTenGioiTinh(ts.getGioiTinh());
 
-                        ImGui::TableNextRow();
+                        // Thiết lập chiều cao tối thiểu cho từng hàng để căn giữa dọc chuẩn mực
+                        ImGui::TableNextRow(ImGuiTableRowFlags_None, rowMinH);
 
                         int stt = (currentPage - 1) * pageSize + (int)i + 1;
 
-                        ImGui::TableSetColumnIndex(0);
-                        char rId[32];
-                        sprintf(rId, "##row_ts_%d", (int)i);
-                        bool isRowSelected = (!selectedSBD.empty() && selectedSBD == ts.getSoBaoDanh()) || (selectedRow == (int)i);
-                        RenderRowHover(rId, isRowSelected);
-                        ImGui::Text("%d", stt);
+                        // CỘT 0: STT (CĂN GIỮA)
+                        AlignAndRenderCenter(0, to_string(stt), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ts.getSoBaoDanh().c_str());
+                        // CỘT 1: SBD (PK) (CĂN GIỮA)
+                        AlignAndRenderCenter(1, ts.getSoBaoDanh(), ImVec4(0.4f, 0.8f, 1.0f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::Text("%s", ts.getSoCCCD().c_str());
+                        // CỘT 2: SỐ CCCD (FK) (CĂN GIỮA)
+                        AlignAndRenderCenter(2, ts.getSoCCCD(), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(3);
-                        ImGui::Text("%s", ts.getHoTen().c_str());
+                        // CỘT 3: HỌ VÀ TÊN (TEXT => CANH PHẢI)
+                        AlignAndRenderTextRight(3, ts.getHoTen(), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(4);
-                        ImGui::Text("%s", ts.getNgaySinh().c_str());
+                        // CỘT 4: NGÀY SINH (CĂN GIỮA)
+                        AlignAndRenderCenter(4, ts.getNgaySinh(), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(5);
-                        ImGui::Text("%s", tenQue.c_str());
+                        // CỘT 5: QUÊ QUÁN (TEXT => CANH PHẢI)
+                        AlignAndRenderTextRight(5, tenQue, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(6);
-                        ImGui::Text("%s", tenGT.c_str());
+                        // CỘT 6: GIỚI TÍNH (CĂN GIỮA)
+                        AlignAndRenderCenter(6, tenGT, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(7);
-                        ImGui::Text("%.2f", ts.getDiemToan());
+                        // CỘT 7-10: ĐIỂM SỐ (CĂN GIỮA)
+                        char bufScore[16];
+                        sprintf(bufScore, "%.2f", ts.getDiemToan());
+                        AlignAndRenderCenter(7, bufScore, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(8);
-                        ImGui::Text("%.2f", ts.getDiemLy());
+                        sprintf(bufScore, "%.2f", ts.getDiemLy());
+                        AlignAndRenderCenter(8, bufScore, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(9);
-                        ImGui::Text("%.2f", ts.getDiemHoa());
+                        sprintf(bufScore, "%.2f", ts.getDiemHoa());
+                        AlignAndRenderCenter(9, bufScore, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(10);
-                        ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.3f, 1.0f), "%.2f", ts.tinhTongDiem());
+                        sprintf(bufScore, "%.2f", ts.tinhTongDiem());
+                        AlignAndRenderCenter(10, bufScore, ImVec4(1.0f, 0.9f, 0.3f, 1.0f), rowMinH);
 
-                        ImGui::TableSetColumnIndex(11);
+                        // CỘT 11: KẾT QUẢ XÉT TUYỂN (TEXT => CANH PHẢI)
+                        string ketQuaStr;
+                        ImVec4 ketQuaColor;
                         if (ts.daTrungTuyen()) {
-                            ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "TRUNG TUYEN (NV%d)", ts.getNguyenVongTrungTuyen());
+                            ketQuaStr = "TRUNG TUYEN (NV" + to_string(ts.getNguyenVongTrungTuyen()) + ")";
+                            ketQuaColor = ImVec4(0.2f, 0.95f, 0.4f, 1.0f);
                         } else if (ts.kiemTraDiemLiet(ql.getDiemLiet())) {
-                            ImGui::TextColored(ImVec4(0.95f, 0.35f, 0.35f, 1.0f), "%s", AdmissionConst::KET_QUA_DIEM_LIET.c_str());
+                            ketQuaStr = AdmissionConst::KET_QUA_DIEM_LIET;
+                            ketQuaColor = ImVec4(0.95f, 0.35f, 0.35f, 1.0f);
                         } else if (ts.tinhTongDiem() < ql.getDiemSan()) {
-                            ImGui::TextColored(ImVec4(1.0f, 0.65f, 0.25f, 1.0f), "%s", AdmissionConst::KET_QUA_KHONG_DAT_SAN.c_str());
+                            ketQuaStr = AdmissionConst::KET_QUA_KHONG_DAT_SAN;
+                            ketQuaColor = ImVec4(1.0f, 0.65f, 0.25f, 1.0f);
                         } else {
                             bool coNVDangXet = false;
                             const Vector<NguyenVong>& nvList = ts.getDsNguyenVong();
@@ -1088,64 +1265,68 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 }
                             }
                             if (coNVDangXet || nvList.empty()) {
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", AdmissionConst::KET_QUA_DANG_XET.c_str());
+                                ketQuaStr = AdmissionConst::KET_QUA_DANG_XET;
+                                ketQuaColor = ImVec4(1.0f, 0.85f, 0.3f, 1.0f);
                             } else {
-                                ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", AdmissionConst::KET_QUA_KHONG_DAT.c_str());
+                                ketQuaStr = AdmissionConst::KET_QUA_KHONG_DAT;
+                                ketQuaColor = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
                             }
                         }
+                        AlignAndRenderTextRight(11, ketQuaStr, ketQuaColor, rowMinH);
 
-                        // CỘT 12: KHOA TRÚNG TUYỂN (BỔ SUNG MỚI)
-                        ImGui::TableSetColumnIndex(12);
+                        // CỘT 12: KHOA (TEXT => CANH PHẢI)
+                        string khoaStr = "-";
+                        ImVec4 khoaColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
                         if (ts.daTrungTuyen() && !ts.getNganhTrungTuyen().empty()) {
                             string mk = ql.layMaKhoaCuaNganh(ts.getNganhTrungTuyen());
-                            string tenKhoa = ql.layTenKhoa(mk);
-                            ImGui::TextColored(ImVec4(0.9f, 0.85f, 0.4f, 1.0f), "%s", tenKhoa.c_str());
-                        } else {
-                            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
+                            khoaStr = ql.layTenKhoa(mk);
+                            khoaColor = ImVec4(0.9f, 0.85f, 0.4f, 1.0f);
                         }
+                        AlignAndRenderTextRight(12, khoaStr, khoaColor, rowMinH);
 
-                        // CỘT 13: NGÀNH TRÚNG TUYỂN
-                        ImGui::TableSetColumnIndex(13);
+                        // CỘT 13: NGÀNH TRÚNG TUYỂN (TEXT => CANH PHẢI)
+                        string nganhStr = "-";
+                        ImVec4 nganhColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
                         if (!ts.getNganhTrungTuyen().empty()) {
-                            ImGui::TextColored(ImVec4(0.4f, 0.85f, 1.0f, 1.0f), "%s", ql.layTenNganh(ts.getNganhTrungTuyen()).c_str());
-                        } else {
-                            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
+                            nganhStr = ql.layTenNganh(ts.getNganhTrungTuyen());
+                            nganhColor = ImVec4(0.4f, 0.85f, 1.0f, 1.0f);
                         }
+                        AlignAndRenderTextRight(13, nganhStr, nganhColor, rowMinH);
 
-                        // CỘT 14: LỚP SINH HOẠT
-                        ImGui::TableSetColumnIndex(14);
-                        if (!ts.getLopSinhHoat().empty()) {
-                            ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", ts.getLopSinhHoat().c_str());
-                        } else {
-                            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
-                        }
+                        // CỘT 14: LỚP SINH HOẠT (CĂN GIỮA)
+                        string lopStr = ts.getLopSinhHoat().empty() ? "-" : ts.getLopSinhHoat();
+                        ImVec4 lopColor = ts.getLopSinhHoat().empty() ? ImVec4(0.5f, 0.5f, 0.5f, 1.0f) : ImVec4(1.0f, 0.85f, 0.3f, 1.0f);
+                        AlignAndRenderCenter(14, lopStr, lopColor, rowMinH);
 
-                        // CỘT 15: MÃ SINH VIÊN DUT
-                        ImGui::TableSetColumnIndex(15);
-                        if (!ts.getMaSinhVien().empty()) {
-                            ImGui::TextColored(ImVec4(0.35f, 0.95f, 0.75f, 1.0f), "%s", ts.getMaSinhVien().c_str());
-                        } else {
-                            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "-");
-                        }
+                        // CỘT 15: MÃ SINH VIÊN DUT (CĂN GIỮA)
+                        string msvStr = ts.getMaSinhVien().empty() ? "-" : ts.getMaSinhVien();
+                        ImVec4 msvColor = ts.getMaSinhVien().empty() ? ImVec4(0.5f, 0.5f, 0.5f, 1.0f) : ImVec4(0.35f, 0.95f, 0.75f, 1.0f);
+                        AlignAndRenderCenter(15, msvStr, msvColor, rowMinH);
 
-                        // CỘT 16: THAO TÁC (XEM, SỬA & XÓA)
+                        // CỘT 16: THAO TÁC (3 ICON BUTTONS CĂN GIỮA CẢ DỌC VÀ NGANG)
                         ImGui::TableSetColumnIndex(16);
                         ImGui::PushID((int)i);
 
-                        // 1. Nút Xem chi tiết hồ sơ thí sinh
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.14f, 0.50f, 0.44f, 1.0f));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.65f, 0.55f, 1.0f));
-                        if (ImGui::Button("Xem", ImVec2(42, 22))) {
+                        float availW16 = ImGui::GetContentRegionAvail().x;
+                        float totalBtnsW = 26.0f * 3.0f + 4.0f * 2.0f; // 86px
+                        float padY16 = (rowMinH - 22.0f) * 0.5f;
+                        if (padY16 > 0.0f) {
+                            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY16);
+                        }
+                        if (availW16 > totalBtnsW) {
+                            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW16 - totalBtnsW) * 0.5f);
+                        }
+
+                        // 1. Icon Button Xem chi tiết hồ sơ thí sinh (Con mắt)
+                        if (RenderIconButtonView("##btnView", ImVec2(26, 22))) {
                             selectedSBD = ts.getSoBaoDanh();
                             showDetailModal = true;
                         }
-                        ImGui::PopStyleColor(2);
 
-                        ImGui::SameLine();
+                        ImGui::SameLine(0, 4);
 
-                        // 2. Nút Sửa hồ sơ
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.45f, 0.80f, 1.0f));
-                        if (ImGui::Button("Sua", ImVec2(42, 22))) {
+                        // 2. Icon Button Sửa hồ sơ (Bút chì)
+                        if (RenderIconButtonEdit("##btnEdit", ImVec2(26, 22))) {
                             selectedRow = (int)i;
                             selectedSBD = ts.getSoBaoDanh();
                             strcpy(bufSBD, ts.getSoBaoDanh().c_str());
@@ -1182,18 +1363,15 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                             showEditModal = true;
                         }
-                        ImGui::PopStyleColor();
 
-                        ImGui::SameLine();
+                        ImGui::SameLine(0, 4);
 
-                        // 3. Nút Xóa hồ sơ
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.25f, 0.25f, 1.0f));
-                        if (ImGui::Button("Xoa", ImVec2(42, 22))) {
+                        // 3. Icon Button Xóa hồ sơ (Thùng rác)
+                        if (RenderIconButtonDelete("##btnDelete", ImVec2(26, 22))) {
                             selectedRow = (int)i;
                             selectedSBD = ts.getSoBaoDanh();
                             showDeleteModal = true;
                         }
-                        ImGui::PopStyleColor();
 
                         ImGui::PopID();
                     }

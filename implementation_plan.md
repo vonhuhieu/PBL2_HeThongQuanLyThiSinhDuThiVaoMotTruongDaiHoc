@@ -1,186 +1,182 @@
-# KẾ HOẠCH TRIỂN KHAI KHẮC PHỤC TRIỆT ĐỂ 3 LỖI NGHIỆP VỤ & GIAO DIỆN TUYỂN SINH PBL2 (DUT)
-
-> **Người lập kế hoạch**: Thánh cô  
-> **Người tiếp nhận & thẩm định**: Con chiên ngoan đạo / Đệ tử trung thành  
-> **Dự án**: PBL2 (Đề tài 24) - Quản lý Tuyển sinh Đại học Bách khoa Đà Nẵng  
-> **Tài liệu tham chiếu**: Quy chế tuyển sinh Bách khoa DUT, Chuẩn CSDL 5 Bảng 3NF, Cấu hình hằng số `Constants.h`
+# KẾ HOẠCH TRIỂN KHAI (IMPLEMENTATION PLAN)
+## Refactor Chức Năng Khởi Tạo Dữ Liệu & Tối Ưu Hóa Giao Diện Bảng Quản Lý Thí Sinh (PBL2)
 
 ---
 
-## I. TỔNG QUAN VÀ PHÂN TÍCH GỐC RỄ (ROOT CAUSE) 3 BUGS HIỆN TẠI
+### I. TỔNG QUAN & BỐI CẢNH BÀI TOÁN
 
-| STT | Vấn đề phản hồi | Phân loại | Đánh giá & Nguyên nhân gốc rễ (Root Cause) |
-| :---: | :--- | :---: | :--- |
-| **1** | **Form Thêm mới / Sửa báo "Không đạt" sai lệch dù điểm thực tế đủ đỗ** (Hình 1 & 4) | Lỗi Logic Nghiệp vụ (Legacy Bug) | **Nguyên nhân**: Dòng tính toán kết quả trên Modal (`AppGUI.cpp`) đang so sánh cứng với con số khởi tạo cũ `ql.getDiemChuan() = 22.00`. Trong đề tài 24 hiện tại, **Điểm chuẩn là ĐỘNG theo từng ngành** (`diemChuanChot` trong `nganh_theo_khoa_hoc`), được chốt theo thuật toán lọc chỉ tiêu (ví dụ ngành CNTT Nhật lấy 18.50, KHDL lấy 15.45). Tại thời điểm thêm mới/chỉnh sửa, chưa thể kết luận thí sinh "Trúng tuyển" hay "Không đạt" toàn trường bằng con số 22.00 vô nghĩa. |
-| **2** | **Sửa điểm thí sinh xuống thấp nhưng vẫn giữ nguyên kết quả Đỗ NV1, Mã SV, Lớp sinh hoạt cũ** (Hình 3, 5, 6) | Lỗi Toàn vẹn Dữ liệu (Data Inconsistency) | **Nguyên nhân**: Trong hàm xử lý nút *"Lưu Thay Đổi"* (`AppGUI.cpp#L2845`), code đang copy lại nguyên vẹn `MaSinhVien`, `LopSinhHoat`, `NganhTrungTuyen`, `NguyenVongTrungTuyen` của bản ghi cũ. Khi một thí sinh bị hạ điểm hoặc đổi NV (như thí sinh Đỗ Minh Phong hạ từ 20.90 xuống 17.40), kết quả trúng tuyển của đợt quét trước đó đã hoàn toàn bị vô hiệu hóa nhưng hệ thống không reset, dẫn đến việc thí sinh điểm thấp vẫn giữ ghế trúng tuyển và mã SV DUT. |
-| **3** | **Sau khi Quét tuyển sinh, danh sách thí sinh bị nhảy vị trí lộn xộn** (Hình 7 & 8) | Lỗi Trải nghiệm & Sắp xếp (UX) | **Nguyên nhân**: Khi chạy xét tuyển xong, hàm `luuDuLieuVaoMySQL()` ghi kết quả hàng loạt lên DB theo thứ tự vòng lặp phân lớp của từng ngành, khiến trường audit `ngaySua` bị cập nhật rải rác. Do bảng ở Tab 1 đang giữ chế độ sắp xếp mặc định theo `sortCol = 0` (`ngaySua DESC`), danh sách bị đảo lộn thứ tự (điểm 17.40 ở đầu, rồi đến 16.80, 15.00, 20.00...). Cần tự động chuyển sắp xếp về **Tổng điểm Giảm dần (`sortCol = 10, sortAsc = false`)** ngay sau khi quét xong. |
+Hệ thống Quản lý Thí sinh Tuyển sinh Đại học Bách Khoa - ĐH Đà Nẵng (DUT) hiện tại đang gặp 2 vấn đề trọng yếu cần refactor toàn diện:
 
----
+1. **Vấn đề Dữ liệu mẫu (Data Seeding):**
+   - Hệ thống tự động chèn 36 bản ghi thí sinh mẫu hardcode vào cơ sở dữ liệu khi khởi chạy lần đầu.
+   - Bộ dữ liệu này không đồng bộ với bộ 100 thí sinh xét tuyển chuyên sâu ngành **CNTT - Ngoại ngữ Nhật (`7480201A`)** mà môn đồ đã chuẩn bị trong file `generate_100_students.ps1` / `sql/05_seed_sample_data.sql`.
+   - **Yêu cầu mới:** Ban đầu cơ sở dữ liệu thí sinh phải hoàn toàn **RỖNG** (chỉ có sẵn các danh mục hệ thống: Tỉnh thành, Giới tính, Khoa, Ngành, Năm học, Cấu hình). Thêm một nút `[+] Import Dữ Liệu Mẫu (100)` nằm ở **bên phải nút `[ Xuất Báo Cáo Excel ]`**. Khi người dùng chủ động click vào nút này, hệ thống mới nạp bộ 100 thí sinh mẫu vào MySQL và cập nhật lên giao diện.
 
-## II. GIẢI PHÁP KỸ THUẬT CHI TIẾT CHO TỪNG VẤN ĐỀ
-
-### 1. Chuẩn hóa Trạng thái tại Form Thêm Mới & Chỉnh Sửa Hồ Sơ (Khắc phục Bug 1)
-
-* **Nguyên lý nghiệp vụ**:
-  - Tại bước tiếp nhận / điều chỉnh hồ sơ thi, thí sinh chỉ được kiểm tra **Điều kiện hợp lệ tham gia xét tuyển (Eligibility)** chứ chưa thể biết kết quả trúng tuyển ngành nào (kết quả trúng tuyển chỉ có sau khi chạy thuật toán cạnh tranh chỉ tiêu toàn khóa).
-  - Loại bỏ hoàn toàn việc so sánh với ngưỡng `DiemChuan = 22.00` trong các Modal.
-* **Quy tắc 3 trạng thái Binding Real-time theo Điểm đã nhập**:
-  1. **Trạng thái 1 - BỊ ĐIỂM LIỆT** (Màu đỏ `ImVec4(1.0f, 0.3f, 0.3f, 1.0f)`):
-     - Điều kiện: `formToan <= ql.getDiemLiet() || formLy <= ql.getDiemLiet() || formHoa <= ql.getDiemLiet()` (Môn thi $\le 1.00$).
-     - Hiển thị: `Tong Diem: xx.xx | Trang Thai: BI DIEM LIET (Co mon <= 1.00 - Khong du dieu kien)`.
-  2. **Trạng thái 2 - KHÔNG ĐẠT ĐIỂM SÀN** (Màu cam `ImVec4(1.0f, 0.6f, 0.2f, 1.0f)`):
-     - Điều kiện: Không bị điểm liệt nhưng Tổng điểm $< 15.00$ (`ql.getDiemSan()`).
-     - Hiển thị: `Tong Diem: xx.xx | Trang Thai: KHONG DAT DIEM SAN (Toi thieu 15.00 - Khong du dieu kien)`.
-  3. **Trạng thái 3 - ĐỦ ĐIỀU KIỆN XÉT TUYỂN (ĐANG XÉT)** (Màu xanh ngọc dịu `ImVec4(0.3f, 0.9f, 0.6f, 1.0f)`):
-     - Điều kiện: Không bị điểm liệt VÀ Tổng điểm $\ge 15.00$.
-     - Hiển thị: `Tong Diem: xx.xx | Trang Thai: DU DIEU KIEN XET TUYEN (San >= 15.00 - Dang cho quet)`.
-
----
-
-### 2. Quy trình Reset Trạng thái khi Thêm mới hoặc Chỉnh sửa Hồ sơ (Khắc phục Bug 2)
-
-* **Quy trình chuẩn hóa khi Lưu Hồ Sơ**:
-  Khi người dùng nhấn **"Xác Nhận Thêm"** hoặc **"Lưu Thay Đổi"**:
-  1. **Khởi tạo/Reset kết quả trúng tuyển về rỗng (Chưa xét)**:
-     - `maSinhVien = ""` (MySQL lưu `NULL`).
-     - `lopSinhHoat = ""` (MySQL lưu `NULL`).
-     - `nganhTrungTuyen = ""` (MySQL lưu `NULL`).
-     - `nguyenVongTrungTuyen = 0`.
-  2. **Đồng bộ trạng thái danh sách Nguyện vọng (`dsNguyenVong`)**:
-     - Nếu thí sinh bị điểm liệt hoặc dưới điểm sàn: Cả 3 nguyện vọng gán trạng thái `AdmissionConst::TT_NV_KHONG_TRUNG` ("KHONG TRUNG TUYEN").
-     - Nếu thí sinh đạt điểm sàn và không bị điểm liệt: Các nguyện vọng hợp lệ được gán `AdmissionConst::TT_NV_DANG_XET` ("DANG XET").
-  3. **Cập nhật hiển thị cột "Ket Qua" trên Bảng Quản lý Thí sinh**:
-     - Thí sinh có `daTrungTuyen() == true`: Hiển thị `TRUNG TUYEN (NV%d)` (Màu xanh lá).
-     - Thí sinh bị điểm liệt: Hiển thị `Diem liet` (Màu đỏ).
-     - Thí sinh dưới điểm sàn: Hiển thị `Khong dat diem san` (Màu cam).
-     - Thí sinh có nguyện vọng "DANG XET" (vừa thêm/sửa hoặc chưa quét): Hiển thị `Dang xet tuyen` (Màu vàng sáng).
-     - Thí sinh đã quét tuyển sinh nhưng không đỗ nguyện vọng nào: Hiển thị `Khong trung tuyen` (Màu xám).
-  4. **Nghiệp vụ sau khi sửa**: Muốn biết thí sinh sau khi sửa điểm có trúng tuyển hay không, cán bộ tuyển sinh chỉ cần bấm nút **"CHẠY XÉT TUYỂN & CHỐT ĐIỂM CHUẨN DUT"** tại Tab 3 (hoặc shortcut), hệ thống sẽ phân bổ lại công bằng từ đầu.
+2. **Vấn đề Lỗi Giao diện Bảng Quản lý Thí sinh (UI Bug - Candidates Table):**
+   - Bảng hiện tại xuất hiện **thanh cuộn ngang (`ScrollX`)** dưới đáy, làm giảm tính thẩm mỹ và bất tiện khi thao tác.
+   - Các cột quan trọng như **"Họ và Tên"** và **"Ngày Sinh"** bị che khuất/co rút nghiêm trọng (như hình chụp: cột Họ tên co lại chỉ còn 1-2 chữ cái `V<`, `N<`..., cột Ngày sinh chỉ còn `04`, `15`... bị mất tháng và năm).
+   - Nhiều cột phía sau (Khoa, Ngành, Lớp, Mã SV DUT, Thao tác) bị đẩy trôi ra ngoài màn hình về bên phải.
+   - **Yêu cầu mới:**
+     - Loại bỏ hoàn toàn thanh cuộn ngang (`ScrollX`), bảng hiển thị vừa vặn 100% trên màn hình.
+     - Các cột có nội dung dài (Họ tên, Quê quán, Kết quả, Khoa, Ngành trúng tuyển) sẽ tự động **xuống dòng (Text Wrap)** để bảo toàn toàn bộ chữ nghĩa.
+     - **Ưu tiên hiển thị dữ liệu trên CÙNG MỘT HÀNG (Single Line - không bị ngắt dòng):**
+       + `STT`
+       + `SBD (Số báo danh)`
+       + `Số CCCD`
+       + `Ngày sinh` (`dd/mm/yyyy`)
+       + `Giới tính`
+       + `Toán`
+       + `Lý`
+       + `Hóa`
+       + `Tổng điểm`
+       + `Lớp sinh hoạt`
+       + `Mã SV DUT`
 
 ---
 
-### 3. Tự động Sắp xếp Điểm cao xuống thấp sau khi Quét Tuyển Sinh (Khắc phục Bug 3)
+### II. PHÂN TÍCH NGUYÊN NHÂN GỐC RỄ (ROOT CAUSE ANALYSIS)
 
-* **Giải pháp kỹ thuật**:
-  Ngay khi sự kiện bấm nút `[ >> CHAY XET TUYEN & CHOT DIEM CHUAN DUT << ]` chạy thành công:
-  1. **Thiết lập tham số sắp xếp mặc định của Bảng Thí Sinh**:
-     - `sortCol = 10;` (Cột Tổng điểm 3 môn `Toan + Ly + Hoa`).
-     - `sortAsc = false;` (Sắp xếp Giảm dần: từ Thủ khoa đến Điểm chuẩn và Điểm sàn).
-     - `currentPage = 1;` (Tự động chuyển về Trang 1 để người dùng nhìn thấy top đầu bảng ngay lập tức).
-  2. **Đồng bộ sắp xếp trên cả RAM và MySQL Server-side**:
-     - Trong bộ nhớ RAM: Gọi `sapXepTheoTongDiemGiamDan()` để vector `dsThiSinh` giữ trật tự điểm giảm dần.
-     - Khi truy vấn phân trang qua MySQL (`layDanhSachThiSinhPhanTrang`): Với `sortCol = 10` và `sortAsc = false`, câu lệnh SQL tự động sinh mệnh đề:
-       `ORDER BY (ts.diemToan + ts.diemLy + ts.diemHoa) DESC, ts.soBaoDanh ASC`
-  3. **Loại bỏ lọc ảo 22.00 trong câu truy vấn MySQL Server**:
-     - Tại `QuanLyThiSinh.cpp#L1401-L1409`: Xóa bỏ mệnh đề cũ `OR ((diemToan + diemLy + diemHoa) >= 22.00)` trong bộ lọc kết quả, thay bằng kiểm tra chính xác `ts.nganhTrungTuyen IS NOT NULL AND ts.nguyenVongTrungTuyen > 0`.
+#### 1. Nguyên nhân Vấn đề Dữ liệu (36 records tự động import)
+- Trong file `src/MySQLConnector.cpp`, hàm `seedDefaultData()` đang chứa các khối lệnh SQL hardcode từ dòng 404 đến 521, chèn 36 bản ghi thí sinh vào 3 bảng `nguoi`, `thisinh`, và `nguyen_vong`.
+- Khi ứng dụng kết nối MySQL lần đầu, hàm này được tự động gọi, dẫn tới việc thí sinh bị nạp ngoài ý muốn thay vì để bảng rỗng cho người dùng tự chủ động import.
+
+#### 2. Nguyên nhân Lỗi Giao diện Bảng Quản lý Thí sinh
+- **Cờ `ImGuiTableFlags_ScrollX`:** Được bật trong `AppGUI.cpp` (dòng 948). Khi bật cờ này, ImGui cho phép tổng chiều rộng các cột vượt quá khung nhìn cửa sổ và kích hoạt cuộn ngang.
+- **Xung đột cấu hình lưu vết trong `imgui.ini`:**
+  - ImGui tự động lưu kích thước các cột của bảng `[Table][0x6B657D3F,17]` vào file `imgui.ini`.
+  - Trong `imgui.ini` hiện tại, `Column 4` (Ngày Sinh) bị gán `Width=8px` (!), `Column 3` (Họ và Tên) bị chèn ép, trong khi `Column 16` (Thao Tác) chiếm tới `Width=658px`. Khi khởi động lại, ImGui nạp cấu hình méo mó này đè lên code, khiến các cột bị co rút kỳ dị.
+- **Thiếu cơ chế ngắt dòng (`ImGui::PushTextWrapPos`):** Mặc định trong cell của ImGui, hàm `ImGui::Text()` sẽ cắt ngắn (clip) chuỗi nếu vượt quá ô chứ không tự động bẻ dòng xuống.
 
 ---
 
-## III. CÁC TỆP NGUỒN CẦN CHỈNH SỬA & PHẠM VI ẢNH HƯỞNG
+### III. GIẢI PHÁP THỰC HIỆN CHI TIẾT (DETAILED PROPOSED SOLUTION)
 
-1. **`pbl2_MySQL/include/Constants.h`**:
-   - Bổ sung hằng số chuỗi:
-     - `KET_QUA_DANG_XET = "Dang xet tuyen"`
-     - `KET_QUA_KHONG_DAT_SAN = "Khong dat diem san"`
-2. **`pbl2_MySQL/src/AppGUI.cpp`**:
-   - Cập nhật dòng hiển thị Tổng điểm & Trạng thái trong Modal **Thêm Mới Thí Sinh** (`showAddModal`).
-   - Cập nhật dòng hiển thị Tổng điểm & Trạng thái trong Modal **Chỉnh Sửa Thí Sinh** (`showEditModal`).
-   - Sửa logic nút **"Lưu Thay Đổi"** (`showEditModal`): Reset `maSinhVien`, `lopSinhHoat`, `nganhTrungTuyen` về rỗng, đưa nguyện vọng về `DANG XET` (nếu đủ sàn) hoặc `KHONG TRUNG TUYEN` (nếu dưới sàn/liệt).
-   - Cập nhật hiển thị Cột 11 ("Ket Qua") trong bảng thí sinh: Phân biệt rõ 5 trạng thái (`TRUNG TUYEN`, `Diem liet`, `Khong dat diem san`, `Dang xet tuyen`, `Khong trung tuyen`).
-   - Tại nút **`[ >> CHAY XET TUYEN & CHOT DIEM CHUAN DUT << ]`**: Gán `sortCol = 10; sortAsc = false; currentPage = 1;` ngay sau khi quét xong.
-3. **`pbl2_MySQL/src/QuanLyThiSinh.cpp`**:
-   - Cập nhật hàm `layDanhSachThiSinhPhanTrang()`: Chuẩn hóa điều kiện `WHERE` khi lọc theo trạng thái (loại bỏ con số 22.00).
+#### 1. Refactor Cơ chế Khởi tạo Dữ liệu & Nút Import 100 Thí sinh
+
+##### A. Dọn sạch Seeding tự động trong CSDL
+- Trong `src/MySQLConnector.cpp` - hàm `seedDefaultData()`:
+  - Giữ nguyên seeding cho các bảng danh mục: `tinh_thanh`, `gioi_tinh`, `khoa`, `danh_muc_nganh`, `khoa_hoc`, `nganh_theo_khoa_hoc`, `cau_hinh`.
+  - **Xóa bỏ hoàn toàn** các đoạn INSERT vào `nguoi`, `thisinh`, `nguyen_vong`.
+  - Đảm bảo khi hệ thống chạy lên với database mới, danh sách thí sinh là **rỗng 100%**.
+
+##### B. Hiện thực hóa chức năng `importDuLieuMau100()`
+- Bổ sung hàm trong `QuanLyThiSinh` / `MySQLConnector`:
+  ```cpp
+  bool importDuLieuMau100(const string& sqlFilePath = "sql/05_seed_sample_data.sql");
+  ```
+- **Quy trình xử lý của hàm:**
+  1. Kiểm tra kết nối MySQL.
+  2. Bắt đầu transaction (`beginTransaction()`).
+  3. Đọc nội dung file `sql/05_seed_sample_data.sql`.
+  4. Tách và thực thi tuần tự các khối lệnh `INSERT INTO cau_hinh`, `INSERT INTO nguoi`, `INSERT INTO thisinh`, `INSERT INTO nguyen_vong`.
+  5. Commit transaction.
+  6. Đồng bộ lại dữ liệu lên bộ nhớ RAM (`docDuLieuTuMySQL()`).
+  7. Trả về `true` khi thành công, hoặc `false` kèm thông báo lỗi.
+
+##### C. Thêm Nút `[+] Import 100 Thí Sinh Mẫu` trên Giao diện (`AppGUI.cpp`)
+- Đặt nút bấm tại vị trí ngay bên phải nút `[ Xuất Báo Cáo Excel ]` (hàng công cụ trên cùng của Tab 1):
+  ```cpp
+  // Sau nút [ Xuat Bao Cao Excel ]
+  ImGui::SameLine();
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.78f, 0.42f, 0.15f, 1.0f)); // Màu cam hổ phách nổi bật
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.88f, 0.50f, 0.20f, 1.0f));
+  if (ImGui::Button("[+] Import Du Lieu Mau (100)", ImVec2(195, 28))) {
+      bool ok = ql.importDuLieuMau100("sql/05_seed_sample_data.sql");
+      if (ok) {
+          currentPage = 1;
+          selectedRow = -1;
+          showToast = true;
+          toastMsg = "Da import thanh cong 100 thi sinh xet tuyen CNTT Nhat (K26)!";
+      } else {
+          showToast = true;
+          toastMsg = "Loi: Khong the import du lieu mau. Kiem tra file sql!";
+      }
+  }
+  ImGui::PopStyleColor(2);
+  ```
+- Điều chỉnh lại vị trí căn phải của nhóm nút công cụ (`ImGui::SameLine(...)`) để cả 3 nút `[+] Thêm Thí Sinh`, `[ Xuất Báo Cáo Excel ]` và `[+] Import Dữ Liệu Mẫu (100)` nằm ngay ngắn, không bị đè lên bộ lọc.
 
 ---
 
-## IV. KẾ HOẠCH KIỂM THỬ (TEST PLAN)
+#### 2. Refactor Toàn diện Bảng Quản lý Thí sinh (Candidates Table)
 
-1. **Test Case 1 - Thêm thí sinh mới với điểm 17.00**:
-   - Nhập điểm Toán 4.0, Lý 5.0, Hóa 8.0 (Tổng 17.00, NV1: CNTT KHDL `7480201B`).
-   - **Kỳ vọng**: Form hiển thị `Trang Thai: DU DIEU KIEN XET TUYEN (San >= 15.00 - Dang cho quet)` màu xanh ngọc, không còn báo "Không đạt".
-2. **Test Case 2 - Sửa hồ sơ thí sinh đã đỗ thành điểm thấp**:
-   - Mở thí sinh Đỗ Minh Phong (`DUT047`), sửa điểm từ 20.90 xuống 17.40, lưu thay đổi.
-   - **Kỳ vọng**: Sau khi lưu, kết quả của Đỗ Minh Phong chuyển thành `Dang xet tuyen`, Lớp và Mã SV bị xóa rỗng, không còn hiện `TRUNG TUYEN (NV1)` ảo.
-3. **Test Case 3 - Quét tuyển sinh và kiểm tra thứ tự sắp xếp**:
-   - Bấm nút `[ >> CHAY XET TUYEN & CHOT DIEM CHUAN DUT << ]`.
-   - **Kỳ vọng**: Toast thông báo thành công, danh sách ở Tab 1 tự động sắp xếp theo cột Tổng điểm từ cao xuống thấp (Thủ khoa đứng hàng đầu tiên, điểm giảm dần đều).
+##### A. Thay đổi Bảng Flags & Vô hiệu hóa Cache Hỏng trong `imgui.ini`
+- **Loại bỏ `ImGuiTableFlags_ScrollX`**.
+- Thêm cờ `ImGuiTableFlags_NoSavedSettings` để bảng không bị phụ thuộc vào kích thước lưu sai trong `imgui.ini`.
+- Đổi tên định danh bảng từ `"CandidatesTable"` thành `"CandidatesTable_v2"` để giải phóng hoàn toàn cache cũ.
+- Thiết lập cờ định cỡ: `ImGuiTableFlags_SizingStretchProp` (tất cả các cột co giãn cân đối theo tỷ lệ màn hình).
+
+##### B. Phân bổ Kích thước & Quy tắc Hiển thị cho 17 Cột
+Dựa trên chiều rộng màn hình tiêu chuẩn (từ 1280px đến 1920px), bảng sẽ được phân chia làm 2 nhóm cột rõ ràng:
+
+| STT | Cột | Kiểu Định Cỡ | Kích Thước / Trọng Số | Quy Tắc Hiển Thị |
+|---|---|---|---|---|
+| 1 | **STT** | `WidthFixed` | 36px | **1 hàng duy nhất**, căn giữa |
+| 2 | **SBD (PK)** | `WidthFixed` | 75px | **1 hàng duy nhất**, màu xanh dương sáng |
+| 3 | **Số CCCD (FK)**| `WidthFixed` | 108px | **1 hàng duy nhất**, đủ 12 chữ số |
+| 4 | **Họ và Tên** | `WidthStretch`| Trọng số `1.4f` | **Cho phép xuống dòng** nếu tên dài |
+| 5 | **Ngày Sinh** | `WidthFixed` | 86px | **1 hàng duy nhất** (`dd/mm/yyyy`) |
+| 6 | **Quê Quán** | `WidthStretch`| Trọng số `1.0f` | **Cho phép xuống dòng** (tên tỉnh/TP dài) |
+| 7 | **Giới Tính** | `WidthFixed` | 55px | **1 hàng duy nhất** (Nam / Nữ / Khác) |
+| 8 | **Toán** | `WidthFixed` | 42px | **1 hàng duy nhất**, căn phải/giữa |
+| 9 | **Lý** | `WidthFixed` | 42px | **1 hàng duy nhất**, căn phải/giữa |
+| 10 | **Hóa** | `WidthFixed` | 42px | **1 hàng duy nhất**, căn phải/giữa |
+| 11 | **Tổng Điểm** | `WidthFixed` | 58px | **1 hàng duy nhất**, chữ vàng đậm nét |
+| 12 | **Kết Quả** | `WidthStretch`| Trọng số `1.1f` | **Cho phép xuống dòng** (Trúng tuyển, Đang xét...) |
+| 13 | **Khoa** | `WidthStretch`| Trọng số `0.9f` | **Cho phép xuống dòng** |
+| 14 | **Ngành Trúng Tuyển**| `WidthStretch`| Trọng số `1.3f` | **Cho phép xuống dòng** (tên ngành dài) |
+| 15 | **Lớp Sinh Hoạt** | `WidthFixed`| 92px | **1 hàng duy nhất** (ví dụ `26T_N1`, `26TCLC_KHDL1`) |
+| 16 | **Mã SV DUT** | `WidthFixed` | 88px | **1 hàng duy nhất** (9 chữ số `102260001`) |
+| 17 | **Thao Tác** | `WidthFixed` | 105px | **1 hàng duy nhất**, chứa 3 nút [Xem], [Sửa], [Xóa] |
+
+> **Tổng chiều rộng cố định của 11 cột ưu tiên 1 dòng + cột Thao Tác:**  
+> $36 + 75 + 108 + 86 + 55 + 42 + 42 + 42 + 58 + 92 + 88 + 105 = 830\text{px}$.  
+> Phần không gian còn lại (từ $400\text{px}$ đến $800\text{px}$ tùy độ phân giải màn hình) sẽ được 5 cột co giãn (`Họ và Tên`, `Quê Quán`, `Kết Quả`, `Khoa`, `Ngành Trúng Tuyển`) chia nhau theo tỷ lệ và tự động xuống dòng đẹp mắt khi cần.
+
+##### C. Cơ chế Tự Động Xuống Dòng (Text Wrap) trong Cell
+Trong ImGui, để một ô văn bản tự động xuống dòng khi nội dung chạm mép cột:
+```cpp
+// Helper ngắt dòng an toàn trong cell của bảng
+void RenderWrappedText(const string& text, const ImVec4& color = ImVec4(0.92f, 0.94f, 0.96f, 1.0f)) {
+    float availWidth = ImGui::GetContentRegionAvail().x;
+    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + availWidth);
+    ImGui::TextColored(color, "%s", text.c_str());
+    ImGui::PopTextWrapPos();
+}
+```
+
+##### D. Tinh Chỉnh Cột Thao Tác (Action Buttons)
+- Thu gọn 3 nút bấm `Xem`, `Sửa`, `Xóa` với kích thước gọn gàng `30x20` px hoặc `32x22` px, đặt trên cùng một dòng bằng `ImGui::SameLine()`, có padding nhỏ (2-3px) để nằm trọn vẹn trong cột 105px mà không bị tràn hay xuống dòng.
 
 ---
 
-## V. KẾ HOẠCH ĐẠI TU TÍNH NĂNG XUẤT BÁO CÁO EXCEL CHUYÊN NGHIỆP
+### IV. CÁC TỆP TIN CẦN THAY ĐỔI & TÁC ĐỘNG
 
-### 1. Phân tích Nguyên nhân Lỗi Xuất Báo Cáo Cũ
-- Nút bấm `[ Xuat Bao Cao ]` ở phiên bản cũ gọi `ql.xuatBaoCaoXetTuyen("data/ketqua_xettuyen.txt", ql.getDiemChuan(), kw)`.
-- Hàm cũ chỉ nhận chuỗi `keyword`, **bỏ qua hoàn toàn** các bộ lọc trên giao diện (`filterNam`, `filterStatus`, `filterKhoa`, `filterNganh`, `filterLop`).
-- Dữ liệu xuất ra chỉ là file text tĩnh thô sơ, dẫn đến việc trên giao diện lọc 2 thí sinh nhưng file xuất ra lại chứa 45 bản ghi tĩnh toàn trường.
+1. **`include/MySQLConnector.h` & `src/MySQLConnector.cpp`:**
+   - Xóa bỏ việc seed 36 thí sinh trong `seedDefaultData()`.
+   - Bổ sung phương thức `executeSqlScript(const string& filePath)` hoặc logic nạp dữ liệu từ file SQL.
+2. **`include/QuanLyThiSinh.h` & `src/QuanLyThiSinh.cpp`:**
+   - Thêm phương thức `importDuLieuMau100(const string& filePath)`.
+3. **`src/AppGUI.cpp`:**
+   - Bổ sung nút `[+] Import Du Lieu Mau (100)` bên phải nút Xuất Excel.
+   - Refactor cấu hình bảng `CandidatesTable_v2`: Bỏ `ScrollX`, gán flags `StretchProp`, thiết lập độ rộng chuẩn cho 17 cột, bọc Text Wrap cho các cột chuỗi dài.
+4. **`imgui.ini`:**
+   - Dọn sạch section table cache bị lỗi của bảng cũ.
 
-### 2. Quy tắc Đặt Tên File Excel Động (Phương án 1 được duyệt)
-Tên tệp Excel được sinh tự động dựa trên ngữ cảnh bộ lọc hiện hành kết hợp với timestamp thời gian thực (`YYYYMMDD_HHMMSS`):
-* **Nếu đang lọc theo Lớp**:
-  `data/BaoCao_ThiSinh_DUT_<filterLop>_<YYYYMMDD_HHMMSS>.xls`
-  *(Ví dụ: `data/BaoCao_ThiSinh_DUT_26TCLC_KHDL2_20261116_191530.xls`)*
-* **Nếu đang lọc theo Ngành**:
-  `data/BaoCao_ThiSinh_DUT_<filterNganh>_<YYYYMMDD_HHMMSS>.xls`
-  *(Ví dụ: `data/BaoCao_ThiSinh_DUT_7480201B_20261116_191530.xls`)*
-* **Nếu đang lọc theo Khoa**:
-  `data/BaoCao_ThiSinh_DUT_Khoa<filterKhoa>_<YYYYMMDD_HHMMSS>.xls`
-  *(Ví dụ: `data/BaoCao_ThiSinh_DUT_KhoaCNTT_20261116_191530.xls`)*
-* **Nếu lọc chung toàn trường**:
-  `data/BaoCao_DanhSach_ThiSinh_DUT_K<Khóa>_<YYYYMMDD_HHMMSS>.xls`
-  *(Ví dụ: `data/BaoCao_DanhSach_ThiSinh_DUT_K26_20261116_191530.xls`)*
-* **Shortcut tiện lợi**: Đồng thời luôn cập nhật một bản copy tại `data/BaoCao_DanhSach_ThiSinh_DUT_MoiNhat.xls` để người dùng có thể mở nhanh ngay lập tức.
+---
 
-### 3. Cấu trúc 4 Thành Phần của File Excel (Chuẩn XML Spreadsheet 2003)
-Tệp được định dạng theo chuẩn **Microsoft XML Spreadsheet 2003 (UTF-8)**, tương thích 100% với Microsoft Excel, Google Sheets và LibreOffice:
+### V. KẾ HOẠCH KIỂM THỬ (TEST PLAN)
 
-1. **Thành phần 1: TIÊU ĐỀ IN HOA VÀ IN ĐẬM**:
-   - Dòng 1: `TRƯỜNG ĐẠI HỌC BÁCH KHOA - ĐẠI HỌC ĐÀ NẴNG` (Font Calibri, Size 11, In đậm, Căn giữa).
-   - Dòng 2: `BÁO CÁO HỒ SƠ THÍ SINH & KẾT QUẢ XÉT TUYỂN ĐẠI HỌC` (Font Calibri, Size 16, **IN HOA & IN ĐẬM**, Màu xanh Navy DUT `#1F4E79`, Gộp ngang 16 cột `ss:MergeAcross="15"`, Căn giữa).
-
-2. **Thành phần 2: THÔNG TIN BỘ LỌC ĐÃ CHỌN**:
-   - Nhãn bộ lọc (Label) in đậm, Giá trị lọc in nghiêng:
-     * **Từ khóa tìm kiếm**: *[Giá trị hoặc "Tất cả"]*
-     * **Năm tuyển sinh**: *[Năm đang chọn hoặc "Tất cả các năm"]*
-     * **Kết quả xét tuyển**: *[Tất cả / Trúng tuyển / Không đạt]*
-     * **Khoa đào tạo**: *[Tên Khoa hoặc "Tất cả khoa"]*
-     * **Ngành trúng tuyển**: *[Tên Ngành hoặc "Tất cả ngành"]*
-     * **Lớp sinh hoạt**: *[Tên Lớp hoặc "Tất cả lớp"]*
-
-3. **Thành phần 3: NGÀY XUẤT BÁO CÁO & THỐNG KÊ**:
-   - **Ngày xuất báo cáo**: *dd/mm/yyyy hh:mm:ss* (thời gian thực hệ thống, in nghiêng).
-   - **Tổng số bản ghi**: *X thí sinh phù hợp bộ lọc* (in nghiêng).
-
-4. **Thành phần 4: BẢNG DỮ LIỆU DANH SÁCH (TABLE)**:
-   - **Tiêu đề bảng (`<thead>`)**:
-     * In đậm (`ss:Bold="1"`), căn giữa (`ss:Horizontal="Center"`).
-     * Nền xanh Navy `#1F4E79`, chữ trắng `#FFFFFF`, kẻ viền lưới hoàn chỉnh.
-     * **Tuyệt đối KHÔNG CÓ cột Thao Tác**.
-   - **16 Cột dữ liệu chuẩn**:
-     1. `STT` (Căn giữa)
-     2. `Số Báo Danh (SBD)` (Căn giữa, in đậm)
-     3. `Số CCCD` (Căn giữa, định dạng String `ss:Type="String"` bảo toàn số 0 ở đầu)
-     4. `Họ và Tên` (Căn trái)
-     5. `Ngày Sinh` (Căn giữa)
-     6. `Quê Quán` (Căn trái)
-     7. `Giới Tính` (Căn giữa)
-     8. `Điểm Toán` (Căn phải, định dạng `0.00`)
-     9. `Điểm Lý` (Căn phải, `0.00`)
-     10. `Điểm Hóa` (Căn phải, `0.00`)
-     11. `Tổng Điểm` (Căn phải, in đậm, `0.00`)
-     12. `Kết Quả` (Căn giữa: Xanh nhạt nếu Đỗ, Đỏ nhạt nếu Trượt/Liệt)
-     13. `Khoa` (Căn trái)
-     14. `Ngành Trúng Tuyển` (Căn trái)
-     15. `Lớp Sinh Hoạt` (Căn giữa)
-     16. `Mã SV DUT` (Căn giữa, in đậm)
-
-### 4. Triển khai Kỹ thuật trong Mã Nguồn
-- Bổ sung hàm trong `QuanLyThiSinh.h` và `QuanLyThiSinh.cpp`:
-  `bool xuatBaoCaoExcel(const string& filePath, const FilterThiSinhParams& params, const string& tenKhoaFilter, const string& tenNganhFilter) const;`
-  - Hàm này lấy danh sách thí sinh chính xác bằng câu truy vấn `layDanhSachThiSinhPhanTrang(paramsWithFullSize)` để không bị giới hạn phân trang.
-  - Sinh chuỗi XML Spreadsheet 2003 chuẩn UTF-8 ghi trực tiếp vào `filePath`.
-- Cập nhật sự kiện click nút `[ Xuat Bao Cao ]` trong `AppGUI.cpp`:
-  - Lấy thời gian thực để tạo timestamp `YYYYMMDD_HHMMSS`.
-  - Sinh tên file động theo Phương án 1.
-  - Gọi hàm xuất báo cáo.
-  - Sau khi xuất thành công, hiện Toast thông báo chi tiết và tự động gọi `ShellExecuteA(NULL, "open", filePath.c_str(), NULL, NULL, SW_SHOWNORMAL)` hoặc mở thư mục `data/` để người dùng trải nghiệm ngay.
-
+1. **Kiểm tra trạng thái ban đầu:**
+   - Khởi động ứng dụng khi database trống: Xác nhận danh sách thí sinh hiển thị 0 bản ghi, không còn 36 bản ghi lạ.
+2. **Kiểm tra chức năng nút Import 100 Thí sinh:**
+   - Nhấn nút `[+] Import Du Lieu Mau (100)`:
+     + Toast thông báo thành công xuất hiện.
+     + Bảng nạp đủ 100 thí sinh thuộc bộ hồ sơ K26 CNTT Nhật.
+     + Dữ liệu tổng điểm, nguyện vọng khớp 100% với file `05_seed_sample_data.sql`.
+3. **Kiểm tra Giao diện Bảng không còn Cuộn Ngang:**
+   - Thu nhỏ, phóng to cửa sổ: Bảng tự động co giãn vừa vặn, **không hề có thanh cuộn ngang dưới đáy**.
+   - Kiểm tra các cột ưu tiên 1 dòng (`STT`, `SBD`, `CCCD`, `Ngày sinh`, `Giới tính`, `Toán`, `Lý`, `Hóa`, `Tổng`, `Lớp`, `Mã SV`): Đảm bảo hiển thị đầy đủ, không bị cắt cụt ký tự, không bị ngắt dòng.
+   - Kiểm tra các cột chuỗi dài (`Họ và tên`, `Quê quán`, `Ngành trúng tuyển`): Hiển thị đầy đủ tiếng Việt, tự động xuống dòng thẩm mỹ khi độ rộng cột thu hẹp.
+4. **Kiểm tra Biên dịch & Chạy thực tế:**
+   - Chạy `build.bat` biên dịch không lỗi, chạy thử ứng dụng xác nhận trải nghiệm người dùng mượt mà.

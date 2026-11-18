@@ -51,6 +51,7 @@ public:
     // Khởi tạo Schema, bảng và dữ liệu mẫu tự động
     bool initSchemaAndTables();
     bool seedDefaultData();
+    bool executeScript(const std::string& filePath);
 };
 
 #endif // MYSQL_CONNECTOR_H
