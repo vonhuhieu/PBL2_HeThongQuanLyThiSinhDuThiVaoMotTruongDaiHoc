@@ -461,6 +461,42 @@ string QuanLyThiSinh::layMaGioiTinh(const string& tenHoacMa) const {
 }
 
 // Tra cứu Khoa & Ngành DUT
+int QuanLyThiSinh::timViTriKhoa(const string& maKhoa) const {
+    for (size_t i = 0; i < dsKhoa.size(); ++i) {
+        if (Utils::toUpper(dsKhoa[i].maKhoa) == Utils::toUpper(maKhoa)) return (int)i;
+    }
+    return -1;
+}
+
+int QuanLyThiSinh::timViTriDanhMucNganh(const string& maNganh) const {
+    for (size_t i = 0; i < dsDanhMucNganh.size(); ++i) {
+        if (Utils::toUpper(dsDanhMucNganh[i].maNganh) == Utils::toUpper(maNganh)) return (int)i;
+    }
+    return -1;
+}
+
+int QuanLyThiSinh::timViTriNganhTheoKhoaHoc(int nam, const string& maNganh) const {
+    for (size_t i = 0; i < dsNganhTheoKhoaHoc.size(); ++i) {
+        if (dsNganhTheoKhoaHoc[i].namTuyenSinh == nam && 
+            Utils::toUpper(dsNganhTheoKhoaHoc[i].maNganh) == Utils::toUpper(maNganh)) return (int)i;
+    }
+    return -1;
+}
+
+int QuanLyThiSinh::timViTriTinhThanh(const string& maTinh) const {
+    for (size_t i = 0; i < dsTinhThanh.size(); ++i) {
+        if (dsTinhThanh[i].maTinh == maTinh) return (int)i;
+    }
+    return -1;
+}
+
+int QuanLyThiSinh::timViTriGioiTinh(const string& maGioiTinh) const {
+    for (size_t i = 0; i < dsGioiTinh.size(); ++i) {
+        if (Utils::toUpper(dsGioiTinh[i].maGioiTinh) == Utils::toUpper(maGioiTinh)) return (int)i;
+    }
+    return -1;
+}
+
 string QuanLyThiSinh::layTenKhoa(const string& maKhoa) const {
     for (size_t i = 0; i < dsKhoa.size(); ++i) {
         if (dsKhoa[i].maKhoa == maKhoa) return dsKhoa[i].tenKhoa;
@@ -837,6 +873,106 @@ bool QuanLyThiSinh::xoaGioiTinh(const string& ma) {
     return false;
 }
 
+bool QuanLyThiSinh::themKhoa(const Khoa& k) {
+    if (k.maKhoa.empty() || k.tenKhoa.empty()) return false;
+    for (size_t i = 0; i < dsKhoa.size(); ++i) {
+        if (dsKhoa[i].maKhoa == k.maKhoa) return false;
+    }
+    dsKhoa.insert(0, k);
+    if (isMySQLConnected()) {
+        string sql = "INSERT INTO `khoa` (`maKhoa`, `tenKhoa`, `maKhoaTheoChuanDUT`) VALUES ('" +
+                     db.escape(k.maKhoa) + "', '" + db.escape(k.tenKhoa) + "', '" + db.escape(k.maKhoaTheoChuanDUT) + "') " +
+                     "ON DUPLICATE KEY UPDATE `tenKhoa`=VALUES(`tenKhoa`), `maKhoaTheoChuanDUT`=VALUES(`maKhoaTheoChuanDUT`);";
+        db.execute(sql);
+    }
+    return true;
+}
+
+bool QuanLyThiSinh::capNhatKhoa(const Khoa& k) {
+    for (size_t i = 0; i < dsKhoa.size(); ++i) {
+        if (dsKhoa[i].maKhoa == k.maKhoa) {
+            dsKhoa[i] = k;
+            if (isMySQLConnected()) {
+                string sql = "UPDATE `khoa` SET `tenKhoa`='" + db.escape(k.tenKhoa) + "', " +
+                             "`maKhoaTheoChuanDUT`='" + db.escape(k.maKhoaTheoChuanDUT) + "' " +
+                             "WHERE `maKhoa`='" + db.escape(k.maKhoa) + "';";
+                db.execute(sql);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QuanLyThiSinh::xoaKhoa(const string& maKhoa) {
+    // Không cho xóa nếu có ngành đào tạo đang trực thuộc khoa này
+    for (size_t i = 0; i < dsDanhMucNganh.size(); ++i) {
+        if (dsDanhMucNganh[i].maKhoa == maKhoa) return false;
+    }
+    for (size_t i = 0; i < dsKhoa.size(); ++i) {
+        if (dsKhoa[i].maKhoa == maKhoa) {
+            dsKhoa.erase(i);
+            if (isMySQLConnected()) {
+                db.execute("DELETE FROM `khoa` WHERE `maKhoa`='" + db.escape(maKhoa) + "';");
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QuanLyThiSinh::themDanhMucNganh(const DanhMucNganh& dmn) {
+    if (dmn.maNganh.empty() || dmn.tenNganh.empty()) return false;
+    for (size_t i = 0; i < dsDanhMucNganh.size(); ++i) {
+        if (dsDanhMucNganh[i].maNganh == dmn.maNganh) return false;
+    }
+    dsDanhMucNganh.insert(0, dmn);
+    if (isMySQLConnected()) {
+        string sql = "INSERT INTO `danh_muc_nganh` (`maNganh`, `tenNganh`, `maKhoa`, `tienToLop`) VALUES ('" +
+                     db.escape(dmn.maNganh) + "', '" + db.escape(dmn.tenNganh) + "', '" + db.escape(dmn.maKhoa) + "', '" + db.escape(dmn.tienToLop) + "') " +
+                     "ON DUPLICATE KEY UPDATE `tenNganh`=VALUES(`tenNganh`), `maKhoa`=VALUES(`maKhoa`), `tienToLop`=VALUES(`tienToLop`);";
+        db.execute(sql);
+    }
+    return true;
+}
+
+bool QuanLyThiSinh::capNhatDanhMucNganh(const DanhMucNganh& dmn) {
+    for (size_t i = 0; i < dsDanhMucNganh.size(); ++i) {
+        if (dsDanhMucNganh[i].maNganh == dmn.maNganh) {
+            dsDanhMucNganh[i] = dmn;
+            if (isMySQLConnected()) {
+                string sql = "UPDATE `danh_muc_nganh` SET `tenNganh`='" + db.escape(dmn.tenNganh) + "', " +
+                             "`maKhoa`='" + db.escape(dmn.maKhoa) + "', `tienToLop`='" + db.escape(dmn.tienToLop) + "' " +
+                             "WHERE `maNganh`='" + db.escape(dmn.maNganh) + "';";
+                db.execute(sql);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QuanLyThiSinh::xoaDanhMucNganh(const string& maNganh) {
+    // Không cho xóa nếu có nguyện vọng hoặc thí sinh trúng tuyển vào ngành này
+    for (size_t i = 0; i < dsThiSinh.size(); ++i) {
+        if (dsThiSinh[i].getNganhTrungTuyen() == maNganh) return false;
+        const Vector<NguyenVong>& nvs = dsThiSinh[i].getDsNguyenVong();
+        for (size_t k = 0; k < nvs.size(); ++k) {
+            if (nvs[k].maNganh == maNganh) return false;
+        }
+    }
+    for (size_t i = 0; i < dsDanhMucNganh.size(); ++i) {
+        if (dsDanhMucNganh[i].maNganh == maNganh) {
+            dsDanhMucNganh.erase(i);
+            if (isMySQLConnected()) {
+                db.execute("DELETE FROM `danh_muc_nganh` WHERE `maNganh`='" + db.escape(maNganh) + "';");
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
 bool QuanLyThiSinh::capNhatChiTieuNganh(int nam, const string& maNganh, int chiTieuMoi) {
     for (size_t i = 0; i < dsNganhTheoKhoaHoc.size(); ++i) {
         if (dsNganhTheoKhoaHoc[i].namTuyenSinh == nam && dsNganhTheoKhoaHoc[i].maNganh == maNganh) {
@@ -844,6 +980,53 @@ bool QuanLyThiSinh::capNhatChiTieuNganh(int nam, const string& maNganh, int chiT
             if (isMySQLConnected()) {
                 db.execute("UPDATE `nganh_theo_khoa_hoc` SET `chiTieu`=" + to_string(chiTieuMoi) +
                            " WHERE `namTuyenSinh`=" + to_string(nam) + " AND `maNganh`='" + db.escape(maNganh) + "';");
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QuanLyThiSinh::capNhatChiTieuVaDiemSan(int nam, const string& maNganh, int chiTieuMoi, double diemSanMoi) {
+    for (size_t i = 0; i < dsNganhTheoKhoaHoc.size(); ++i) {
+        if (dsNganhTheoKhoaHoc[i].namTuyenSinh == nam && dsNganhTheoKhoaHoc[i].maNganh == maNganh) {
+            dsNganhTheoKhoaHoc[i].chiTieu = chiTieuMoi;
+            dsNganhTheoKhoaHoc[i].diemSanToiThieu = diemSanMoi;
+            if (isMySQLConnected()) {
+                db.execute("UPDATE `nganh_theo_khoa_hoc` SET `chiTieu`=" + to_string(chiTieuMoi) +
+                           ", `diemSanToiThieu`=" + to_string(diemSanMoi) +
+                           " WHERE `namTuyenSinh`=" + to_string(nam) + " AND `maNganh`='" + db.escape(maNganh) + "';");
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QuanLyThiSinh::themNganhTheoKhoaHoc(const NganhTheoKhoaHoc& ntk) {
+    for (size_t i = 0; i < dsNganhTheoKhoaHoc.size(); ++i) {
+        if (dsNganhTheoKhoaHoc[i].namTuyenSinh == ntk.namTuyenSinh && dsNganhTheoKhoaHoc[i].maNganh == ntk.maNganh) {
+            return false;
+        }
+    }
+    dsNganhTheoKhoaHoc.push_back(ntk);
+    if (isMySQLConnected()) {
+        string sql = "INSERT INTO `nganh_theo_khoa_hoc` (`namTuyenSinh`, `maNganh`, `chiTieu`, `diemSanToiThieu`, `diemChuanChot`) VALUES (" +
+                     to_string(ntk.namTuyenSinh) + ", '" + db.escape(ntk.maNganh) + "', " +
+                     to_string(ntk.chiTieu) + ", " + to_string(ntk.diemSanToiThieu) + ", " +
+                     to_string(ntk.diemChuanChot) + ");";
+        db.execute(sql);
+    }
+    return true;
+}
+
+bool QuanLyThiSinh::xoaNganhTheoKhoaHoc(int nam, const string& maNganh) {
+    for (size_t i = 0; i < dsNganhTheoKhoaHoc.size(); ++i) {
+        if (dsNganhTheoKhoaHoc[i].namTuyenSinh == nam && dsNganhTheoKhoaHoc[i].maNganh == maNganh) {
+            dsNganhTheoKhoaHoc.erase(i);
+            if (isMySQLConnected()) {
+                db.execute("DELETE FROM `nganh_theo_khoa_hoc` WHERE `namTuyenSinh`=" + to_string(nam) +
+                           " AND `maNganh`='" + db.escape(maNganh) + "';");
             }
             return true;
         }
@@ -1552,6 +1735,131 @@ bool QuanLyThiSinh::xuatBaoCaoExcel(const string& filePath, const FilterThiSinhP
         dst << src.rdbuf();
     }
 
+    return true;
+}
+
+bool QuanLyThiSinh::xuatBangDuLieuExcel(const string& filePath, const string& title, const Vector<string>& headers, const Vector<Vector<string>>& rows) const {
+    Vector<int> emptyWidths;
+    return xuatBangDuLieuExcel(filePath, title, headers, emptyWidths, rows);
+}
+
+bool QuanLyThiSinh::xuatBangDuLieuExcel(const string& filePath, const string& title, const Vector<string>& headers, const Vector<int>& colWidths, const Vector<Vector<string>>& rows) const {
+    ofstream fout(filePath);
+    if (!fout.is_open()) return false;
+
+    time_t now = time(nullptr);
+    tm* ltm = localtime(&now);
+    char dateBuf[32];
+    strftime(dateBuf, sizeof(dateBuf), "%d/%m/%Y %H:%M:%S", ltm);
+    string ngayXuat = dateBuf;
+
+    int colCount = (int)headers.size();
+    if (colCount <= 0) colCount = 1;
+    int mergeAcross = colCount - 1;
+
+    fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    fout << "<?mso-application progid=\"Excel.Sheet\"?>\n";
+    fout << "<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\"\n";
+    fout << " xmlns:o=\"urn:schemas-microsoft-com:office:office\"\n";
+    fout << " xmlns:x=\"urn:schemas-microsoft-com:office:excel\"\n";
+    fout << " xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\"\n";
+    fout << " xmlns:html=\"http://www.w3.org/TR/REC-html40\">\n";
+    fout << " <Styles>\n";
+    fout << "  <Style ss:ID=\"Default\" ss:Name=\"Normal\">\n";
+    fout << "   <Alignment ss:Vertical=\"Center\"/>\n";
+    fout << "   <Font ss:FontName=\"Segoe UI\" ss:Size=\"10\" ss:Color=\"#000000\"/>\n";
+    fout << "  </Style>\n";
+    fout << "  <Style ss:ID=\"TitleUni\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Font ss:FontName=\"Segoe UI\" ss:Size=\"13\" ss:Bold=\"1\" ss:Color=\"#0B4F35\"/>\n";
+    fout << "  </Style>\n";
+    fout << "  <Style ss:ID=\"TitleReport\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Font ss:FontName=\"Segoe UI\" ss:Size=\"11\" ss:Bold=\"1\" ss:Color=\"#153E75\"/>\n";
+    fout << "  </Style>\n";
+    fout << "  <Style ss:ID=\"FilterInfoCenter\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Font ss:FontName=\"Segoe UI\" ss:Size=\"9.5\" ss:Italic=\"1\" ss:Color=\"#444444\"/>\n";
+    fout << "  </Style>\n";
+    fout << "  <Style ss:ID=\"HeaderCol\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\" ss:WrapText=\"1\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#0E2A47\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#0E2A47\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#0E2A47\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#0E2A47\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "   <Font ss:FontName=\"Segoe UI\" ss:Size=\"10\" ss:Bold=\"1\" ss:Color=\"#FFFFFF\"/>\n";
+    fout << "   <Interior ss:Color=\"#1A365D\" ss:Pattern=\"Solid\"/>\n";
+    fout << "  </Style>\n";
+    fout << "  <Style ss:ID=\"DataCenter\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Center\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "   <Font ss:FontName=\"Segoe UI\" ss:Size=\"9.5\" ss:Color=\"#111827\"/>\n";
+    fout << "  </Style>\n";
+    fout << "  <Style ss:ID=\"DataLeft\">\n";
+    fout << "   <Alignment ss:Horizontal=\"Left\" ss:Vertical=\"Center\"/>\n";
+    fout << "   <Borders>\n";
+    fout << "    <Border ss:Position=\"Bottom\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "    <Border ss:Position=\"Left\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "    <Border ss:Position=\"Right\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "    <Border ss:Position=\"Top\" ss:LineStyle=\"Continuous\" ss:Weight=\"1\" ss:Color=\"#D1D5DB\"/>\n";
+    fout << "   </Borders>\n";
+    fout << "   <Font ss:FontName=\"Segoe UI\" ss:Size=\"9.5\" ss:Color=\"#111827\"/>\n";
+    fout << "  </Style>\n";
+    fout << " </Styles>\n";
+    fout << " <Worksheet ss:Name=\"DanhSach\">\n";
+    fout << "  <Table>\n";
+
+    for (int c = 0; c < colCount; ++c) {
+        int w = (c < (int)colWidths.size() && colWidths[c] > 0) ? colWidths[c] : 120;
+        fout << "   <Column ss:Width=\"" << w << "\"/>\n";
+    }
+
+    // Tiêu đề trường
+    fout << "   <Row ss:Height=\"28\">\n";
+    fout << "    <Cell ss:StyleID=\"TitleUni\" ss:MergeAcross=\"" << mergeAcross << "\"><Data ss:Type=\"String\">" 
+         << escapeXml(tenTruong) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    // Tiêu đề báo cáo
+    fout << "   <Row ss:Height=\"22\">\n";
+    fout << "    <Cell ss:StyleID=\"TitleReport\" ss:MergeAcross=\"" << mergeAcross << "\"><Data ss:Type=\"String\">"
+         << escapeXml(title) << "</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"18\">\n";
+    fout << "    <Cell ss:StyleID=\"FilterInfoCenter\" ss:MergeAcross=\"" << mergeAcross << "\"><Data ss:Type=\"String\">"
+         << "Ngay xuat: " << escapeXml(ngayXuat) << " | Tong so: " << rows.size() << " ban ghi</Data></Cell>\n";
+    fout << "   </Row>\n";
+
+    fout << "   <Row ss:Height=\"6\"/>\n";
+
+    // Header row
+    fout << "   <Row ss:Height=\"26\">\n";
+    for (size_t c = 0; c < headers.size(); ++c) {
+        fout << "    <Cell ss:StyleID=\"HeaderCol\"><Data ss:Type=\"String\">" << escapeXml(headers[c]) << "</Data></Cell>\n";
+    }
+    fout << "   </Row>\n";
+
+    // Data rows
+    for (size_t r = 0; r < rows.size(); ++r) {
+        fout << "   <Row ss:Height=\"20\">\n";
+        for (size_t c = 0; c < rows[r].size(); ++c) {
+            fout << "    <Cell ss:StyleID=\"DataCenter\"><Data ss:Type=\"String\">" << escapeXml(rows[r][c]) << "</Data></Cell>\n";
+        }
+        fout << "   </Row>\n";
+    }
+
+    fout << "  </Table>\n";
+    fout << " </Worksheet>\n";
+    fout << "</Workbook>\n";
+    fout.close();
     return true;
 }
 

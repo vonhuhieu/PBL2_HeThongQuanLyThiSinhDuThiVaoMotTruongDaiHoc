@@ -1,0 +1,2083 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center"/>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="TitleUni">
+   <Font ss:FontName="Calibri" ss:Size="15" ss:Bold="1" ss:Color="#1F4E79"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="TitleReport">
+   <Font ss:FontName="Calibri" ss:Size="12" ss:Bold="1" ss:Color="#333333"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="FilterInfoCenter">
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Italic="1" ss:Color="#333333"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="FilterTotalCenter">
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#1F4E79"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="HeaderCol">
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#1F4E79" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataCenter">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataCenterBold">
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#002060"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataLeft">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataScore">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="0.00"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataScoreTotal">
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#C00000"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <NumberFormat ss:Format="0.00"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataPass">
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#006100"/>
+   <Interior ss:Color="#C6EFCE" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataFail">
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#9C0006"/>
+   <Interior ss:Color="#FFC7CE" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DataPending">
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#9C6500"/>
+   <Interior ss:Color="#FFEB9C" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D9D9D9"/>
+   </Borders>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="DanhSachThiSinh">
+  <Table>
+   <Column ss:Width="35"/>
+   <Column ss:Width="75"/>
+   <Column ss:Width="105"/>
+   <Column ss:Width="160"/>
+   <Column ss:Width="80"/>
+   <Column ss:Width="115"/>
+   <Column ss:Width="60"/>
+   <Column ss:Width="65"/>
+   <Column ss:Width="65"/>
+   <Column ss:Width="65"/>
+   <Column ss:Width="75"/>
+   <Column ss:Width="140"/>
+   <Column ss:Width="150"/>
+   <Column ss:Width="220"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="95"/>
+   <Row ss:Height="28">
+    <Cell ss:StyleID="TitleUni" ss:MergeAcross="15"><Data ss:Type="String">TRUONG DAI HOC BACH KHOA - DAI HOC DA NANG</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="TitleReport" ss:MergeAcross="15"><Data ss:Type="String">BAO CAO HO SO THI SINH &amp; KET QUA XET TUYEN DAI HOC</Data></Cell>
+   </Row>
+   <Row ss:Height="6"/>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Nam tuyen sinh: 2026 (Khoa K26)</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Ket qua xet tuyen: Tat ca</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Khoa dao tao: Tat ca khoa</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Nganh trung tuyen: Tat ca nganh</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Lop sinh hoat: Tat ca lop</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Tu khoa tim kiem: (Tat ca)</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Ngay xuat bao cao: 18/11/2026 15:16:49</Data></Cell>
+   </Row>
+   <Row ss:Height="22">
+    <Cell ss:StyleID="FilterTotalCenter" ss:MergeAcross="15"><Data ss:Type="String">Tong so ho so phu hop: 105 thi sinh</Data></Cell>
+   </Row>
+   <Row ss:Height="8"/>
+   <Row ss:Height="26">
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">STT</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">So Bao Danh</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">So CCCD</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Ho va Ten</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Ngay Sinh</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Que Quan</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Gioi Tinh</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Toan</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Ly</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Hoa</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Tong Diem</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Ket Qua</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Khoa</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Nganh Trung Tuyen</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Lop Sinh Hoat</Data></Cell>
+    <Cell ss:StyleID="HeaderCol"><Data ss:Type="String">Ma SV DUT</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT001</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">048003001234</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Nhu Hieu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">04/03/2003</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.50</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">28.30</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260003</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT002</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">048208001567</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nguyen Hoang Minh Quan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">15/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.80</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">29.20</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260001</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT003</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">048308002341</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Tran Le Thao Vy</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">22/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.75</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">28.75</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260002</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT004</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208869299</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Duy Vu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">03/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.40</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">28.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260001</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT005</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">042208569604</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Do Cong Hai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">15/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Tinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.48</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.88</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260002</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT006</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">004208765675</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Dinh Son</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">01/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Bang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.96</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.76</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260004</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT007</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046308871402</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Tran Anh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">09/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.44</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.64</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260005</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">8</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT008</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046208854061</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Truong Bao Huy</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.72</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.52</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260003</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">9</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT009</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">042208730388</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Luu Minh Thong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">08/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Tinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.40</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260004</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">10</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT010</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">048208275762</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dinh Trong Quang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">12/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.68</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.28</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260006</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">11</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT011</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">056308955152</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Phuong Yen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.56</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.16</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260005</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">12</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT012</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040308281408</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Cam Ha</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.64</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">27.04</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260007</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">13</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT013</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">079208121035</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Mai Phuoc Tien</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/05/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Ho Chi Minh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.72</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.92</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260008</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">14</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT014</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">042208588292</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nguyen Quang Nhan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">18/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Tinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.80</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260006</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">15</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT015</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208214124</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lam Bao Tu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">02/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.68</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.68</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260009</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">16</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT016</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">004208615642</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Do Cong Vu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">12/03/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Bang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.30</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260010</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">17</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT017</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208536573</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Hoang Bao Thuan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">20/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.02</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.42</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260011</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">18</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT018</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">064208286596</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dang Dinh Hieu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">02/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Gia Lai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.54</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.34</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260007</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">19</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT019</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208403757</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ngo Phuoc Viet</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">22/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.66</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.26</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260012</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">20</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT020</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046308725319</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Phan Quynh Hien</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">04/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.38</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.18</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260008</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">21</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT021</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">066208319916</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Quoc Thang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">23/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dak Lak</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.10</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260009</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">22</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT022</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027208273476</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Minh Toan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">11/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.42</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">26.02</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260010</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">23</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT023</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">038208170305</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bui Huu Thinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/03/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.34</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.94</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260011</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">24</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT024</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">056308277728</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bui Thu Thuy</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">03/07/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.06</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.86</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260012</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">25</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT025</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208141371</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dinh Ngoc Dat</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">05/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.38</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.78</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260013</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">26</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT026</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027208141944</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lam Xuan Son</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">12/03/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.70</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260014</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">27</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT027</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">045308721568</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Tran Thuy Thao</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">21/07/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Tri</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.82</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.62</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260015</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">28</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT028</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">042208383419</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vu Trong An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">18/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Tinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.34</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.54</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260016</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">29</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT029</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">048208100230</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nguyen Trong Vinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">04/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.86</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.46</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260017</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">30</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT030</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">064208537374</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Tuan Lam</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Gia Lai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.78</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.38</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260018</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">31</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT031</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027208996626</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ngo Cong Hoang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">03/07/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.30</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260019</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">32</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT032</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">045208624172</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nguyen Xuan Khanh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">21/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Tri</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.62</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.22</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260020</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">33</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT033</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027308364970</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Hong Linh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.94</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.14</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260021</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">34</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT034</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">004208482125</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Duy Nhan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">05/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Bang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.26</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">25.06</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260013</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">35</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT035</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">038208137238</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bui Bao Sang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">20/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.18</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.98</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260014</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">36</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT036</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">056208889119</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Doan Xuan Nhat</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">04/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.90</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.90</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260022</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">37</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT037</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">031208613290</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Doan Duy Lam</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hai Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.02</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.82</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260015</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">38</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT038</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">038308114676</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Duong Kim Thuong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">17/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.74</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.74</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260023</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">39</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT039</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208841120</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Dinh Thang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.46</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.66</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260016</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">40</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT040</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">048308781154</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Le Yen Thao</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">25/05/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.78</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.58</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260017</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">41</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT041</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">004308495998</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Doan Mai Duyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">22/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Bang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260024</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">42</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT042</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046308722916</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Tran Diem Diep</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.02</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.42</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260025</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">43</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT043</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">066208690780</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lam Duc Thong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">15/07/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dak Lak</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.54</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.34</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260026</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">44</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT044</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">045208825428</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ngo Gia Nhan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">20/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Tri</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.26</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.26</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260027</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">45</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT045</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027208136948</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Do Duy Dung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">22/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.78</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.18</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260028</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">46</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT046</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">051208898238</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Do Gia Tuan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">02/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Ngai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">24.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260029</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">47</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT047</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">064208613062</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Do Minh Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">10/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Gia Lai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.40</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260004</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">48</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT048</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">056208871722</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Le Xuan Tri</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.80</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260018</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">49</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT049</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208383378</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ta Minh Tuan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">17/01/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.50</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.70</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260030</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">50</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT050</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">001208123961</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Pham Hoang Vu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">03/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Ha Noi</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.60</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260031</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">51</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT051</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208192856</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Trong Dung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">13/12/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260019</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">52</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT052</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">031208554672</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Le Quoc Long</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hai Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.40</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260032</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">53</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT053</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">064308441952</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Luu Cam Huong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">03/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Gia Lai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.50</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.30</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260020</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">54</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT054</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">042308437450</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Do Khanh My</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">08/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Tinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.20</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260021</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">55</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT055</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046208625326</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ly Quang Toan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">09/07/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.10</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260033</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">56</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT056</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027308475729</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dang My Mai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">23/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">23.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260034</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">57</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT057</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040308889195</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Phan Hong Nhung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">20/03/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.30</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.90</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260035</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">58</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT058</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">004208882361</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Doan Huu Tung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/05/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Bang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.80</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260036</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">59</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT059</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">004208567608</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dinh Cong Tung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">08/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Bang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.70</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260037</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">60</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT060</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">056308458675</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Luu Thao Chi</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.80</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.60</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260038</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">61</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT061</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046308140602</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Phan Ha Huyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260039</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">62</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT062</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">038208137468</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Minh Binh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">24/12/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.40</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260022</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">63</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT063</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">031308152697</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Truong Thao Thuy</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">12/05/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hai Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.30</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.30</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260040</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">64</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT064</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">079208684869</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Dinh Cuong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">06/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Ho Chi Minh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.20</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260041</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">65</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT065</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">079208526500</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lam Thanh Tung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/12/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Ho Chi Minh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.90</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.10</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260042</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">66</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT066</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040308682550</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vu Ha Ha</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">05/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.80</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">22.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260043</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">67</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT067</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208237356</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lam Dinh Thong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">10/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.90</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.90</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260044</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">68</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT068</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208192746</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Mai Hoang Nghia</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">25/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.20</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.80</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260045</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">69</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT069</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040308278364</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Pham Ngoc Ha</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">24/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.70</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.70</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260046</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">70</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT070</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">031208756225</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Duong Bao Tai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">05/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hai Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.60</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260023</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">71</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT071</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208818880</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Minh Thang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">08/07/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.70</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260047</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">72</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT072</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">045308470563</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Luu Thu Thi</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">01/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Tri</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.60</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.40</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260048</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">73</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT073</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">045208545838</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Duy Tien</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">03/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Tri</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.30</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260049</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">74</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT074</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">064308662572</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ta Phuong Chi</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Gia Lai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.60</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.20</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260050</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">75</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT075</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046308851315</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lam Hong Nhu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.90</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.10</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260024</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">76</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT076</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">051308214131</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Thanh Thuy</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">01/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Ngai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.60</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">21.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260051</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">77</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT077</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">051208937150</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Truong Quoc Minh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">10/12/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Quang Ngai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.75</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">20.75</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260052</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">78</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT078</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">066208901462</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Duc Cuong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dak Lak</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.90</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">20.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260053</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">79</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT079</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208214515</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vu Gia Thang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">23/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.45</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">20.25</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260054</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">80</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT080</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">066208894949</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Pham Xuan Long</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">23/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dak Lak</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.40</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">20.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260025</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">81</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT081</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">046208473396</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Cong Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">09/07/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hue</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.55</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">19.75</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260055</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">82</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT082</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">001208521304</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ta Duy Tri</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">12/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Ha Noi</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.30</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">19.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260056</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">83</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT083</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208659536</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Doan Huu Khoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">07/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.25</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">19.25</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260026</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">84</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT084</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">038208627390</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lam Dinh Hoang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">21/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thanh Hoa</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.60</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">19.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260057</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">85</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT085</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208770564</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Tan Nhan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">09/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.55</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">18.75</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260058</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">86</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT086</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">031208549322</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nguyen Tan Nghia</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/04/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hai Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.50</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">18.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260059</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">87</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT087</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208391354</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Duc Quang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">01/05/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.85</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">18.25</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Dinh huong Ngoai ngu Nhat)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_N2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260060</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">88</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT088</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019308795541</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ly Kim Ngan</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">10/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.20</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">18.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260027</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">89</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT089</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027208346728</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dinh Duc Lam</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">27/03/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.95</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.75</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260001</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">90</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT090</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">040208406864</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Phuoc Khang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">28/11/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nghe An</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.60</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.70</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260002</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">91</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT091</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">042208903789</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Nguyen Duc Dung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">03/12/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ha Tinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.40</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.85</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.25</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260005</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">92</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT092</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027308236019</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Anh Huyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">02/06/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.40</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260028</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">93</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT093</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">064308944132</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Le Ngoc Ngoc</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">01/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Gia Lai</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.70</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">16.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260031</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">94</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT094</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019308367543</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Dinh Mai Dung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">19/02/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.15</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">16.15</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260006</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">95</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT095</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027308895961</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Ly Cam Thao</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">01/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">4.90</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.40</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">15.80</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260007</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">96</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT096</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">031208348730</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Phan Minh Binh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">12/12/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Hai Phong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.30</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.05</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">15.45</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260033</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">97</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT097</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019308150079</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bui Yen Dung</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">05/10/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.20</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">4.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.10</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">15.10</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260008</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">98</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT098</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">027308225005</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Hoang Bao Tien</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">01/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Bac Ninh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nu</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.10</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">4.55</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">14.75</Data></Cell>
+    <Cell ss:StyleID="DataFail"><Data ss:Type="String">Khong dat diem san</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">-</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">99</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT099</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">004208400278</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Duong Van Vinh</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">24/09/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cao Bang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">4.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">4.80</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">4.20</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">13.80</Data></Cell>
+    <Cell ss:StyleID="DataFail"><Data ss:Type="String">Khong dat diem san</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">-</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">100</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT100</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">019208167044</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Trinh Thanh Thang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">04/08/2008</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Thai Nguyen</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">9.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">1.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">18.50</Data></Cell>
+    <Cell ss:StyleID="DataFail"><Data ss:Type="String">Diem liet</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">-</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">101</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT101</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">012345678954</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Tô Lâm</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">12/11/2002</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">2.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260029</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">102</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT102</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">012345678901</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Chính Ba Ðò</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/11/2026</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">3.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.50</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">16.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260032</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">103</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT103</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">012345678904</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Lê Van Long</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">04/03/2003</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">4.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.00</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV1)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260030</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">104</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT104</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">012345678908</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Nhu Hieu</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">04/03/2003</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">7.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">6.50</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">3.50</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">17.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Cong nghe Thong tin (Chuong trinh Dac thu)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26T_DT1</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260003</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">105</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT105</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">012345678989</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Vo Huy Tuong</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/11/2026</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.00</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">15.00</Data></Cell>
+    <Cell ss:StyleID="DataPending"><Data ss:Type="String">Khong trung tuyen</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">-</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">-</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>

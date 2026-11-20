@@ -149,7 +149,7 @@
     <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Nam tuyen sinh: 2026 (Khoa K26)</Data></Cell>
    </Row>
    <Row ss:Height="18">
-    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Ket qua xet tuyen: Tat ca</Data></Cell>
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Ket qua xet tuyen: Trung tuyen</Data></Cell>
    </Row>
    <Row ss:Height="18">
     <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Khoa dao tao: Khoa Cong nghe Thong tin</Data></Cell>
@@ -164,7 +164,7 @@
     <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Tu khoa tim kiem: Nh</Data></Cell>
    </Row>
    <Row ss:Height="18">
-    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Ngay xuat bao cao: 16/11/2026 19:28:30</Data></Cell>
+    <Cell ss:StyleID="FilterInfoCenter" ss:MergeAcross="15"><Data ss:Type="String">Ngay xuat bao cao: 20/11/2026 08:54:18</Data></Cell>
    </Row>
    <Row ss:Height="22">
     <Cell ss:StyleID="FilterTotalCenter" ss:MergeAcross="15"><Data ss:Type="String">Tong so ho so phu hop: 2 thi sinh</Data></Cell>
@@ -190,24 +190,6 @@
    </Row>
    <Row ss:Height="20">
     <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">1</Data></Cell>
-    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT102</Data></Cell>
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">012345678901</Data></Cell>
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Chính Ba Ðò</Data></Cell>
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/11/2026</Data></Cell>
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
-    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">3.00</Data></Cell>
-    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
-    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.50</Data></Cell>
-    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">16.50</Data></Cell>
-    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
-    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL2</Data></Cell>
-    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260032</Data></Cell>
-   </Row>
-   <Row ss:Height="20">
-    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">2</Data></Cell>
     <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT096</Data></Cell>
     <Cell ss:StyleID="DataCenter"><Data ss:Type="String">031208348730</Data></Cell>
     <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Phan Minh Binh</Data></Cell>
@@ -223,6 +205,24 @@
     <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
     <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL2</Data></Cell>
     <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260033</Data></Cell>
+   </Row>
+   <Row ss:Height="20">
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">DUT102</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">012345678901</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Chính Ba Ðò</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">16/11/2026</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">TP. Da Nang</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">Nam</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">3.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">8.00</Data></Cell>
+    <Cell ss:StyleID="DataScore"><Data ss:Type="Number">5.50</Data></Cell>
+    <Cell ss:StyleID="DataScoreTotal"><Data ss:Type="Number">16.50</Data></Cell>
+    <Cell ss:StyleID="DataPass"><Data ss:Type="String">TRUNG TUYEN (NV2)</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">Khoa Cong nghe Thong tin</Data></Cell>
+    <Cell ss:StyleID="DataLeft"><Data ss:Type="String">CNTT (Khoa hoc Du lieu &amp; Tri tue Nhan tao)</Data></Cell>
+    <Cell ss:StyleID="DataCenter"><Data ss:Type="String">26TCLC_KHDL2</Data></Cell>
+    <Cell ss:StyleID="DataCenterBold"><Data ss:Type="String">102260032</Data></Cell>
    </Row>
   </Table>
  </Worksheet>

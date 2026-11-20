@@ -171,7 +171,7 @@ static void RenderRowHover(const char* rowId, bool isSelected = false) {
 // CÁC HÀM RENDER ICON BUTTONS VECTOR CHO CỘT THAO TÁC (XEM, SỬA, XÓA)
 // Độc lập hoàn toàn với font chữ, vẽ trực tiếp bằng ImDrawList sắc nét ở mọi độ phân giải
 // ------------------------------------------------------------------------------
-static bool RenderIconButtonView(const char* id, ImVec2 size = ImVec2(26, 22)) {
+static bool RenderIconButtonView(const char* id, ImVec2 size = ImVec2(26, 22), const char* tooltip = "Xem chi tiet ho so thi sinh") {
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.14f, 0.50f, 0.44f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.20f, 0.65f, 0.55f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.10f, 0.40f, 0.35f, 1.0f));
@@ -194,13 +194,13 @@ static bool RenderIconButtonView(const char* id, ImVec2 size = ImVec2(26, 22)) {
     // Tròng mắt ở giữa
     dl->AddCircleFilled(center, 2.0f, iconColor);
 
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Xem chi tiet ho so thi sinh");
+    if (ImGui::IsItemHovered() && tooltip) {
+        ImGui::SetTooltip("%s", tooltip);
     }
     return clicked;
 }
 
-static bool RenderIconButtonEdit(const char* id, ImVec2 size = ImVec2(26, 22)) {
+static bool RenderIconButtonEdit(const char* id, ImVec2 size = ImVec2(26, 22), const char* tooltip = "Sua thong tin ho so") {
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.45f, 0.80f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.55f, 0.92f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.12f, 0.35f, 0.70f, 1.0f));
@@ -223,13 +223,13 @@ static bool RenderIconButtonEdit(const char* id, ImVec2 size = ImVec2(26, 22)) {
     // Đuôi tẩy
     dl->AddCircleFilled(ImVec2(center.x + 4.2f, center.y - 4.2f), 1.6f, iconColor);
 
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Sua thong tin ho so");
+    if (ImGui::IsItemHovered() && tooltip) {
+        ImGui::SetTooltip("%s", tooltip);
     }
     return clicked;
 }
 
-static bool RenderIconButtonDelete(const char* id, ImVec2 size = ImVec2(26, 22)) {
+static bool RenderIconButtonDelete(const char* id, ImVec2 size = ImVec2(26, 22), const char* tooltip = "Xoa ho so thi sinh") {
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.25f, 0.25f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.88f, 0.32f, 0.32f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.60f, 0.18f, 0.18f, 1.0f));
@@ -255,61 +255,347 @@ static bool RenderIconButtonDelete(const char* id, ImVec2 size = ImVec2(26, 22))
     dl->AddLine(ImVec2(center.x - 1.2f, center.y - 1.0f), ImVec2(center.x - 1.0f, center.y + 4.0f), iconColor, 1.0f);
     dl->AddLine(ImVec2(center.x + 1.2f, center.y - 1.0f), ImVec2(center.x + 1.0f, center.y + 4.0f), iconColor, 1.0f);
 
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Xoa ho so thi sinh");
+    if (ImGui::IsItemHovered() && tooltip) {
+        ImGui::SetTooltip("%s", tooltip);
     }
     return clicked;
 }
 
 // ------------------------------------------------------------------------------
-// CÁC HÀM CĂN CHỈNH NỘI DUNG CELL: CĂN GIỮA DỌC, CANH PHẢI CHO TEXT, CANH GIỮA CHO CÒN LẠI
+// CÁC HÀM CĂN CHỈNH NỘI DUNG CELL: CĂN GIỮA DỌC, CANH TRÁI CHO TEXT, CANH GIỮA CHO CÒN LẠI
 // ------------------------------------------------------------------------------
-static void AlignAndRenderCenter(int colIdx, const string& text, const ImVec4& color, float minH) {
+static void AlignAndRenderCenter(int colIdx, const string& text, const ImVec4& color = ImVec4(0.88f, 0.90f, 0.94f, 1.0f), float minH = 26.0f) {
     ImGui::TableSetColumnIndex(colIdx);
     float availW = ImGui::GetContentRegionAvail().x;
     float textW = ImGui::CalcTextSize(text.c_str()).x;
     float textH = ImGui::GetTextLineHeight();
 
-    // Căn giữa theo chiều dọc
     float padY = (minH - textH) * 0.5f;
     if (padY > 0.0f) {
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
     }
-
-    // Căn giữa theo chiều ngang
     if (availW > textW) {
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - textW) * 0.5f);
     }
     ImGui::TextColored(color, "%s", text.c_str());
 }
 
-static void AlignAndRenderTextRight(int colIdx, const string& text, const ImVec4& color, float minH) {
+static void AlignAndRenderCenter(const string& text, const ImVec4& color = ImVec4(0.88f, 0.90f, 0.94f, 1.0f), float minH = 26.0f) {
+    float availW = ImGui::GetContentRegionAvail().x;
+    float textW = ImGui::CalcTextSize(text.c_str()).x;
+    float textH = ImGui::GetTextLineHeight();
+
+    float padY = (minH - textH) * 0.5f;
+    if (padY > 0.0f) {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
+    }
+    if (availW > textW) {
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - textW) * 0.5f);
+    }
+    ImGui::TextColored(color, "%s", text.c_str());
+}
+
+static void AlignAndRenderTextLeft(int colIdx, const string& text, const ImVec4& color = ImVec4(0.88f, 0.90f, 0.94f, 1.0f), float minH = 26.0f) {
     ImGui::TableSetColumnIndex(colIdx);
     float availW = ImGui::GetContentRegionAvail().x;
     float wrapW = (availW > 20.0f) ? availW : 120.0f;
-
-    // Tính kích thước chuỗi text khi có wrap
     ImVec2 textSize = ImGui::CalcTextSize(text.c_str(), nullptr, false, wrapW);
 
-    // Căn giữa theo chiều dọc
     float padY = (minH - textSize.y) * 0.5f;
     if (padY > 0.0f) {
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
     }
-
-    // Căn phải theo chiều ngang
     if (textSize.y <= ImGui::GetTextLineHeight() * 1.35f) {
-        // Text ngắn nằm trên 1 dòng duy nhất: dịch con trỏ sang phải để canh phải
+        ImGui::TextColored(color, "%s", text.c_str());
+    } else {
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + wrapW);
+        ImGui::TextColored(color, "%s", text.c_str());
+        ImGui::PopTextWrapPos();
+    }
+}
+
+static void AlignAndRenderTextLeft(const string& text, const ImVec4& color = ImVec4(0.88f, 0.90f, 0.94f, 1.0f), float minH = 26.0f) {
+    float availW = ImGui::GetContentRegionAvail().x;
+    float wrapW = (availW > 20.0f) ? availW : 120.0f;
+    ImVec2 textSize = ImGui::CalcTextSize(text.c_str(), nullptr, false, wrapW);
+
+    float padY = (minH - textSize.y) * 0.5f;
+    if (padY > 0.0f) {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
+    }
+    if (textSize.y <= ImGui::GetTextLineHeight() * 1.35f) {
+        ImGui::TextColored(color, "%s", text.c_str());
+    } else {
+        ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + wrapW);
+        ImGui::TextColored(color, "%s", text.c_str());
+        ImGui::PopTextWrapPos();
+    }
+}
+
+static void AlignAndRenderTextRight(int colIdx, const string& text, const ImVec4& color = ImVec4(0.88f, 0.90f, 0.94f, 1.0f), float minH = 26.0f) {
+    ImGui::TableSetColumnIndex(colIdx);
+    float availW = ImGui::GetContentRegionAvail().x;
+    float wrapW = (availW > 20.0f) ? availW : 120.0f;
+    ImVec2 textSize = ImGui::CalcTextSize(text.c_str(), nullptr, false, wrapW);
+
+    float padY = (minH - textSize.y) * 0.5f;
+    if (padY > 0.0f) {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
+    }
+    if (textSize.y <= ImGui::GetTextLineHeight() * 1.35f) {
         if (availW > textSize.x) {
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - textSize.x));
         }
         ImGui::TextColored(color, "%s", text.c_str());
     } else {
-        // Text dài xuống dòng (nhiều dòng): bọc wrap
         ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + wrapW);
         ImGui::TextColored(color, "%s", text.c_str());
         ImGui::PopTextWrapPos();
     }
+}
+
+// ------------------------------------------------------------------------------
+// KIẾN TRÚC BẢNG DÙNG CHUNG (COMMON TABLE ARCHITECTURE)
+// Phù hợp chuẩn thiết kế Frontend chuyên nghiệp (tham khảo sdt-baocaodieuhanh)
+// ------------------------------------------------------------------------------
+struct PaginationState {
+    int currentPage = 1;
+    int pageSizeIndex = 0; // 0: 10, 1: 25, 2: 50, 3: 100
+    int totalRecords = 0;
+    int totalPages = 1;
+    int targetJumpPage = 1;
+    int sortCol = 0;
+    bool sortAsc = true;
+
+    int getPageSize() const {
+        static const int SIZES[] = { 10, 25, 50, 100 };
+        if (pageSizeIndex < 0 || pageSizeIndex > 3) return 10;
+        return SIZES[pageSizeIndex];
+    }
+    int getOffset() const {
+        return (currentPage - 1) * getPageSize();
+    }
+    void updateTotal(int total) {
+        totalRecords = total;
+        int pSize = getPageSize();
+        totalPages = (totalRecords + pSize - 1) / pSize;
+        if (totalPages < 1) totalPages = 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+    }
+    void update(int total) { updateTotal(total); }
+    string getRangeDisplay() const {
+        if (totalRecords <= 0) return "Hien thi 0-0 tren tong 0 ban ghi";
+        int start = getOffset() + 1;
+        int end = getOffset() + getPageSize();
+        if (end > totalRecords) end = totalRecords;
+        return "Hien thi " + to_string(start) + "-" + to_string(end) + " tren tong " + to_string(totalRecords) + " ban ghi";
+    }
+};
+
+struct ActionToolbarConfig {
+    bool showAdd = true;
+    bool showExport = true;
+    bool showImport = true;
+    string addLabel = "[+] Them moi";
+    string exportLabel = "[ Xuat Excel ]";
+    string importLabel = "[+] Import du lieu mau";
+    string addTooltip = "Them moi ban ghi vao he thong";
+    string exportTooltip = "Xuat toan bo du lieu ra file Excel (.xls) chuan dinh dang";
+    string importTooltip = "Nap du lieu mau chuan DUT vao he thong";
+};
+
+static void RenderCommonActionToolbar(const string& screenId,
+                                      const ActionToolbarConfig& cfg,
+                                      bool& outAddClicked,
+                                      bool& outExportClicked,
+                                      bool& outImportClicked) {
+    float wAdd = 125.0f;
+    float wExport = 135.0f;
+    float wImport = 185.0f;
+    float spacing = 8.0f;
+    float totalW = 0.0f;
+
+    if (cfg.showAdd) totalW += wAdd + spacing;
+    if (cfg.showExport) totalW += wExport + spacing;
+    if (cfg.showImport) totalW += wImport + spacing;
+    if (totalW > 0.0f) totalW -= spacing;
+
+    float availW = ImGui::GetContentRegionAvail().x;
+    if (availW > totalW) {
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - totalW));
+    }
+
+    bool isFirst = true;
+    if (cfg.showAdd) {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.34f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.24f, 0.68f, 0.42f, 1.0f));
+        if (ImGui::Button((cfg.addLabel + "##" + screenId).c_str(), ImVec2(wAdd, 28))) {
+            outAddClicked = true;
+        }
+        ImGui::PopStyleColor(2);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", cfg.addTooltip.c_str());
+        isFirst = false;
+    }
+    if (cfg.showExport) {
+        if (!isFirst) ImGui::SameLine(0, spacing);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.50f, 0.75f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.28f, 0.62f, 0.88f, 1.0f));
+        if (ImGui::Button((cfg.exportLabel + "##" + screenId).c_str(), ImVec2(wExport, 28))) {
+            outExportClicked = true;
+        }
+        ImGui::PopStyleColor(2);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", cfg.exportTooltip.c_str());
+        isFirst = false;
+    }
+    if (cfg.showImport) {
+        if (!isFirst) ImGui::SameLine(0, spacing);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45f, 0.35f, 0.15f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.60f, 0.45f, 0.18f, 1.0f));
+        if (ImGui::Button((cfg.importLabel + "##" + screenId).c_str(), ImVec2(wImport, 28))) {
+            outImportClicked = true;
+        }
+        ImGui::PopStyleColor(2);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", cfg.importTooltip.c_str());
+    }
+}
+
+static void RenderCommonActionCell(const string& rowKey,
+                                   bool& outViewClicked,
+                                   bool& outEditClicked,
+                                   bool& outDeleteClicked,
+                                   bool enableView = true,
+                                   bool enableEdit = true,
+                                   bool enableDelete = true,
+                                   const char* viewTip = nullptr,
+                                   const char* editTip = nullptr,
+                                   const char* delTip = nullptr,
+                                   float minH = 26.0f) {
+    float availW = ImGui::GetContentRegionAvail().x;
+    float contentW = (enableView ? 26.0f : 0.0f) + (enableEdit ? 26.0f : 0.0f) + (enableDelete ? 26.0f : 0.0f);
+    int count = (enableView ? 1 : 0) + (enableEdit ? 1 : 0) + (enableDelete ? 1 : 0);
+    if (count > 1) contentW += (count - 1) * 4.0f;
+
+    if (availW > contentW) {
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - contentW) * 0.5f);
+    }
+    float padY = (minH - 22.0f) * 0.5f;
+    if (padY > 0.0f) {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY);
+    }
+
+    bool isFirst = true;
+    if (enableView) {
+        if (RenderIconButtonView(("##btnV_" + rowKey).c_str(), ImVec2(26, 22), viewTip)) {
+            outViewClicked = true;
+        }
+        isFirst = false;
+    }
+    if (enableEdit) {
+        if (!isFirst) ImGui::SameLine(0, 4);
+        if (RenderIconButtonEdit(("##btnE_" + rowKey).c_str(), ImVec2(26, 22), editTip)) {
+            outEditClicked = true;
+        }
+        isFirst = false;
+    }
+    if (enableDelete) {
+        if (!isFirst) ImGui::SameLine(0, 4);
+        if (RenderIconButtonDelete(("##btnD_" + rowKey).c_str(), ImVec2(26, 22), delTip)) {
+            outDeleteClicked = true;
+        }
+    }
+}
+
+static void RenderCommonEmptyRow(int colSpan, const char* msg = "Khong tim thay du lieu phu hop!") {
+    ImGui::TableNextRow();
+    ImGui::TableSetColumnIndex(0);
+    float availW = ImGui::GetWindowWidth() - 50.0f;
+    float textW = ImGui::CalcTextSize(msg).x;
+    if (availW > textW) {
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW - textW) * 0.5f);
+    }
+    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", msg);
+}
+
+static void RenderCommonPaginationBar(const string& barId, PaginationState& state) {
+    ImGui::Spacing();
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.11f, 0.14f, 0.19f, 0.95f));
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 4.0f);
+    ImGui::BeginChild(("PaginationBar_" + barId).c_str(), ImVec2(0, 36), false, ImGuiWindowFlags_NoScrollbar);
+    {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.0f);
+        ImGui::TextColored(ImVec4(0.65f, 0.75f, 0.85f, 1.0f), "So dong/trang:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100);
+        static const char* PAGE_SIZE_LABELS[] = { "10 / trang", "25 / trang", "50 / trang", "100 / trang" };
+        if (ImGui::Combo(("##pSize_" + barId).c_str(), &state.pageSizeIndex, PAGE_SIZE_LABELS, 4)) {
+            state.updateTotal(state.totalRecords);
+        }
+
+        ImGui::SameLine(0, 15);
+        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "|  %s", state.getRangeDisplay().c_str());
+
+        // Phía phải: 5 nút điều hướng phân trang
+        float navW = 280.0f;
+        float availW = ImGui::GetContentRegionAvail().x;
+        if (availW > navW) {
+            ImGui::SameLine(ImGui::GetWindowWidth() - navW - 20.0f);
+        }
+
+        bool disablePrev = (state.currentPage <= 1);
+        bool disableNext = (state.currentPage >= state.totalPages);
+
+        if (disablePrev) ImGui::BeginDisabled();
+        if (ImGui::Button(("|<<##first_" + barId).c_str(), ImVec2(32, 24))) {
+            state.currentPage = 1;
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Ve trang dau tien (Trang 1)");
+        ImGui::SameLine(0, 4);
+        if (ImGui::Button(("<##prev_" + barId).c_str(), ImVec2(32, 24))) {
+            state.currentPage--;
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Trang truoc");
+        if (disablePrev) ImGui::EndDisabled();
+
+        ImGui::SameLine(0, 4);
+        char pageLabel[32];
+        sprintf(pageLabel, "Trang %d/%d##%s", state.currentPage, state.totalPages, barId.c_str());
+        if (ImGui::Button(pageLabel, ImVec2(100, 24))) {
+            state.targetJumpPage = state.currentPage;
+            ImGui::OpenPopup(("JumpPagePopup_" + barId).c_str());
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Click de nhap so trang muon chuyen toi");
+
+        if (ImGui::BeginPopup(("JumpPagePopup_" + barId).c_str())) {
+            ImGui::Text("Chuyen toi trang (1 - %d):", state.totalPages);
+            ImGui::SetNextItemWidth(120);
+            ImGui::InputInt(("##jumpVal_" + barId).c_str(), &state.targetJumpPage);
+            if (state.targetJumpPage < 1) state.targetJumpPage = 1;
+            if (state.targetJumpPage > state.totalPages) state.targetJumpPage = state.totalPages;
+            ImGui::SameLine();
+            if (ImGui::Button("Den")) {
+                state.currentPage = state.targetJumpPage;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        ImGui::SameLine(0, 4);
+        if (disableNext) ImGui::BeginDisabled();
+        if (ImGui::Button((">##next_" + barId).c_str(), ImVec2(32, 24))) {
+            state.currentPage++;
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Trang tiep theo");
+        ImGui::SameLine(0, 4);
+        if (ImGui::Button((">>|##last_" + barId).c_str(), ImVec2(32, 24))) {
+            state.currentPage = state.totalPages;
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Den trang cuoi cung");
+        if (disableNext) ImGui::EndDisabled();
+    }
+    ImGui::EndChild();
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor();
 }
 
 static int getDaysInMonth(int m, int y) {
@@ -555,6 +841,38 @@ int AppGUI::run(QuanLyThiSinh& ql) {
     static string formNV2 = "7480201";
     static string formNV3 = "7520216";
 
+    auto populateEditThiSinh = [&](const ThiSinh& ts) {
+        selectedSBD = ts.getSoBaoDanh();
+        strncpy(bufSBD, ts.getSoBaoDanh().c_str(), sizeof(bufSBD) - 1);
+        strncpy(bufCCCD, ts.getSoCCCD().c_str(), sizeof(bufCCCD) - 1);
+        strncpy(bufHoTen, ts.getHoTen().c_str(), sizeof(bufHoTen) - 1);
+        string ns = ts.getNgaySinh();
+        if (ns.length() == 10 && ns[2] == '/' && ns[5] == '/') {
+            try {
+                formNgay = stoi(ns.substr(0, 2));
+                formThang = stoi(ns.substr(3, 2));
+                formNam = stoi(ns.substr(6, 4));
+            } catch (...) {
+                getCurrentSystemDate(formNgay, formThang, formNam);
+            }
+        } else {
+            getCurrentSystemDate(formNgay, formThang, formNam);
+        }
+        formQueQuanMa = ts.getQueQuan();
+        formGioiTinhMa = ts.getGioiTinh();
+        formToan = (float)ts.getDiemToan();
+        formLy = (float)ts.getDiemLy();
+        formHoa = (float)ts.getDiemHoa();
+        formErrorMsg = "";
+        formNV1 = ""; formNV2 = ""; formNV3 = "";
+        for (size_t nvIdx = 0; nvIdx < ts.getDsNguyenVong().size(); ++nvIdx) {
+            if (ts.getDsNguyenVong()[nvIdx].thuTuNV == 1) formNV1 = ts.getDsNguyenVong()[nvIdx].maNganh;
+            else if (ts.getDsNguyenVong()[nvIdx].thuTuNV == 2) formNV2 = ts.getDsNguyenVong()[nvIdx].maNganh;
+            else if (ts.getDsNguyenVong()[nvIdx].thuTuNV == 3) formNV3 = ts.getDsNguyenVong()[nvIdx].maNganh;
+        }
+        showEditModal = true;
+    };
+
     // State quản lý danh mục (Tab 4)
     static char bufNewMaTinh[16] = "";
     static char bufNewTenTinh[64] = "";
@@ -590,6 +908,93 @@ int AppGUI::run(QuanLyThiSinh& ql) {
     // Preview báo cáo file
     static int selectedReportFile = 0;
     static string reportContent = "";
+
+    // ==================== STATE CÁC BẢNG DÙNG CHUNG (COMMON TABLE ARCHITECTURE) ====================
+    // Tab 4: Danh mục hệ thống
+    static char searchKhoa[64] = "";
+    static PaginationState pagKhoa;
+    static bool showAddKhoaModal = false;
+    static char addKhoaMa[16] = "";
+    static char addKhoaTen[128] = "";
+    static char addKhoaMaDUT[16] = "";
+    static string addKhoaError = "";
+    static bool showEditKhoaModal = false;
+    static char editKhoaMa[16] = "";
+    static char editKhoaTen[128] = "";
+    static char editKhoaMaDUT[16] = "";
+    static string editKhoaError = "";
+    static bool showViewKhoaModal = false;
+    static Khoa viewKhoaData;
+
+    static char searchNganh[64] = "";
+    static string filterNganhKhoa = "ALL";
+    static PaginationState pagNganh;
+    static bool showAddNganhModal = false;
+    static char addNganhMa[32] = "";
+    static char addNganhTen[150] = "";
+    static string addNganhKhoa = "CNTT";
+    static char addNganhTienTo[32] = "";
+    static string addNganhError = "";
+    static bool showEditNganhModal = false;
+    static char editNganhMa[32] = "";
+    static char editNganhTen[150] = "";
+    static string editNganhKhoa = "CNTT";
+    static char editNganhTienTo[32] = "";
+    static string editNganhError = "";
+    static bool showViewNganhModal = false;
+    static DanhMucNganh viewNganhData;
+
+    static char searchNTK[64] = "";
+    static string filterNTKKhoa = "ALL";
+    static PaginationState pagNTK;
+    static bool showAddNTKModal = false;
+    static int addNTKNam = 2026;
+    static string addNTKMa = "7480201B";
+    static int addNTKChiTieu = 50;
+    static float addNTKDiemSan = 15.0f;
+    static string addNTKError = "";
+    static bool showEditNTKModal = false;
+    static int editNTKNam = 2026;
+    static string editNTKMa = "";
+    static int editNTKChiTieu = 50;
+    static float editNTKDiemSan = 15.0f;
+    static string editNTKError = "";
+    static bool showViewNTKModal = false;
+    static NganhTheoKhoaHoc viewNTKData;
+
+    static char searchTinhThanh[64] = "";
+    static PaginationState pagTinhThanh;
+    static bool showAddTinhThanhModal = false;
+    static char addTinhThanhMa[16] = "";
+    static char addTinhThanhTen[128] = "";
+    static char addTinhThanhLoai[64] = "Tinh";
+    static string addTinhThanhError = "";
+    static bool showViewTinhThanhModal = false;
+    static TinhThanh viewTinhThanhData;
+
+    static char searchGioiTinh[64] = "";
+    static PaginationState pagGioiTinh;
+    static bool showAddGioiTinhModal = false;
+    static char addGioiTinhMa[16] = "";
+    static char addGioiTinhTen[64] = "";
+    static char addGioiTinhDesc[128] = "";
+    static string addGioiTinhError = "";
+    static bool showViewGioiTinhModal = false;
+    static GioiTinh viewGioiTinhData;
+
+    // Tab 3: Xét tuyển & Thống kê DUT
+    static char searchDiemChuan[64] = "";
+    static string filterDiemChuanKhoa = "ALL";
+    static PaginationState pagDiemChuan;
+
+    static char searchTanSV[64] = "";
+    static string filterTanSVKhoa = "ALL";
+    static string filterTanSVNganh = "ALL";
+    static PaginationState pagTanSV;
+
+    // Tab 2: 10 Bảng CSDL Quan hệ 3NF
+    static char searchCSDL[10][64] = { "" };
+    static PaginationState pagCSDL[10];
 
     bool done = false;
     while (!done) {
@@ -812,14 +1217,14 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     ImGui::EndDisabled();
                 }
 
-                float rightBtnWidth = 545.0f;
+                float rightBtnWidth = 465.0f;
                 if (ImGui::GetWindowWidth() > 950.0f) {
                     ImGui::SameLine(ImGui::GetWindowWidth() - rightBtnWidth);
                 } else {
                     ImGui::SameLine();
                 }
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.34f, 1.0f));
-                if (ImGui::Button("[+] Them Thi Sinh", ImVec2(145, 28))) {
+                if (ImGui::Button("[+] Them moi##ts", ImVec2(125, 28))) {
                     showAddModal = true;
                     string autoSBD = ql.sinhSoBaoDanhMoi();
                     strcpy(bufSBD, autoSBD.c_str());
@@ -837,10 +1242,13 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     formErrorMsg = "";
                 }
                 ImGui::PopStyleColor();
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetTooltip("Them moi ho so thi sinh vao he thong");
+                }
 
                 ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.45f, 0.70f, 1.0f));
-                if (ImGui::Button("[ Xuat Bao Cao Excel ]", ImVec2(165, 28))) {
+                if (ImGui::Button("[ Xuat Excel ]##ts", ImVec2(135, 28))) {
                     // 1. Tạo timestamp thời gian thực YYYYMMDD_HHMMSS
                     time_t now = time(nullptr);
                     tm* ltm = localtime(&now);
@@ -898,9 +1306,9 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                 // NÚT IMPORT DỮ LIỆU MẪU (100 THÍ SINH)
                 ImGui::SameLine();
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.78f, 0.42f, 0.15f, 1.0f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.88f, 0.50f, 0.20f, 1.0f));
-                if (ImGui::Button("[+] Import 100 Thi Sinh Mau", ImVec2(195, 28))) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.45f, 0.35f, 0.15f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.60f, 0.45f, 0.18f, 1.0f));
+                if (ImGui::Button("[+] Import du lieu mau##ts", ImVec2(185, 28))) {
                     bool ok = ql.importDuLieuMau100("sql/05_seed_sample_data.sql");
                     showToast = true;
                     if (ok) {
@@ -1120,7 +1528,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                              ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoSavedSettings;
                 if (needScrollY) tableFlags |= ImGuiTableFlags_ScrollY;
 
-                if (ImGui::BeginTable("CandidatesTable_v2", 17, tableFlags, ImVec2(0, appliedTableHeight))) {
+                if (ImGui::BeginTable("CandidatesTable_v3", 17, tableFlags, ImVec2(0, appliedTableHeight))) {
                     ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 34.0f);
                     ImGui::TableSetupColumn("SBD (PK)", ImGuiTableColumnFlags_WidthFixed, 75.0f);
                     ImGui::TableSetupColumn("So CCCD (FK)", ImGuiTableColumnFlags_WidthFixed, 108.0f);
@@ -1137,7 +1545,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     ImGui::TableSetupColumn("Nganh Trung Tuyen", ImGuiTableColumnFlags_WidthStretch, 1.3f);
                     ImGui::TableSetupColumn("Lop Sinh Hoat", ImGuiTableColumnFlags_WidthFixed, 92.0f);
                     ImGui::TableSetupColumn("Ma SV DUT", ImGuiTableColumnFlags_WidthFixed, 88.0f);
-                    ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 98.0f);
+                    ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoSort, 102.0f);
 
                     // Render Custom Thead: Luôn hiển thị biểu tượng vector mũi tên sắc nét ở mọi cột sortable
                     ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
@@ -1217,14 +1625,14 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                         // CỘT 2: SỐ CCCD (FK) (CĂN GIỮA)
                         AlignAndRenderCenter(2, ts.getSoCCCD(), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        // CỘT 3: HỌ VÀ TÊN (TEXT => CANH PHẢI)
-                        AlignAndRenderTextRight(3, ts.getHoTen(), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
+                        // CỘT 3: HỌ VÀ TÊN (TEXT => CANH TRÁI)
+                        AlignAndRenderTextLeft(3, ts.getHoTen(), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
                         // CỘT 4: NGÀY SINH (CĂN GIỮA)
                         AlignAndRenderCenter(4, ts.getNgaySinh(), ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
-                        // CỘT 5: QUÊ QUÁN (TEXT => CANH PHẢI)
-                        AlignAndRenderTextRight(5, tenQue, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
+                        // CỘT 5: QUÊ QUÁN (TEXT => CANH TRÁI)
+                        AlignAndRenderTextLeft(5, tenQue, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
 
                         // CỘT 6: GIỚI TÍNH (CĂN GIỮA)
                         AlignAndRenderCenter(6, tenGT, ImVec4(0.92f, 0.94f, 0.96f, 1.0f), rowMinH);
@@ -1243,7 +1651,7 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                         sprintf(bufScore, "%.2f", ts.tinhTongDiem());
                         AlignAndRenderCenter(10, bufScore, ImVec4(1.0f, 0.9f, 0.3f, 1.0f), rowMinH);
 
-                        // CỘT 11: KẾT QUẢ XÉT TUYỂN (TEXT => CANH PHẢI)
+                        // CỘT 11: KẾT QUẢ XÉT TUYỂN (TEXT => CANH TRÁI)
                         string ketQuaStr;
                         ImVec4 ketQuaColor;
                         if (ts.daTrungTuyen()) {
@@ -1272,9 +1680,9 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                 ketQuaColor = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
                             }
                         }
-                        AlignAndRenderTextRight(11, ketQuaStr, ketQuaColor, rowMinH);
+                        AlignAndRenderTextLeft(11, ketQuaStr, ketQuaColor, rowMinH);
 
-                        // CỘT 12: KHOA (TEXT => CANH PHẢI)
+                        // CỘT 12: KHOA (TEXT => CANH TRÁI)
                         string khoaStr = "-";
                         ImVec4 khoaColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
                         if (ts.daTrungTuyen() && !ts.getNganhTrungTuyen().empty()) {
@@ -1282,16 +1690,16 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                             khoaStr = ql.layTenKhoa(mk);
                             khoaColor = ImVec4(0.9f, 0.85f, 0.4f, 1.0f);
                         }
-                        AlignAndRenderTextRight(12, khoaStr, khoaColor, rowMinH);
+                        AlignAndRenderTextLeft(12, khoaStr, khoaColor, rowMinH);
 
-                        // CỘT 13: NGÀNH TRÚNG TUYỂN (TEXT => CANH PHẢI)
+                        // CỘT 13: NGÀNH TRÚNG TUYỂN (TEXT => CANH TRÁI)
                         string nganhStr = "-";
                         ImVec4 nganhColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
                         if (!ts.getNganhTrungTuyen().empty()) {
                             nganhStr = ql.layTenNganh(ts.getNganhTrungTuyen());
                             nganhColor = ImVec4(0.4f, 0.85f, 1.0f, 1.0f);
                         }
-                        AlignAndRenderTextRight(13, nganhStr, nganhColor, rowMinH);
+                        AlignAndRenderTextLeft(13, nganhStr, nganhColor, rowMinH);
 
                         // CỘT 14: LỚP SINH HOẠT (CĂN GIỮA)
                         string lopStr = ts.getLopSinhHoat().empty() ? "-" : ts.getLopSinhHoat();
@@ -1303,30 +1711,15 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                         ImVec4 msvColor = ts.getMaSinhVien().empty() ? ImVec4(0.5f, 0.5f, 0.5f, 1.0f) : ImVec4(0.35f, 0.95f, 0.75f, 1.0f);
                         AlignAndRenderCenter(15, msvStr, msvColor, rowMinH);
 
-                        // CỘT 16: THAO TÁC (3 ICON BUTTONS CĂN GIỮA CẢ DỌC VÀ NGANG)
+                        // CỘT 16: THAO TÁC (3 ICON BUTTONS CĂN GIỮA DỌC VÀ NGANG CHUẨN COMMON TABLE)
                         ImGui::TableSetColumnIndex(16);
-                        ImGui::PushID((int)i);
-
-                        float availW16 = ImGui::GetContentRegionAvail().x;
-                        float totalBtnsW = 26.0f * 3.0f + 4.0f * 2.0f; // 86px
-                        float padY16 = (rowMinH - 22.0f) * 0.5f;
-                        if (padY16 > 0.0f) {
-                            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padY16);
-                        }
-                        if (availW16 > totalBtnsW) {
-                            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (availW16 - totalBtnsW) * 0.5f);
-                        }
-
-                        // 1. Icon Button Xem chi tiết hồ sơ thí sinh (Con mắt)
-                        if (RenderIconButtonView("##btnView", ImVec2(26, 22))) {
+                        bool vClk = false, eClk = false, dClk = false;
+                        RenderCommonActionCell(ts.getSoBaoDanh(), vClk, eClk, dClk, true, true, true, "Xem chi tiet ho so thi sinh", "Sua thong tin ho so", "Xoa ho so thi sinh", rowMinH);
+                        if (vClk) {
                             selectedSBD = ts.getSoBaoDanh();
                             showDetailModal = true;
                         }
-
-                        ImGui::SameLine(0, 4);
-
-                        // 2. Icon Button Sửa hồ sơ (Bút chì)
-                        if (RenderIconButtonEdit("##btnEdit", ImVec2(26, 22))) {
+                        if (eClk) {
                             selectedRow = (int)i;
                             selectedSBD = ts.getSoBaoDanh();
                             strcpy(bufSBD, ts.getSoBaoDanh().c_str());
@@ -1363,17 +1756,11 @@ int AppGUI::run(QuanLyThiSinh& ql) {
 
                             showEditModal = true;
                         }
-
-                        ImGui::SameLine(0, 4);
-
-                        // 3. Icon Button Xóa hồ sơ (Thùng rác)
-                        if (RenderIconButtonDelete("##btnDelete", ImVec2(26, 22))) {
+                        if (dClk) {
                             selectedRow = (int)i;
                             selectedSBD = ts.getSoBaoDanh();
                             showDeleteModal = true;
                         }
-
-                        ImGui::PopID();
                     }
 
                     if (pageData.empty()) {
@@ -1514,336 +1901,1212 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     // SUBTAB 2.1: BẢNG THỰC THỂ CHA NGƯỜI
                     if (ImGui::BeginTabItem("  Bang 1: NGUOI (MySQL: nguoi)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG THUC THE CHA: NGUOI (Khoa chinh: soCCCD | Khoa ngoai: queQuan, gioiTinh)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblNguoiRaw", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL0", "Tim theo CCCD, Ho ten, Que quan...", searchCSDL[0], sizeof(searchCSDL[0]));
+
+                        ImGui::SameLine();
+                        bool addNguoi = false, expNguoi = false, impNguoi = false;
+                        ActionToolbarConfig cfgNguoi;
+                        RenderCommonActionToolbar("csdl_nguoi", cfgNguoi, addNguoi, expNguoi, impNguoi);
+                        if (addNguoi) {
+                            showAddModal = true;
+                        }
+                        if (expNguoi) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("soCCCD (PK)"); hd.push_back("hoTen");
+                            hd.push_back("ngaySinh"); hd.push_back("queQuan (FK)"); hd.push_back("gioiTinh (FK)");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(140); wd.push_back(200);
+                            wd.push_back(110); wd.push_back(160); wd.push_back(100);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                                const ThiSinh& ts = ql.getDanhSach()[i];
+                                if (searchCSDL[0][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[0]);
+                                    if (Utils::toLower(ts.getSoCCCD()).find(kw) == string::npos &&
+                                        Utils::toLower(ts.getHoTen()).find(kw) == string::npos &&
+                                        Utils::toLower(ql.layTenTinhThanh(ts.getQueQuan())).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(ts.getSoCCCD());
+                                r.push_back(ts.getHoTen());
+                                r.push_back(ts.getNgaySinh());
+                                r.push_back(ql.layTenTinhThanh(ts.getQueQuan()) + " [" + ts.getQueQuan() + "]");
+                                r.push_back(ql.layTenGioiTinh(ts.getGioiTinh()) + " [" + ts.getGioiTinh() + "]");
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_Nguoi.xls", "BANG THUC THE CHA: NGUOI", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang Nguoi Excel thanh cong!";
+                        }
+                        if (impNguoi) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang Nguoi tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredNguoi;
+                        for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                            const ThiSinh& ts = ql.getDanhSach()[i];
+                            if (searchCSDL[0][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[0]);
+                                if (Utils::toLower(ts.getSoCCCD()).find(kw) == string::npos &&
+                                    Utils::toLower(ts.getHoTen()).find(kw) == string::npos &&
+                                    Utils::toLower(ql.layTenTinhThanh(ts.getQueQuan())).find(kw) == string::npos) continue;
+                            }
+                            filteredNguoi.push_back(i);
+                        }
+                        pagCSDL[0].update((int)filteredNguoi.size());
+                        int offsetNguoi = pagCSDL[0].getOffset();
+                        int endNguoi = (offsetNguoi + pagCSDL[0].getPageSize() < (int)filteredNguoi.size()) ? 
+                                       (offsetNguoi + pagCSDL[0].getPageSize()) : (int)filteredNguoi.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblNguoiRaw", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("soCCCD (PK)", ImGuiTableColumnFlags_WidthFixed, 140);
                             ImGui::TableSetupColumn("hoTen", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("ngaySinh", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("queQuan (FK)", ImGuiTableColumnFlags_WidthFixed, 160);
                             ImGui::TableSetupColumn("gioiTinh (FK)", ImGuiTableColumnFlags_WidthFixed, 100);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
-                                const ThiSinh& ts = ql.getDanhSach()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_ng_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", ts.getSoCCCD().c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", ts.getHoTen().c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%s", ts.getNgaySinh().c_str());
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::Text("%s [%s]", ql.layTenTinhThanh(ts.getQueQuan()).c_str(), ts.getQueQuan().c_str());
-                                ImGui::TableSetColumnIndex(5);
-                                ImGui::Text("%s [%s]", ql.layTenGioiTinh(ts.getGioiTinh()).c_str(), ts.getGioiTinh().c_str());
+                            if (filteredNguoi.empty()) {
+                                RenderCommonEmptyRow(7);
+                            } else {
+                                for (int idx = offsetNguoi; idx < endNguoi; ++idx) {
+                                    size_t realIdx = filteredNguoi[idx];
+                                    const ThiSinh& ts = ql.getDanhSach()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_ng_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: soCCCD (center)
+                                    AlignAndRenderCenter(1, ts.getSoCCCD(), ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 2: hoTen (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(2, ts.getHoTen());
+                                    // Col 3: ngaySinh (center)
+                                    AlignAndRenderCenter(3, ts.getNgaySinh());
+                                    // Col 4: queQuan (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(4, ql.layTenTinhThanh(ts.getQueQuan()) + " [" + ts.getQueQuan() + "]");
+                                    // Col 5: gioiTinh (center)
+                                    AlignAndRenderCenter(5, ql.layTenGioiTinh(ts.getGioiTinh()) + " [" + ts.getGioiTinh() + "]");
+
+                                    // Col 6: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(6);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        selectedSBD = ts.getSoBaoDanh();
+                                        showDetailModal = true;
+                                    }
+                                    if (onEdit) {
+                                        populateEditThiSinh(ts);
+                                    }
+                                    if (onDelete) {
+                                        selectedSBD = ts.getSoBaoDanh();
+                                        showDeleteModal = true;
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL0", pagCSDL[0]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.2: BẢNG THỰC THỂ CON THÍ SINH
                     if (ImGui::BeginTabItem("  Bang 2: THI SINH (MySQL: thisinh)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG THUC THE CON: THI SINH (Khoa chinh: soBaoDanh | Khoa ngoai: soCCCD, namTuyenSinh)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblThiSinhRaw", 11, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL1", "Tim theo SBD, CCCD, Ho ten, Lop...", searchCSDL[1], sizeof(searchCSDL[1]));
+
+                        ImGui::SameLine();
+                        bool addTS = false, expTS = false, impTS = false;
+                        ActionToolbarConfig cfgTS;
+                        RenderCommonActionToolbar("csdl_thisinh", cfgTS, addTS, expTS, impTS);
+                        if (addTS) {
+                            showAddModal = true;
+                        }
+                        if (expTS) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("soBaoDanh (PK)"); hd.push_back("soCCCD (FK)");
+                            hd.push_back("namTuyenSinh"); hd.push_back("diemToan"); hd.push_back("diemLy");
+                            hd.push_back("diemHoa"); hd.push_back("maSinhVien"); hd.push_back("lopSinhHoat");
+                            hd.push_back("nganhTrungTuyen"); hd.push_back("nguyenVongTrungTuyen");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(105); wd.push_back(120);
+                            wd.push_back(95); wd.push_back(75); wd.push_back(75);
+                            wd.push_back(75); wd.push_back(115); wd.push_back(125);
+                            wd.push_back(115); wd.push_back(60);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                                const ThiSinh& ts = ql.getDanhSach()[i];
+                                if (searchCSDL[1][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[1]);
+                                    if (Utils::toLower(ts.getSoBaoDanh()).find(kw) == string::npos &&
+                                        Utils::toLower(ts.getSoCCCD()).find(kw) == string::npos &&
+                                        Utils::toLower(ts.getHoTen()).find(kw) == string::npos &&
+                                        Utils::toLower(ts.getMaSinhVien()).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(ts.getSoBaoDanh());
+                                r.push_back(ts.getSoCCCD());
+                                r.push_back(to_string(ts.getNamTuyenSinh()));
+                                char b1[32], b2[32], b3[32];
+                                sprintf(b1, "%.2f", ts.getDiemToan()); r.push_back(b1);
+                                sprintf(b2, "%.2f", ts.getDiemLy()); r.push_back(b2);
+                                sprintf(b3, "%.2f", ts.getDiemHoa()); r.push_back(b3);
+                                r.push_back(ts.getMaSinhVien().empty() ? "NULL" : ts.getMaSinhVien());
+                                r.push_back(ts.getLopSinhHoat().empty() ? "NULL" : ts.getLopSinhHoat());
+                                r.push_back(ts.getNganhTrungTuyen().empty() ? "NULL" : ts.getNganhTrungTuyen());
+                                r.push_back(to_string(ts.getNguyenVongTrungTuyen()));
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_ThiSinh.xls", "BANG THUC THE CON: THI SINH", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang ThiSinh Excel thanh cong!";
+                        }
+                        if (impTS) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang ThiSinh tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredTS;
+                        for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                            const ThiSinh& ts = ql.getDanhSach()[i];
+                            if (searchCSDL[1][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[1]);
+                                if (Utils::toLower(ts.getSoBaoDanh()).find(kw) == string::npos &&
+                                    Utils::toLower(ts.getSoCCCD()).find(kw) == string::npos &&
+                                    Utils::toLower(ts.getHoTen()).find(kw) == string::npos &&
+                                    Utils::toLower(ts.getMaSinhVien()).find(kw) == string::npos) continue;
+                            }
+                            filteredTS.push_back(i);
+                        }
+                        pagCSDL[1].update((int)filteredTS.size());
+                        int offsetTS = pagCSDL[1].getOffset();
+                        int endTS = (offsetTS + pagCSDL[1].getPageSize() < (int)filteredTS.size()) ? 
+                                    (offsetTS + pagCSDL[1].getPageSize()) : (int)filteredTS.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblThiSinhRaw", 12, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 35);
                             ImGui::TableSetupColumn("soBaoDanh (PK)", ImGuiTableColumnFlags_WidthFixed, 105);
                             ImGui::TableSetupColumn("soCCCD (FK)", ImGuiTableColumnFlags_WidthFixed, 120);
                             ImGui::TableSetupColumn("namTuyenSinh", ImGuiTableColumnFlags_WidthFixed, 95);
-                            ImGui::TableSetupColumn("diemToan", ImGuiTableColumnFlags_WidthFixed, 75);
-                            ImGui::TableSetupColumn("diemLy", ImGuiTableColumnFlags_WidthFixed, 75);
-                            ImGui::TableSetupColumn("diemHoa", ImGuiTableColumnFlags_WidthFixed, 75);
-                            ImGui::TableSetupColumn("maSinhVien", ImGuiTableColumnFlags_WidthFixed, 115);
-                            ImGui::TableSetupColumn("lopSinhHoat", ImGuiTableColumnFlags_WidthFixed, 125);
-                            ImGui::TableSetupColumn("nganhTrungTuyen", ImGuiTableColumnFlags_WidthFixed, 115);
-                            ImGui::TableSetupColumn("nguyenVongTrungTuyen", ImGuiTableColumnFlags_WidthFixed, 60);
+                            ImGui::TableSetupColumn("diemToan", ImGuiTableColumnFlags_WidthFixed, 70);
+                            ImGui::TableSetupColumn("diemLy", ImGuiTableColumnFlags_WidthFixed, 70);
+                            ImGui::TableSetupColumn("diemHoa", ImGuiTableColumnFlags_WidthFixed, 70);
+                            ImGui::TableSetupColumn("maSinhVien", ImGuiTableColumnFlags_WidthFixed, 110);
+                            ImGui::TableSetupColumn("lopSinhHoat", ImGuiTableColumnFlags_WidthFixed, 120);
+                            ImGui::TableSetupColumn("nganhTrungTuyen", ImGuiTableColumnFlags_WidthFixed, 110);
+                            ImGui::TableSetupColumn("nguyenVongTrungTuyen", ImGuiTableColumnFlags_WidthFixed, 50);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
-                                const ThiSinh& ts = ql.getDanhSach()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_tsr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ts.getSoBaoDanh().c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", ts.getSoCCCD().c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%d", ts.getNamTuyenSinh());
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::Text("%.2f", ts.getDiemToan());
-                                ImGui::TableSetColumnIndex(5);
-                                ImGui::Text("%.2f", ts.getDiemLy());
-                                ImGui::TableSetColumnIndex(6);
-                                ImGui::Text("%.2f", ts.getDiemHoa());
-                                ImGui::TableSetColumnIndex(7);
-                                ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%s", ts.getMaSinhVien().empty() ? "NULL" : ts.getMaSinhVien().c_str());
-                                ImGui::TableSetColumnIndex(8);
-                                ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "%s", ts.getLopSinhHoat().empty() ? "NULL" : ts.getLopSinhHoat().c_str());
-                                ImGui::TableSetColumnIndex(9);
-                                ImGui::Text("%s", ts.getNganhTrungTuyen().empty() ? "NULL" : ts.getNganhTrungTuyen().c_str());
-                                ImGui::TableSetColumnIndex(10);
-                                ImGui::Text("%d", ts.getNguyenVongTrungTuyen());
+                            if (filteredTS.empty()) {
+                                RenderCommonEmptyRow(12);
+                            } else {
+                                for (int idx = offsetTS; idx < endTS; ++idx) {
+                                    size_t realIdx = filteredTS[idx];
+                                    const ThiSinh& ts = ql.getDanhSach()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_tsr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: soBaoDanh (center)
+                                    AlignAndRenderCenter(1, ts.getSoBaoDanh(), ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+                                    // Col 2: soCCCD (center)
+                                    AlignAndRenderCenter(2, ts.getSoCCCD(), ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 3: namTuyenSinh (center)
+                                    AlignAndRenderCenter(3, to_string(ts.getNamTuyenSinh()));
+                                    // Col 4-6: Diem (center)
+                                    char bToan[32], bLy[32], bHoa[32];
+                                    sprintf(bToan, "%.2f", ts.getDiemToan());
+                                    sprintf(bLy, "%.2f", ts.getDiemLy());
+                                    sprintf(bHoa, "%.2f", ts.getDiemHoa());
+                                    AlignAndRenderCenter(4, bToan);
+                                    AlignAndRenderCenter(5, bLy);
+                                    AlignAndRenderCenter(6, bHoa);
+                                    // Col 7: maSinhVien (center)
+                                    AlignAndRenderCenter(7, ts.getMaSinhVien().empty() ? "NULL" : ts.getMaSinhVien(), ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+                                    // Col 8: lopSinhHoat (center)
+                                    AlignAndRenderCenter(8, ts.getLopSinhHoat().empty() ? "NULL" : ts.getLopSinhHoat(), ImVec4(0.35f, 0.85f, 1.0f, 1.0f));
+                                    // Col 9: nganhTrungTuyen (center)
+                                    AlignAndRenderCenter(9, ts.getNganhTrungTuyen().empty() ? "NULL" : ts.getNganhTrungTuyen());
+                                    // Col 10: nguyenVongTrungTuyen (center)
+                                    AlignAndRenderCenter(10, to_string(ts.getNguyenVongTrungTuyen()));
+
+                                    // Col 11: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(11);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        selectedSBD = ts.getSoBaoDanh();
+                                        showDetailModal = true;
+                                    }
+                                    if (onEdit) {
+                                        populateEditThiSinh(ts);
+                                    }
+                                    if (onDelete) {
+                                        selectedSBD = ts.getSoBaoDanh();
+                                        showDeleteModal = true;
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL1", pagCSDL[1]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.3: BẢNG NGUYỆN VỌNG ĐĂNG KÝ
                     if (ImGui::BeginTabItem("  Bang 3: NGUYEN VONG (MySQL: nguyen_vong)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG NGUYEN VONG: QUAN HE NHIEU - NHIEU GIUA THI SINH & NGANH (Khoa ngoai: soBaoDanh, maNganh)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblNguyenVongRaw", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL2", "Tim theo SBD, Ma nganh, Ten nganh...", searchCSDL[2], sizeof(searchCSDL[2]));
+
+                        ImGui::SameLine();
+                        bool addNV = false, expNV = false, impNV = false;
+                        ActionToolbarConfig cfgNV;
+                        RenderCommonActionToolbar("csdl_nv", cfgNV, addNV, expNV, impNV);
+                        if (addNV) {
+                            showAddModal = true;
+                        }
+                        if (expNV) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("soBaoDanh (FK)"); hd.push_back("thuTuNV");
+                            hd.push_back("maNganh (FK)"); hd.push_back("Ten Nganh Dang Ky"); hd.push_back("trangThai");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(120); wd.push_back(80);
+                            wd.push_back(110); wd.push_back(240); wd.push_back(160);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                                const ThiSinh& ts = ql.getDanhSach()[i];
+                                for (size_t j = 0; j < ts.getDsNguyenVong().size(); ++j) {
+                                    const NguyenVong& nv = ts.getDsNguyenVong()[j];
+                                    string tenN = ql.layTenNganh(nv.maNganh);
+                                    if (searchCSDL[2][0] != '\0') {
+                                        string kw = Utils::toLower(searchCSDL[2]);
+                                        if (Utils::toLower(ts.getSoBaoDanh()).find(kw) == string::npos &&
+                                            Utils::toLower(nv.maNganh).find(kw) == string::npos &&
+                                            Utils::toLower(tenN).find(kw) == string::npos) continue;
+                                    }
+                                    sttExp++;
+                                    Vector<string> r;
+                                    r.push_back(to_string(sttExp));
+                                    r.push_back(ts.getSoBaoDanh());
+                                    r.push_back("NV" + to_string(nv.thuTuNV));
+                                    r.push_back(nv.maNganh);
+                                    r.push_back(tenN);
+                                    r.push_back(nv.trangThai);
+                                    rows.push_back(r);
+                                }
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_NguyenVong.xls", "BANG NGUYEN VONG", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang NguyenVong Excel thanh cong!";
+                        }
+                        if (impNV) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang NguyenVong tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        struct NVRow { string sbd; NguyenVong nv; };
+                        Vector<NVRow> flatNV;
+                        for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                            const ThiSinh& ts = ql.getDanhSach()[i];
+                            for (size_t j = 0; j < ts.getDsNguyenVong().size(); ++j) {
+                                const NguyenVong& nv = ts.getDsNguyenVong()[j];
+                                string tenN = ql.layTenNganh(nv.maNganh);
+                                if (searchCSDL[2][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[2]);
+                                    if (Utils::toLower(ts.getSoBaoDanh()).find(kw) == string::npos &&
+                                        Utils::toLower(nv.maNganh).find(kw) == string::npos &&
+                                        Utils::toLower(tenN).find(kw) == string::npos) continue;
+                                }
+                                NVRow r; r.sbd = ts.getSoBaoDanh(); r.nv = nv;
+                                flatNV.push_back(r);
+                            }
+                        }
+                        pagCSDL[2].update((int)flatNV.size());
+                        int offsetNV = pagCSDL[2].getOffset();
+                        int endNV = (offsetNV + pagCSDL[2].getPageSize() < (int)flatNV.size()) ? 
+                                    (offsetNV + pagCSDL[2].getPageSize()) : (int)flatNV.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblNguyenVongRaw", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("soBaoDanh (FK)", ImGuiTableColumnFlags_WidthFixed, 120);
                             ImGui::TableSetupColumn("thuTuNV", ImGuiTableColumnFlags_WidthFixed, 80);
                             ImGui::TableSetupColumn("maNganh (FK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("Ten Nganh Dang Ky", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("trangThai", ImGuiTableColumnFlags_WidthFixed, 160);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            int sttNV = 0;
-                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
-                                const ThiSinh& ts = ql.getDanhSach()[i];
-                                const Vector<NguyenVong>& dsNV = ts.getDsNguyenVong();
-                                for (size_t j = 0; j < dsNV.size(); ++j) {
-                                    sttNV++;
+                            if (flatNV.empty()) {
+                                RenderCommonEmptyRow(7);
+                            } else {
+                                for (int idx = offsetNV; idx < endNV; ++idx) {
+                                    const NVRow& item = flatNV[idx];
+                                    string tenN = ql.layTenNganh(item.nv.maNganh);
+
                                     ImGui::TableNextRow();
-                                    ImGui::TableSetColumnIndex(0);
-                                    char rId[32]; sprintf(rId, "##row_nvr_%d", sttNV); RenderRowHover(rId);
-                                    ImGui::Text("%d", sttNV);
-                                    ImGui::TableSetColumnIndex(1);
-                                    ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ts.getSoBaoDanh().c_str());
-                                    ImGui::TableSetColumnIndex(2);
-                                    ImGui::Text("NV%d", dsNV[j].thuTuNV);
-                                    ImGui::TableSetColumnIndex(3);
-                                    ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", dsNV[j].maNganh.c_str());
-                                    ImGui::TableSetColumnIndex(4);
-                                    ImGui::Text("%s", ql.layTenNganh(dsNV[j].maNganh).c_str());
-                                    ImGui::TableSetColumnIndex(5);
-                                    if (dsNV[j].trangThai == AdmissionConst::TT_NV_TRUNG_TUYEN) {
-                                        ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%s", dsNV[j].trangThai.c_str());
-                                    } else if (dsNV[j].trangThai == AdmissionConst::TT_NV_KHONG_TRUNG) {
-                                        ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.4f, 1.0f), "%s", dsNV[j].trangThai.c_str());
-                                    } else {
-                                        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "%s", dsNV[j].trangThai.c_str());
+                                    char rId[32]; sprintf(rId, "##row_nvr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: soBaoDanh (center)
+                                    AlignAndRenderCenter(1, item.sbd, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+                                    // Col 2: thuTuNV (center)
+                                    AlignAndRenderCenter(2, "NV" + to_string(item.nv.thuTuNV));
+                                    // Col 3: maNganh (center)
+                                    AlignAndRenderCenter(3, item.nv.maNganh, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 4: Ten Nganh (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(4, tenN);
+                                    // Col 5: trangThai (center)
+                                    ImVec4 colTT = (item.nv.trangThai == AdmissionConst::TT_NV_TRUNG_TUYEN) ? ImVec4(0.2f, 0.95f, 0.4f, 1.0f) :
+                                                   ((item.nv.trangThai == AdmissionConst::TT_NV_KHONG_TRUNG) ? ImVec4(0.9f, 0.4f, 0.4f, 1.0f) : ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+                                    AlignAndRenderCenter(5, item.nv.trangThai, colTT);
+
+                                    // Col 6: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(6);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        selectedSBD = item.sbd;
+                                        showDetailModal = true;
+                                    }
+                                    if (onEdit) {
+                                        selectedSBD = item.sbd;
+                                        int p = ql.timViTriTheoSBD(selectedSBD);
+                                        if (p >= 0) {
+                                            populateEditThiSinh(ql.getDanhSach()[p]);
+                                        }
+                                    }
+                                    if (onDelete) {
+                                        selectedSBD = item.sbd;
+                                        showDeleteModal = true;
                                     }
                                 }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL2", pagCSDL[2]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.4: BẢNG KHOA ĐÀO TẠO
                     if (ImGui::BeginTabItem("  Bang 4: KHOA (MySQL: khoa)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG DANH MUC KHOA CHUYEN MON DUT (Khoa chinh: maKhoa)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblKhoaRaw", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL3", "Tim theo Ma khoa, Ten khoa...", searchCSDL[3], sizeof(searchCSDL[3]));
+
+                        ImGui::SameLine();
+                        bool addK = false, expK = false, impK = false;
+                        ActionToolbarConfig cfgK;
+                        RenderCommonActionToolbar("csdl_khoa", cfgK, addK, expK, impK);
+                        if (addK) {
+                            addKhoaMa[0] = '\0'; addKhoaTen[0] = '\0'; addKhoaMaDUT[0] = '\0';
+                            addKhoaError = ""; showAddKhoaModal = true;
+                        }
+                        if (expK) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("maKhoa (PK)"); hd.push_back("tenKhoa"); hd.push_back("maKhoaTheoChuanDUT");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(110); wd.push_back(240); wd.push_back(180);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSachKhoa().size(); ++i) {
+                                const Khoa& k = ql.getDanhSachKhoa()[i];
+                                if (searchCSDL[3][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[3]);
+                                    if (Utils::toLower(k.maKhoa).find(kw) == string::npos &&
+                                        Utils::toLower(k.tenKhoa).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(k.maKhoa);
+                                r.push_back(k.tenKhoa);
+                                r.push_back(k.maKhoaTheoChuanDUT);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_Khoa.xls", "BANG DANH MUC KHOA", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang Khoa Excel thanh cong!";
+                        }
+                        if (impK) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang Khoa tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredKhoa;
+                        for (size_t i = 0; i < ql.getDanhSachKhoa().size(); ++i) {
+                            const Khoa& k = ql.getDanhSachKhoa()[i];
+                            if (searchCSDL[3][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[3]);
+                                if (Utils::toLower(k.maKhoa).find(kw) == string::npos &&
+                                    Utils::toLower(k.tenKhoa).find(kw) == string::npos) continue;
+                            }
+                            filteredKhoa.push_back(i);
+                        }
+                        pagCSDL[3].update((int)filteredKhoa.size());
+                        int offsetK = pagCSDL[3].getOffset();
+                        int endK = (offsetK + pagCSDL[3].getPageSize() < (int)filteredKhoa.size()) ? 
+                                   (offsetK + pagCSDL[3].getPageSize()) : (int)filteredKhoa.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblKhoaRaw", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("maKhoa (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("tenKhoa", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("maKhoaTheoChuanDUT", ImGuiTableColumnFlags_WidthFixed, 180);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachKhoa().size(); ++i) {
-                                const Khoa& k = ql.getDanhSachKhoa()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_kr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", k.maKhoa.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", k.tenKhoa.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", k.maKhoaTheoChuanDUT.c_str());
+                            if (filteredKhoa.empty()) {
+                                RenderCommonEmptyRow(5);
+                            } else {
+                                for (int idx = offsetK; idx < endK; ++idx) {
+                                    size_t realIdx = filteredKhoa[idx];
+                                    const Khoa& k = ql.getDanhSachKhoa()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_kr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: maKhoa (center)
+                                    AlignAndRenderCenter(1, k.maKhoa, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 2: tenKhoa (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(2, k.tenKhoa);
+                                    // Col 3: maKhoaTheoChuanDUT (center)
+                                    AlignAndRenderCenter(3, k.maKhoaTheoChuanDUT, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+
+                                    // Col 4: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(4);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        viewKhoaData = k;
+                                        showViewKhoaModal = true;
+                                    }
+                                    if (onEdit) {
+                                        strncpy(editKhoaMa, k.maKhoa.c_str(), sizeof(editKhoaMa) - 1);
+                                        strncpy(editKhoaTen, k.tenKhoa.c_str(), sizeof(editKhoaTen) - 1);
+                                        strncpy(editKhoaMaDUT, k.maKhoaTheoChuanDUT.c_str(), sizeof(editKhoaMaDUT) - 1);
+                                        editKhoaError = "";
+                                        showEditKhoaModal = true;
+                                    }
+                                    if (onDelete) {
+                                        if (ql.xoaKhoa(k.maKhoa)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa khoa " + k.maKhoa + "!";
+                                        }
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL3", pagCSDL[3]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.5: BẢNG DANH MỤC NGÀNH TĨNH
                     if (ImGui::BeginTabItem("  Bang 5: DANH MUC NGANH (MySQL: danh_muc_nganh)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG DANH MUC NGANH DAO TAO CHUAN BO GD&DT (Khoa chinh: maNganh | Khoa ngoai: maKhoa)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblDanhMucNganhRaw", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL4", "Tim theo Ma nganh, Ten nganh...", searchCSDL[4], sizeof(searchCSDL[4]));
+
+                        ImGui::SameLine();
+                        bool addDMN = false, expDMN = false, impDMN = false;
+                        ActionToolbarConfig cfgDMN;
+                        RenderCommonActionToolbar("csdl_dmn", cfgDMN, addDMN, expDMN, impDMN);
+                        if (addDMN) {
+                            addNganhMa[0] = '\0'; addNganhTen[0] = '\0';
+                            if (!ql.getDanhSachKhoa().empty()) addNganhKhoa = ql.getDanhSachKhoa()[0].maKhoa;
+                            addNganhTienTo[0] = '\0'; addNganhError = ""; showAddNganhModal = true;
+                        }
+                        if (expDMN) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("maNganh (PK)"); hd.push_back("tenNganh");
+                            hd.push_back("maKhoa (FK)"); hd.push_back("tienToLop");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(110); wd.push_back(240); wd.push_back(100); wd.push_back(130);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSachDanhMucNganh().size(); ++i) {
+                                const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
+                                if (searchCSDL[4][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[4]);
+                                    if (Utils::toLower(dmn.maNganh).find(kw) == string::npos &&
+                                        Utils::toLower(dmn.tenNganh).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(dmn.maNganh);
+                                r.push_back(dmn.tenNganh);
+                                r.push_back(dmn.maKhoa);
+                                r.push_back(dmn.tienToLop);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_DanhMucNganh.xls", "BANG DANH MUC NGANH", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang DanhMucNganh Excel thanh cong!";
+                        }
+                        if (impDMN) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang DanhMucNganh tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredDMN;
+                        for (size_t i = 0; i < ql.getDanhSachDanhMucNganh().size(); ++i) {
+                            const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
+                            if (searchCSDL[4][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[4]);
+                                if (Utils::toLower(dmn.maNganh).find(kw) == string::npos &&
+                                    Utils::toLower(dmn.tenNganh).find(kw) == string::npos) continue;
+                            }
+                            filteredDMN.push_back(i);
+                        }
+                        pagCSDL[4].update((int)filteredDMN.size());
+                        int offsetDMN = pagCSDL[4].getOffset();
+                        int endDMN = (offsetDMN + pagCSDL[4].getPageSize() < (int)filteredDMN.size()) ? 
+                                     (offsetDMN + pagCSDL[4].getPageSize()) : (int)filteredDMN.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblDanhMucNganhRaw", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("maNganh (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("tenNganh", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("maKhoa (FK)", ImGuiTableColumnFlags_WidthFixed, 100);
                             ImGui::TableSetupColumn("tienToLop", ImGuiTableColumnFlags_WidthFixed, 130);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachDanhMucNganh().size(); ++i) {
-                                const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_dmnr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", dmn.maNganh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", dmn.tenNganh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", dmn.maKhoa.c_str());
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%s", dmn.tienToLop.c_str());
+                            if (filteredDMN.empty()) {
+                                RenderCommonEmptyRow(6);
+                            } else {
+                                for (int idx = offsetDMN; idx < endDMN; ++idx) {
+                                    size_t realIdx = filteredDMN[idx];
+                                    const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_dmnr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: maNganh (center)
+                                    AlignAndRenderCenter(1, dmn.maNganh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+                                    // Col 2: tenNganh (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(2, dmn.tenNganh);
+                                    // Col 3: maKhoa (center)
+                                    AlignAndRenderCenter(3, dmn.maKhoa, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 4: tienToLop (center)
+                                    AlignAndRenderCenter(4, dmn.tienToLop, ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+
+                                    // Col 5: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(5);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        viewNganhData = dmn;
+                                        showViewNganhModal = true;
+                                    }
+                                    if (onEdit) {
+                                        strncpy(editNganhMa, dmn.maNganh.c_str(), sizeof(editNganhMa) - 1);
+                                        strncpy(editNganhTen, dmn.tenNganh.c_str(), sizeof(editNganhTen) - 1);
+                                        editNganhKhoa = dmn.maKhoa;
+                                        strncpy(editNganhTienTo, dmn.tienToLop.c_str(), sizeof(editNganhTienTo) - 1);
+                                        editNganhError = "";
+                                        showEditNganhModal = true;
+                                    }
+                                    if (onDelete) {
+                                        if (ql.xoaDanhMucNganh(dmn.maNganh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa nganh " + dmn.maNganh + "!";
+                                        }
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL4", pagCSDL[4]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.6: BẢNG NGÀNH THEO KHÓA HỌC (BIẾN ĐỘNG)
                     if (ImGui::BeginTabItem("  Bang 6: NGANH THEO KHOA HOC (MySQL: nganh_theo_khoa_hoc)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG CHI TIEU VA DIEM CHUAN BIEN DONG THEO KHOA (Khoa chinh kep: namTuyenSinh, maNganh)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblNganhTheoKhoaHocRaw", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL5", "Tim theo Nam, Ma nganh, Ten nganh...", searchCSDL[5], sizeof(searchCSDL[5]));
+
+                        ImGui::SameLine();
+                        bool addNTK = false, expNTK = false, impNTK = false;
+                        ActionToolbarConfig cfgNTK;
+                        RenderCommonActionToolbar("csdl_ntk", cfgNTK, addNTK, expNTK, impNTK);
+                        if (addNTK) {
+                            addNTKNam = ql.getNamTuyenSinhHienHanh();
+                            addNTKMa = ql.getDanhSachDanhMucNganh().empty() ? "" : ql.getDanhSachDanhMucNganh()[0].maNganh;
+                            addNTKChiTieu = 50; addNTKDiemSan = (float)ql.getDiemSanMacDinh();
+                            addNTKError = ""; showAddNTKModal = true;
+                        }
+                        if (expNTK) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("namTuyenSinh (PK, FK)"); hd.push_back("maNganh (PK, FK)");
+                            hd.push_back("chiTieu"); hd.push_back("diemSanToiThieu"); hd.push_back("diemChuanChot");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(140); wd.push_back(120); wd.push_back(90); wd.push_back(110); wd.push_back(120);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
+                                const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
+                                if (searchCSDL[5][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[5]);
+                                    if (to_string(ntk.namTuyenSinh).find(kw) == string::npos &&
+                                        Utils::toLower(ntk.maNganh).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(to_string(ntk.namTuyenSinh));
+                                r.push_back(ntk.maNganh);
+                                r.push_back(to_string(ntk.chiTieu));
+                                char bSan[32], bChuan[32];
+                                sprintf(bSan, "%.2f", ntk.diemSanToiThieu); r.push_back(bSan);
+                                if (ntk.diemChuanChot > 0.0) { sprintf(bChuan, "%.2f", ntk.diemChuanChot); r.push_back(bChuan); }
+                                else r.push_back("Chua chot");
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_NganhTheoKhoaHoc.xls", "BANG NGANH THEO KHOA HOC", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang NganhTheoKhoaHoc Excel thanh cong!";
+                        }
+                        if (impNTK) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang NganhTheoKhoaHoc tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredNTK;
+                        for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
+                            const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
+                            if (searchCSDL[5][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[5]);
+                                if (to_string(ntk.namTuyenSinh).find(kw) == string::npos &&
+                                    Utils::toLower(ntk.maNganh).find(kw) == string::npos) continue;
+                            }
+                            filteredNTK.push_back(i);
+                        }
+                        pagCSDL[5].update((int)filteredNTK.size());
+                        int offsetNTK = pagCSDL[5].getOffset();
+                        int endNTK = (offsetNTK + pagCSDL[5].getPageSize() < (int)filteredNTK.size()) ? 
+                                     (offsetNTK + pagCSDL[5].getPageSize()) : (int)filteredNTK.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblNganhTheoKhoaHocRaw", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("namTuyenSinh (PK, FK)", ImGuiTableColumnFlags_WidthFixed, 140);
                             ImGui::TableSetupColumn("maNganh (PK, FK)", ImGuiTableColumnFlags_WidthFixed, 120);
                             ImGui::TableSetupColumn("chiTieu", ImGuiTableColumnFlags_WidthFixed, 90);
                             ImGui::TableSetupColumn("diemSanToiThieu", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("diemChuanChot", ImGuiTableColumnFlags_WidthFixed, 120);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
-                                const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_ntkr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::Text("%d", ntk.namTuyenSinh);
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ntk.maNganh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%d", ntk.chiTieu);
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::Text("%.2f", ntk.diemSanToiThieu);
-                                ImGui::TableSetColumnIndex(5);
-                                if (ntk.diemChuanChot > 0.0) {
-                                    ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%.2f", ntk.diemChuanChot);
-                                } else {
-                                    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Chua chot");
+                            if (filteredNTK.empty()) {
+                                RenderCommonEmptyRow(7);
+                            } else {
+                                for (int idx = offsetNTK; idx < endNTK; ++idx) {
+                                    size_t realIdx = filteredNTK[idx];
+                                    const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_ntkr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: namTuyenSinh (center)
+                                    AlignAndRenderCenter(1, to_string(ntk.namTuyenSinh));
+                                    // Col 2: maNganh (center)
+                                    AlignAndRenderCenter(2, ntk.maNganh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+                                    // Col 3: chiTieu (center)
+                                    AlignAndRenderCenter(3, to_string(ntk.chiTieu));
+                                    // Col 4: diemSanToiThieu (center)
+                                    char bSan[32]; sprintf(bSan, "%.2f", ntk.diemSanToiThieu);
+                                    AlignAndRenderCenter(4, bSan);
+                                    // Col 5: diemChuanChot (center)
+                                    if (ntk.diemChuanChot > 0.0) {
+                                        char bChuan[32]; sprintf(bChuan, "%.2f", ntk.diemChuanChot);
+                                        AlignAndRenderCenter(5, bChuan, ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+                                    } else {
+                                        AlignAndRenderCenter(5, "Chua chot", ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+                                    }
+
+                                    // Col 6: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(6);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        viewNTKData = ntk;
+                                        showViewNTKModal = true;
+                                    }
+                                    if (onEdit) {
+                                        editNTKNam = ntk.namTuyenSinh;
+                                        editNTKMa = ntk.maNganh;
+                                        editNTKChiTieu = ntk.chiTieu;
+                                        editNTKDiemSan = (float)ntk.diemSanToiThieu;
+                                        editNTKError = "";
+                                        showEditNTKModal = true;
+                                    }
+                                    if (onDelete) {
+                                        if (ql.xoaNganhTheoKhoaHoc(ntk.namTuyenSinh, ntk.maNganh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa chi tieu nganh " + ntk.maNganh + "!";
+                                        }
+                                    }
                                 }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL5", pagCSDL[5]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.7: BẢNG KHÓA HỌC
                     if (ImGui::BeginTabItem("  Bang 7: KHOA HOC (MySQL: khoa_hoc)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG DANH MUC KHOA HOC / NAM TUYEN SINH (Khoa chinh: namTuyenSinh)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblKhoaHocRaw", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL6", "Tim theo Nam, Ten khoa hoc...", searchCSDL[6], sizeof(searchCSDL[6]));
+
+                        ImGui::SameLine();
+                        bool addKH = false, expKH = false, impKH = false;
+                        ActionToolbarConfig cfgKH;
+                        RenderCommonActionToolbar("csdl_kh", cfgKH, addKH, expKH, impKH);
+                        if (addKH) {
+                            showToast = true;
+                            toastMsg = "Chuc nang them Khoa hoc truc tiep dang duoc phat trien!";
+                        }
+                        if (expKH) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("namTuyenSinh (PK)"); hd.push_back("tenKhoaHoc"); hd.push_back("trangThai");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(140); wd.push_back(240); wd.push_back(160);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSachKhoaHoc().size(); ++i) {
+                                const KhoaHoc& kh = ql.getDanhSachKhoaHoc()[i];
+                                if (searchCSDL[6][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[6]);
+                                    if (to_string(kh.namTuyenSinh).find(kw) == string::npos &&
+                                        Utils::toLower(kh.tenKhoaHoc).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(to_string(kh.namTuyenSinh));
+                                r.push_back(kh.tenKhoaHoc);
+                                r.push_back(kh.trangThai);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_KhoaHoc.xls", "BANG KHOA HOC", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang KhoaHoc Excel thanh cong!";
+                        }
+                        if (impKH) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang KhoaHoc tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredKH;
+                        for (size_t i = 0; i < ql.getDanhSachKhoaHoc().size(); ++i) {
+                            const KhoaHoc& kh = ql.getDanhSachKhoaHoc()[i];
+                            if (searchCSDL[6][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[6]);
+                                if (to_string(kh.namTuyenSinh).find(kw) == string::npos &&
+                                    Utils::toLower(kh.tenKhoaHoc).find(kw) == string::npos) continue;
+                            }
+                            filteredKH.push_back(i);
+                        }
+                        pagCSDL[6].update((int)filteredKH.size());
+                        int offsetKH = pagCSDL[6].getOffset();
+                        int endKH = (offsetKH + pagCSDL[6].getPageSize() < (int)filteredKH.size()) ? 
+                                    (offsetKH + pagCSDL[6].getPageSize()) : (int)filteredKH.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblKhoaHocRaw", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("namTuyenSinh (PK)", ImGuiTableColumnFlags_WidthFixed, 140);
                             ImGui::TableSetupColumn("tenKhoaHoc", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("trangThai", ImGuiTableColumnFlags_WidthFixed, 160);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachKhoaHoc().size(); ++i) {
-                                const KhoaHoc& kh = ql.getDanhSachKhoaHoc()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_khr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%d", kh.namTuyenSinh);
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", kh.tenKhoaHoc.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%s", kh.trangThai.c_str());
+                            if (filteredKH.empty()) {
+                                RenderCommonEmptyRow(5);
+                            } else {
+                                for (int idx = offsetKH; idx < endKH; ++idx) {
+                                    size_t realIdx = filteredKH[idx];
+                                    const KhoaHoc& kh = ql.getDanhSachKhoaHoc()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_khr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: namTuyenSinh (center)
+                                    AlignAndRenderCenter(1, to_string(kh.namTuyenSinh), ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 2: tenKhoaHoc (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(2, kh.tenKhoaHoc);
+                                    // Col 3: trangThai (center)
+                                    AlignAndRenderCenter(3, kh.trangThai, ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+
+                                    // Col 4: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(4);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView || onEdit) {
+                                        showToast = true;
+                                        toastMsg = "Khoa hoc: " + kh.tenKhoaHoc;
+                                    }
+                                    if (onDelete) {
+                                        showToast = true;
+                                        toastMsg = "Khong the xoa Khoa hoc he thong!";
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL6", pagCSDL[6]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.8: BẢNG DANH MỤC TỈNH THÀNH
                     if (ImGui::BeginTabItem("  Bang 8: TINH THANH (MySQL: tinh_thanh)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG DANH MUC: 34 TINH / THANH PHO (Khoa chinh: maTinh)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblTinhThanhRaw", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL7", "Tim theo Ma tinh, Ten tinh...", searchCSDL[7], sizeof(searchCSDL[7]));
+
+                        ImGui::SameLine();
+                        bool addTT = false, expTT = false, impTT = false;
+                        ActionToolbarConfig cfgTT;
+                        RenderCommonActionToolbar("csdl_tt", cfgTT, addTT, expTT, impTT);
+                        if (addTT) {
+                            addTinhThanhMa[0] = '\0'; addTinhThanhTen[0] = '\0'; addTinhThanhLoai[0] = '\0';
+                            addTinhThanhError = ""; showAddTinhThanhModal = true;
+                        }
+                        if (expTT) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("maTinh (PK)"); hd.push_back("tenTinh"); hd.push_back("loai");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(110); wd.push_back(240); wd.push_back(260);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSachTinhThanh().size(); ++i) {
+                                const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
+                                if (searchCSDL[7][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[7]);
+                                    if (Utils::toLower(tt.maTinh).find(kw) == string::npos &&
+                                        Utils::toLower(tt.tenTinh).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(tt.maTinh);
+                                r.push_back(tt.tenTinh);
+                                r.push_back(tt.loai);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_TinhThanh.xls", "BANG TINH THANH", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang TinhThanh Excel thanh cong!";
+                        }
+                        if (impTT) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang TinhThanh tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredTT;
+                        for (size_t i = 0; i < ql.getDanhSachTinhThanh().size(); ++i) {
+                            const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
+                            if (searchCSDL[7][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[7]);
+                                if (Utils::toLower(tt.maTinh).find(kw) == string::npos &&
+                                    Utils::toLower(tt.tenTinh).find(kw) == string::npos) continue;
+                            }
+                            filteredTT.push_back(i);
+                        }
+                        pagCSDL[7].update((int)filteredTT.size());
+                        int offsetTT = pagCSDL[7].getOffset();
+                        int endTT = (offsetTT + pagCSDL[7].getPageSize() < (int)filteredTT.size()) ? 
+                                    (offsetTT + pagCSDL[7].getPageSize()) : (int)filteredTT.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblTinhThanhRaw", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("maTinh (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("tenTinh", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("loai", ImGuiTableColumnFlags_WidthFixed, 260);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachTinhThanh().size(); ++i) {
-                                const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_ttr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", tt.maTinh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", tt.tenTinh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%s", tt.loai.c_str());
+                            if (filteredTT.empty()) {
+                                RenderCommonEmptyRow(5);
+                            } else {
+                                for (int idx = offsetTT; idx < endTT; ++idx) {
+                                    size_t realIdx = filteredTT[idx];
+                                    const TinhThanh& tt = ql.getDanhSachTinhThanh()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_ttr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: maTinh (center)
+                                    AlignAndRenderCenter(1, tt.maTinh, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 2: tenTinh (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(2, tt.tenTinh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+                                    // Col 3: loai (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(3, tt.loai);
+
+                                    // Col 4: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(4);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        viewTinhThanhData = tt;
+                                        showViewTinhThanhModal = true;
+                                    }
+                                    if (onEdit) {
+                                        strncpy(editTinhThanhMa, tt.maTinh.c_str(), sizeof(editTinhThanhMa) - 1);
+                                        strncpy(editTinhThanhTen, tt.tenTinh.c_str(), sizeof(editTinhThanhTen) - 1);
+                                        strncpy(editTinhThanhLoai, tt.loai.c_str(), sizeof(editTinhThanhLoai) - 1);
+                                        editTinhThanhError = "";
+                                        showEditTinhThanhModal = true;
+                                    }
+                                    if (onDelete) {
+                                        if (ql.xoaTinhThanh(tt.maTinh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa tinh thanh " + tt.maTinh + "!";
+                                        }
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL7", pagCSDL[7]);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 2.9: BẢNG DANH MỤC GIỚI TÍNH
                     if (ImGui::BeginTabItem("  Bang 9: GIOI TINH (MySQL: gioi_tinh)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "BANG DANH MUC: GIOI TINH (Khoa chinh: maGioiTinh)");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblGioiTinhRaw", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchCSDL8", "Tim theo Ma, Ten gioi tinh...", searchCSDL[8], sizeof(searchCSDL[8]));
+
+                        ImGui::SameLine();
+                        bool addGT = false, expGT = false, impGT = false;
+                        ActionToolbarConfig cfgGT;
+                        RenderCommonActionToolbar("csdl_gt", cfgGT, addGT, expGT, impGT);
+                        if (addGT) {
+                            addGioiTinhMa[0] = '\0'; addGioiTinhTen[0] = '\0'; addGioiTinhDesc[0] = '\0';
+                            addGioiTinhError = ""; showAddGioiTinhModal = true;
+                        }
+                        if (expGT) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("maGioiTinh (PK)"); hd.push_back("tenGioiTinh"); hd.push_back("moTa");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(120); wd.push_back(160); wd.push_back(240);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSachGioiTinh().size(); ++i) {
+                                const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
+                                if (searchCSDL[8][0] != '\0') {
+                                    string kw = Utils::toLower(searchCSDL[8]);
+                                    if (Utils::toLower(gt.maGioiTinh).find(kw) == string::npos &&
+                                        Utils::toLower(gt.tenGioiTinh).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(gt.maGioiTinh);
+                                r.push_back(gt.tenGioiTinh);
+                                r.push_back(gt.moTa);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_CSDL_GioiTinh.xls", "BANG GIOI TINH", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat bang GioiTinh Excel thanh cong!";
+                        }
+                        if (impGT) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo bang GioiTinh tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredGT;
+                        for (size_t i = 0; i < ql.getDanhSachGioiTinh().size(); ++i) {
+                            const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
+                            if (searchCSDL[8][0] != '\0') {
+                                string kw = Utils::toLower(searchCSDL[8]);
+                                if (Utils::toLower(gt.maGioiTinh).find(kw) == string::npos &&
+                                    Utils::toLower(gt.tenGioiTinh).find(kw) == string::npos) continue;
+                            }
+                            filteredGT.push_back(i);
+                        }
+                        pagCSDL[8].update((int)filteredGT.size());
+                        int offsetGT = pagCSDL[8].getOffset();
+                        int endGT = (offsetGT + pagCSDL[8].getPageSize() < (int)filteredGT.size()) ? 
+                                    (offsetGT + pagCSDL[8].getPageSize()) : (int)filteredGT.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblGioiTinhRaw", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("maGioiTinh (PK)", ImGuiTableColumnFlags_WidthFixed, 120);
                             ImGui::TableSetupColumn("tenGioiTinh", ImGuiTableColumnFlags_WidthFixed, 160);
                             ImGui::TableSetupColumn("moTa", ImGuiTableColumnFlags_WidthStretch);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachGioiTinh().size(); ++i) {
-                                const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_gtr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", gt.maGioiTinh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", gt.tenGioiTinh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%s", gt.moTa.c_str());
+                            if (filteredGT.empty()) {
+                                RenderCommonEmptyRow(5);
+                            } else {
+                                for (int idx = offsetGT; idx < endGT; ++idx) {
+                                    size_t realIdx = filteredGT[idx];
+                                    const GioiTinh& gt = ql.getDanhSachGioiTinh()[realIdx];
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_gtr_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: maGioiTinh (center)
+                                    AlignAndRenderCenter(1, gt.maGioiTinh, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 2: tenGioiTinh (center)
+                                    AlignAndRenderCenter(2, gt.tenGioiTinh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+                                    // Col 3: moTa (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(3, gt.moTa);
+
+                                    // Col 4: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(4);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        viewGioiTinhData = gt;
+                                        showViewGioiTinhModal = true;
+                                    }
+                                    if (onEdit) {
+                                        strncpy(editGioiTinhMa, gt.maGioiTinh.c_str(), sizeof(editGioiTinhMa) - 1);
+                                        strncpy(editGioiTinhTen, gt.tenGioiTinh.c_str(), sizeof(editGioiTinhTen) - 1);
+                                        strncpy(editGioiTinhDesc, gt.moTa.c_str(), sizeof(editGioiTinhDesc) - 1);
+                                        editGioiTinhError = "";
+                                        showEditGioiTinhModal = true;
+                                    }
+                                    if (onDelete) {
+                                        if (ql.xoaGioiTinh(gt.maGioiTinh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa gioi tinh " + gt.maGioiTinh + "!";
+                                        }
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagCSDL8", pagCSDL[8]);
+
                         ImGui::EndTabItem();
                     }
 
@@ -2014,33 +3277,57 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     // SUBTAB 3.1: BẢNG CHỈ TIÊU & ĐIỂM CHUẨN CHỐT THEO NGÀNH
                     if (ImGui::BeginTabItem("  1. Bang Diem Chuan Chot & Chi Tieu Nganh DUT  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "DANH MUC NGANH TUYEN SINH, CHI TIEU VA DIEM CHUAN CHOT K%d:", ql.getNamTuyenSinhHienHanh() % 100);
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblDiemChuanNganh", 10, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 290))) {
-                            ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 35);
-                            ImGui::TableSetupColumn("Ma Nganh", ImGuiTableColumnFlags_WidthFixed, 95);
-                            ImGui::TableSetupColumn("Ten Nganh Dao Tao DUT", ImGuiTableColumnFlags_WidthStretch);
-                            ImGui::TableSetupColumn("Khoa", ImGuiTableColumnFlags_WidthFixed, 75);
-                            ImGui::TableSetupColumn("Tien To Lop", ImGuiTableColumnFlags_WidthFixed, 105);
-                            ImGui::TableSetupColumn("Chi Tieu", ImGuiTableColumnFlags_WidthFixed, 80);
-                            ImGui::TableSetupColumn("Diem San", ImGuiTableColumnFlags_WidthFixed, 80);
-                            ImGui::TableSetupColumn("Diem Chuan Chot", ImGuiTableColumnFlags_WidthFixed, 125);
-                            ImGui::TableSetupColumn("Da Trung", ImGuiTableColumnFlags_WidthFixed, 80);
-                            ImGui::TableSetupColumn("Du Kien Lop", ImGuiTableColumnFlags_WidthFixed, 100);
-                            ImGui::TableHeadersRow();
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH & FILTER KHOA | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(180);
+                        if (ImGui::BeginCombo("##filterDCNKhoa", filterDiemChuanKhoa == "ALL" ? "Tat ca Khoa" : filterDiemChuanKhoa.c_str())) {
+                            if (ImGui::Selectable("Tat ca Khoa", filterDiemChuanKhoa == "ALL")) filterDiemChuanKhoa = "ALL";
+                            for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                                const Khoa& kh = ql.getDanhSachKhoa()[k];
+                                bool isSel = (filterDiemChuanKhoa == kh.maKhoa);
+                                if (ImGui::Selectable(kh.maKhoa.c_str(), isSel)) filterDiemChuanKhoa = kh.maKhoa;
+                            }
+                            ImGui::EndCombo();
+                        }
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(260);
+                        ImGui::InputTextWithHint("##searchDiemChuan", "Tim theo Ma nganh, Ten nganh...", searchDiemChuan, sizeof(searchDiemChuan));
 
-                            int stt = 0;
+                        ImGui::SameLine();
+                        bool addDCN = false, expDCN = false, impDCN = false;
+                        ActionToolbarConfig cfgDCN;
+                        RenderCommonActionToolbar("dcn", cfgDCN, addDCN, expDCN, impDCN);
+                        if (addDCN) {
+                            addNTKNam = ql.getNamTuyenSinhHienHanh();
+                            addNTKMa = ql.getDanhSachDanhMucNganh().empty() ? "" : ql.getDanhSachDanhMucNganh()[0].maNganh;
+                            addNTKChiTieu = 50;
+                            addNTKDiemSan = (float)ql.getDiemSanMacDinh();
+                            addNTKError = "";
+                            showAddNTKModal = true;
+                        }
+                        if (expDCN) {
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("Ma Nganh"); hd.push_back("Ten Nganh Dao Tao DUT");
+                            hd.push_back("Khoa"); hd.push_back("Tien To Lop"); hd.push_back("Chi Tieu");
+                            hd.push_back("Diem San"); hd.push_back("Diem Chuan Chot"); hd.push_back("Da Trung"); hd.push_back("Du Kien Lop");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(95); wd.push_back(240);
+                            wd.push_back(75); wd.push_back(100); wd.push_back(75);
+                            wd.push_back(75); wd.push_back(115); wd.push_back(80); wd.push_back(95);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
                             for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
                                 const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
                                 if (ntk.namTuyenSinh != ql.getNamTuyenSinhHienHanh()) continue;
-                                stt++;
-
-                                string tenNganh = ql.layTenNganh(ntk.maNganh);
-                                string maKhoa = ql.layMaKhoaCuaNganh(ntk.maNganh);
-                                string tienTo = ql.layTienToLop(ntk.maNganh);
-
-                                // Đếm số lượng đã trúng tuyển ngành này
+                                string maK = ql.layMaKhoaCuaNganh(ntk.maNganh);
+                                if (filterDiemChuanKhoa != "ALL" && maK != filterDiemChuanKhoa) continue;
+                                string tenN = ql.layTenNganh(ntk.maNganh);
+                                if (searchDiemChuan[0] != '\0') {
+                                    string kw = Utils::toLower(searchDiemChuan);
+                                    if (Utils::toLower(ntk.maNganh).find(kw) == string::npos &&
+                                        Utils::toLower(tenN).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
                                 int countAdmitted = 0;
                                 for (size_t k = 0; k < ql.getDanhSach().size(); ++k) {
                                     if (ql.getDanhSach()[k].getNamTuyenSinh() == ql.getNamTuyenSinhHienHanh() &&
@@ -2049,89 +3336,321 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                                         countAdmitted++;
                                     }
                                 }
-
                                 int siSo = ql.getSiSoLopChuan() > 0 ? ql.getSiSoLopChuan() : 30;
                                 int soLop = countAdmitted > 0 ? ((countAdmitted - 1) / siSo + 1) : 0;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(ntk.maNganh);
+                                r.push_back(tenN);
+                                r.push_back(maK);
+                                r.push_back(ql.layTienToLop(ntk.maNganh));
+                                r.push_back(to_string(ntk.chiTieu));
+                                char b1[32], b2[32];
+                                sprintf(b1, "%.2f", ntk.diemSanToiThieu); r.push_back(b1);
+                                if (ntk.diemChuanChot > 0.0) { sprintf(b2, "%.2f", ntk.diemChuanChot); r.push_back(b2); }
+                                else r.push_back("Chua chot");
+                                r.push_back(to_string(countAdmitted) + "/" + to_string(ntk.chiTieu));
+                                r.push_back(to_string(soLop) + " lop");
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_DiemChuan_ChiTieu_K" + to_string(ql.getNamTuyenSinhHienHanh() % 100) + ".xls",
+                                                  "BANG CHI TIEU VA DIEM CHUAN CHOT KHOA " + to_string(ql.getNamTuyenSinhHienHanh()),
+                                                  hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat danh sach Diem chuan & Chi tieu Excel thanh cong!";
+                        }
+                        if (impDCN) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo du lieu Chi tieu & Diem chuan tu MySQL thanh cong!";
+                        }
 
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_dcn_%d", stt); RenderRowHover(rId);
-                                ImGui::Text("%d", stt);
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ntk.maNganh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", tenNganh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::TextColored(ImVec4(0.85f, 0.85f, 0.85f, 1.0f), "%s", maKhoa.c_str());
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", tienTo.c_str());
-                                ImGui::TableSetColumnIndex(5);
-                                ImGui::Text("%d", ntk.chiTieu);
-                                ImGui::TableSetColumnIndex(6);
-                                ImGui::Text("%.2f", ntk.diemSanToiThieu);
-                                ImGui::TableSetColumnIndex(7);
-                                if (ntk.diemChuanChot > 0.0) {
-                                    ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%.2f diem", ntk.diemChuanChot);
-                                } else {
-                                    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Chua chot");
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredIndices;
+                        for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
+                            const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
+                            if (ntk.namTuyenSinh != ql.getNamTuyenSinhHienHanh()) continue;
+                            string maK = ql.layMaKhoaCuaNganh(ntk.maNganh);
+                            if (filterDiemChuanKhoa != "ALL" && maK != filterDiemChuanKhoa) continue;
+                            string tenN = ql.layTenNganh(ntk.maNganh);
+                            if (searchDiemChuan[0] != '\0') {
+                                string kw = Utils::toLower(searchDiemChuan);
+                                if (Utils::toLower(ntk.maNganh).find(kw) == string::npos &&
+                                    Utils::toLower(tenN).find(kw) == string::npos) continue;
+                            }
+                            filteredIndices.push_back(i);
+                        }
+                        pagDiemChuan.update((int)filteredIndices.size());
+                        int offsetDCN = pagDiemChuan.getOffset();
+                        int endDCN = (offsetDCN + pagDiemChuan.getPageSize() < (int)filteredIndices.size()) ? 
+                                     (offsetDCN + pagDiemChuan.getPageSize()) : (int)filteredIndices.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblDiemChuanNganh_v2", 11, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
+                            ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 35);
+                            ImGui::TableSetupColumn("Ma Nganh", ImGuiTableColumnFlags_WidthFixed, 95);
+                            ImGui::TableSetupColumn("Ten Nganh Dao Tao DUT", ImGuiTableColumnFlags_WidthStretch);
+                            ImGui::TableSetupColumn("Khoa", ImGuiTableColumnFlags_WidthFixed, 75);
+                            ImGui::TableSetupColumn("Tien To Lop", ImGuiTableColumnFlags_WidthFixed, 100);
+                            ImGui::TableSetupColumn("Chi Tieu", ImGuiTableColumnFlags_WidthFixed, 75);
+                            ImGui::TableSetupColumn("Diem San", ImGuiTableColumnFlags_WidthFixed, 75);
+                            ImGui::TableSetupColumn("Diem Chuan Chot", ImGuiTableColumnFlags_WidthFixed, 115);
+                            ImGui::TableSetupColumn("Da Trung", ImGuiTableColumnFlags_WidthFixed, 80);
+                            ImGui::TableSetupColumn("Du Kien Lop", ImGuiTableColumnFlags_WidthFixed, 95);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
+                            ImGui::TableHeadersRow();
+
+                            if (filteredIndices.empty()) {
+                                RenderCommonEmptyRow(11);
+                            } else {
+                                for (int idx = offsetDCN; idx < endDCN; ++idx) {
+                                    size_t realIdx = filteredIndices[idx];
+                                    const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[realIdx];
+                                    string tenNganh = ql.layTenNganh(ntk.maNganh);
+                                    string maKhoa = ql.layMaKhoaCuaNganh(ntk.maNganh);
+                                    string tienTo = ql.layTienToLop(ntk.maNganh);
+
+                                    int countAdmitted = 0;
+                                    for (size_t k = 0; k < ql.getDanhSach().size(); ++k) {
+                                        if (ql.getDanhSach()[k].getNamTuyenSinh() == ql.getNamTuyenSinhHienHanh() &&
+                                            ql.getDanhSach()[k].getNganhTrungTuyen() == ntk.maNganh &&
+                                            ql.getDanhSach()[k].daTrungTuyen()) {
+                                            countAdmitted++;
+                                        }
+                                    }
+                                    int siSo = ql.getSiSoLopChuan() > 0 ? ql.getSiSoLopChuan() : 30;
+                                    int soLop = countAdmitted > 0 ? ((countAdmitted - 1) / siSo + 1) : 0;
+
+                                    ImGui::TableNextRow();
+                                    char rId[32]; sprintf(rId, "##row_dcn_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: Ma Nganh (center)
+                                    AlignAndRenderCenter(1, ntk.maNganh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+                                    // Col 2: Ten Nganh (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(2, tenNganh);
+                                    // Col 3: Khoa (center)
+                                    AlignAndRenderCenter(3, maKhoa, ImVec4(0.85f, 0.85f, 0.85f, 1.0f));
+                                    // Col 4: Tien To Lop (center)
+                                    AlignAndRenderCenter(4, tienTo, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+                                    // Col 5: Chi Tieu (center)
+                                    AlignAndRenderCenter(5, to_string(ntk.chiTieu));
+                                    // Col 6: Diem San (center)
+                                    char bufSan[32]; sprintf(bufSan, "%.2f", ntk.diemSanToiThieu);
+                                    AlignAndRenderCenter(6, bufSan);
+                                    // Col 7: Diem Chuan Chot (center)
+                                    if (ntk.diemChuanChot > 0.0) {
+                                        char bufDiem[32]; sprintf(bufDiem, "%.2f diem", ntk.diemChuanChot);
+                                        AlignAndRenderCenter(7, bufDiem, ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+                                    } else {
+                                        AlignAndRenderCenter(7, "Chua chot", ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+                                    }
+                                    // Col 8: Da Trung (center)
+                                    string strAdmit = to_string(countAdmitted) + " / " + to_string(ntk.chiTieu);
+                                    AlignAndRenderCenter(8, strAdmit, countAdmitted > 0 ? ImVec4(0.2f, 0.95f, 0.4f, 1.0f) : ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+                                    // Col 9: Du Kien Lop (center)
+                                    AlignAndRenderCenter(9, to_string(soLop) + " lop");
+
+                                    // Col 10: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(10);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        viewNTKData = ntk;
+                                        showViewNTKModal = true;
+                                    }
+                                    if (onEdit) {
+                                        editNTKNam = ntk.namTuyenSinh;
+                                        editNTKMa = ntk.maNganh;
+                                        editNTKChiTieu = ntk.chiTieu;
+                                        editNTKDiemSan = (float)ntk.diemSanToiThieu;
+                                        editNTKError = "";
+                                        showEditNTKModal = true;
+                                    }
+                                    if (onDelete) {
+                                        if (ql.xoaNganhTheoKhoaHoc(ntk.namTuyenSinh, ntk.maNganh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa nganh " + ntk.maNganh + " khoi khoa " + to_string(ntk.namTuyenSinh) + "!";
+                                        }
+                                    }
                                 }
-                                ImGui::TableSetColumnIndex(8);
-                                ImGui::TextColored(countAdmitted > 0 ? ImVec4(0.2f, 0.95f, 0.4f, 1.0f) : ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "%d / %d", countAdmitted, ntk.chiTieu);
-                                ImGui::TableSetColumnIndex(9);
-                                ImGui::Text("%d lop", soLop);
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagDCN", pagDiemChuan);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 3.2: DANH SÁCH TÂN SINH VIÊN TRÚNG TUYỂN & PHÂN LỚP
                     if (ImGui::BeginTabItem("  2. Danh Sach Tan Sinh Vien & Lop Sinh Hoat DUT  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(0.35f, 0.95f, 0.75f, 1.0f), "DANH SACH TAN SINH VIEN DA CAP MA SINH VIEN VA PHAN LOP SINH HOAT K%d:", ql.getNamTuyenSinhHienHanh() % 100);
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblTanSinhVienDUT", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 290))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH & FILTERS | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(160);
+                        if (ImGui::BeginCombo("##filterTanSVKhoa", filterTanSVKhoa == "ALL" ? "Tat ca Khoa" : filterTanSVKhoa.c_str())) {
+                            if (ImGui::Selectable("Tat ca Khoa", filterTanSVKhoa == "ALL")) filterTanSVKhoa = "ALL";
+                            for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                                const Khoa& kh = ql.getDanhSachKhoa()[k];
+                                bool isSel = (filterTanSVKhoa == kh.maKhoa);
+                                if (ImGui::Selectable(kh.maKhoa.c_str(), isSel)) filterTanSVKhoa = kh.maKhoa;
+                            }
+                            ImGui::EndCombo();
+                        }
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(260);
+                        ImGui::InputTextWithHint("##searchTanSV", "Tim theo Ho ten, SBD, Ma SV, Lop...", searchTanSV, sizeof(searchTanSV));
+
+                        ImGui::SameLine();
+                        bool addTSV = false, expTSV = false, impTSV = false;
+                        ActionToolbarConfig cfgTSV;
+                        RenderCommonActionToolbar("tansv", cfgTSV, addTSV, expTSV, impTSV);
+                        if (addTSV) {
+                            showAddModal = true;
+                        }
+                        if (expTSV) {
+                            ql.xuatBaoCaoTrungTuyenDUT("data/BaoCao_TanSinhVien_DUT_K" + to_string(ql.getNamTuyenSinhHienHanh() % 100) + ".txt", ql.getNamTuyenSinhHienHanh());
+                            Vector<string> hd;
+                            hd.push_back("STT"); hd.push_back("Ma Sinh Vien DUT"); hd.push_back("Ho va Ten");
+                            hd.push_back("Lop Sinh Hoat"); hd.push_back("Nganh Trung Tuyen"); hd.push_back("Khoa");
+                            hd.push_back("NV"); hd.push_back("Tong Diem");
+                            Vector<int> wd;
+                            wd.push_back(40); wd.push_back(120); wd.push_back(200);
+                            wd.push_back(130); wd.push_back(240); wd.push_back(75);
+                            wd.push_back(50); wd.push_back(80);
+                            Vector<Vector<string>> rows;
+                            int sttExp = 0;
+                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                                const ThiSinh& ts = ql.getDanhSach()[i];
+                                if (ts.getNamTuyenSinh() != ql.getNamTuyenSinhHienHanh() || !ts.daTrungTuyen()) continue;
+                                string maK = ql.layMaKhoaCuaNganh(ts.getNganhTrungTuyen());
+                                if (filterTanSVKhoa != "ALL" && maK != filterTanSVKhoa) continue;
+                                if (searchTanSV[0] != '\0') {
+                                    string kw = Utils::toLower(searchTanSV);
+                                    if (Utils::toLower(ts.getHoTen()).find(kw) == string::npos &&
+                                        Utils::toLower(ts.getSoBaoDanh()).find(kw) == string::npos &&
+                                        Utils::toLower(ts.getMaSinhVien()).find(kw) == string::npos &&
+                                        Utils::toLower(ts.getLopSinhHoat()).find(kw) == string::npos) continue;
+                                }
+                                sttExp++;
+                                Vector<string> r;
+                                r.push_back(to_string(sttExp));
+                                r.push_back(ts.getMaSinhVien());
+                                r.push_back(ts.getHoTen());
+                                r.push_back(ts.getLopSinhHoat());
+                                r.push_back(ql.layTenNganh(ts.getNganhTrungTuyen()));
+                                r.push_back(maK);
+                                r.push_back("NV" + to_string(ts.getNguyenVongTrungTuyen()));
+                                char bDiem[32]; sprintf(bDiem, "%.2f", ts.tinhTongDiem());
+                                r.push_back(bDiem);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_TanSinhVien_DUT_K" + to_string(ql.getNamTuyenSinhHienHanh() % 100) + ".xls",
+                                                  "DANH SACH TAN SINH VIEN DUT KHOA " + to_string(ql.getNamTuyenSinhHienHanh()),
+                                                  hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Xuat danh sach Tan sinh vien DUT Excel thanh cong!";
+                        }
+                        if (impTSV) {
+                            ql.taiTatCaDuLieuTuDatabase();
+                            showToast = true;
+                            toastMsg = "Dong bo du lieu Tan sinh vien tu MySQL thanh cong!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. DATA FILTERING & SERVER-SIDE PAGINATION
+                        Vector<size_t> filteredTSV;
+                        for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
+                            const ThiSinh& ts = ql.getDanhSach()[i];
+                            if (ts.getNamTuyenSinh() != ql.getNamTuyenSinhHienHanh() || !ts.daTrungTuyen()) continue;
+                            string maK = ql.layMaKhoaCuaNganh(ts.getNganhTrungTuyen());
+                            if (filterTanSVKhoa != "ALL" && maK != filterTanSVKhoa) continue;
+                            if (searchTanSV[0] != '\0') {
+                                string kw = Utils::toLower(searchTanSV);
+                                if (Utils::toLower(ts.getHoTen()).find(kw) == string::npos &&
+                                    Utils::toLower(ts.getSoBaoDanh()).find(kw) == string::npos &&
+                                    Utils::toLower(ts.getMaSinhVien()).find(kw) == string::npos &&
+                                    Utils::toLower(ts.getLopSinhHoat()).find(kw) == string::npos) continue;
+                            }
+                            filteredTSV.push_back(i);
+                        }
+                        pagTanSV.update((int)filteredTSV.size());
+                        int offsetTSV = pagTanSV.getOffset();
+                        int endTSV = (offsetTSV + pagTanSV.getPageSize() < (int)filteredTSV.size()) ? 
+                                     (offsetTSV + pagTanSV.getPageSize()) : (int)filteredTSV.size();
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblTanSinhVienDUT_v2", 9, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 335))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 35);
                             ImGui::TableSetupColumn("Ma Sinh Vien DUT", ImGuiTableColumnFlags_WidthFixed, 130);
                             ImGui::TableSetupColumn("Ho va Ten", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("Lop Sinh Hoat", ImGuiTableColumnFlags_WidthFixed, 140);
                             ImGui::TableSetupColumn("Nganh Trung Tuyen", ImGuiTableColumnFlags_WidthFixed, 220);
                             ImGui::TableSetupColumn("Khoa", ImGuiTableColumnFlags_WidthFixed, 75);
-                            ImGui::TableSetupColumn("NV", ImGuiTableColumnFlags_WidthFixed, 45);
-                            ImGui::TableSetupColumn("Tong Diem", ImGuiTableColumnFlags_WidthFixed, 85);
+                            ImGui::TableSetupColumn("NV", ImGuiTableColumnFlags_WidthFixed, 50);
+                            ImGui::TableSetupColumn("Tong Diem", ImGuiTableColumnFlags_WidthFixed, 80);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            int sttAdmitted = 0;
-                            for (size_t i = 0; i < ql.getDanhSach().size(); ++i) {
-                                const ThiSinh& ts = ql.getDanhSach()[i];
-                                if (ts.getNamTuyenSinh() == ql.getNamTuyenSinhHienHanh() && ts.daTrungTuyen()) {
-                                    sttAdmitted++;
+                            if (filteredTSV.empty()) {
+                                RenderCommonEmptyRow(9);
+                            } else {
+                                for (int idx = offsetTSV; idx < endTSV; ++idx) {
+                                    size_t realIdx = filteredTSV[idx];
+                                    const ThiSinh& ts = ql.getDanhSach()[realIdx];
                                     string tenNganh = ql.layTenNganh(ts.getNganhTrungTuyen());
                                     string maKhoa = ql.layMaKhoaCuaNganh(ts.getNganhTrungTuyen());
 
                                     ImGui::TableNextRow();
-                                    ImGui::TableSetColumnIndex(0);
-                                    char rId[32]; sprintf(rId, "##row_tsv_%d", sttAdmitted); RenderRowHover(rId);
-                                    ImGui::Text("%d", sttAdmitted);
-                                    ImGui::TableSetColumnIndex(1);
-                                    ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.2f, 1.0f), "%s", ts.getMaSinhVien().c_str());
-                                    ImGui::TableSetColumnIndex(2);
-                                    ImGui::Text("%s", ts.getHoTen().c_str());
-                                    ImGui::TableSetColumnIndex(3);
-                                    ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "%s", ts.getLopSinhHoat().c_str());
-                                    ImGui::TableSetColumnIndex(4);
-                                    ImGui::Text("%s", tenNganh.c_str());
-                                    ImGui::TableSetColumnIndex(5);
-                                    ImGui::Text("%s", maKhoa.c_str());
-                                    ImGui::TableSetColumnIndex(6);
-                                    ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "NV%d", ts.getNguyenVongTrungTuyen());
-                                    ImGui::TableSetColumnIndex(7);
-                                    ImGui::TextColored(ImVec4(1.0f, 0.9f, 0.3f, 1.0f), "%.2f", ts.tinhTongDiem());
+                                    char rId[32]; sprintf(rId, "##row_tsv_%d", idx + 1); RenderRowHover(rId);
+
+                                    // Col 0: STT (center)
+                                    AlignAndRenderCenter(0, to_string(idx + 1));
+                                    // Col 1: Ma Sinh Vien (center)
+                                    AlignAndRenderCenter(1, ts.getMaSinhVien(), ImVec4(1.0f, 0.85f, 0.2f, 1.0f));
+                                    // Col 2: Ho va Ten (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(2, ts.getHoTen());
+                                    // Col 3: Lop Sinh Hoat (center)
+                                    AlignAndRenderCenter(3, ts.getLopSinhHoat(), ImVec4(0.35f, 0.85f, 1.0f, 1.0f));
+                                    // Col 4: Nganh Trung Tuyen (LEFT ALIGN)
+                                    AlignAndRenderTextLeft(4, tenNganh);
+                                    // Col 5: Khoa (center)
+                                    AlignAndRenderCenter(5, maKhoa);
+                                    // Col 6: NV (center)
+                                    AlignAndRenderCenter(6, "NV" + to_string(ts.getNguyenVongTrungTuyen()), ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+                                    // Col 7: Tong Diem (center)
+                                    char bDiem[32]; sprintf(bDiem, "%.2f", ts.tinhTongDiem());
+                                    AlignAndRenderCenter(7, bDiem, ImVec4(1.0f, 0.9f, 0.3f, 1.0f));
+
+                                    // Col 8: Thao Tac (102px fixed, center)
+                                    ImGui::TableSetColumnIndex(8);
+                                    bool onView = false, onEdit = false, onDelete = false;
+                                    RenderCommonActionCell(rId, onView, onEdit, onDelete);
+                                    if (onView) {
+                                        selectedSBD = ts.getSoBaoDanh();
+                                        showDetailModal = true;
+                                    }
+                                    if (onEdit) {
+                                        populateEditThiSinh(ts);
+                                    }
+                                    if (onDelete) {
+                                        selectedSBD = ts.getSoBaoDanh();
+                                        showDeleteModal = true;
+                                    }
                                 }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM DUAL-WING PAGINATION BAR
+                        RenderCommonPaginationBar("pagTanSV", pagTanSV);
+
                         ImGui::EndTabItem();
                     }
 
@@ -2224,270 +3743,576 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     // SUBTAB 4.1: DANH MỤC KHOA ĐÀO TẠO DUT
                     if (ImGui::BeginTabItem("  1. Khoa Dao tao DUT  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "DANH MUC KHOA CHUYEN MON TRUONG DAI HOC BACH KHOA - DH DA NANG (DUT):");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblManageKhoa", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchKhoa", "Tim theo Ma khoa, Ten khoa...", searchKhoa, sizeof(searchKhoa));
+
+                        ImGui::SameLine();
+                        bool addKhoa = false, expKhoa = false, impKhoa = false;
+                        ActionToolbarConfig cfgKhoa;
+                        RenderCommonActionToolbar("khoa", cfgKhoa, addKhoa, expKhoa, impKhoa);
+                        if (addKhoa) {
+                            addKhoaMa[0] = '\0';
+                            addKhoaTen[0] = '\0';
+                            addKhoaMaDUT[0] = '\0';
+                            addKhoaError = "";
+                            showAddKhoaModal = true;
+                        }
+                        if (expKhoa) {
+                            Vector<string> hd; hd.push_back("STT"); hd.push_back("Ma Khoa (PK)"); hd.push_back("Ten Khoa Dao Tao DUT"); hd.push_back("Ma Dinh Danh DUT"); hd.push_back("Quy Uoc Ma SV");
+                            Vector<int> wd; wd.push_back(50); wd.push_back(120); wd.push_back(280); wd.push_back(140); wd.push_back(180);
+                            Vector<Vector<string>> rows;
+                            for (size_t i = 0; i < ql.getDanhSachKhoa().size(); ++i) {
+                                const Khoa& k = ql.getDanhSachKhoa()[i];
+                                Vector<string> r;
+                                r.push_back(to_string(i + 1));
+                                r.push_back(k.maKhoa);
+                                r.push_back(k.tenKhoa);
+                                r.push_back(k.maKhoaTheoChuanDUT);
+                                r.push_back(k.maKhoaTheoChuanDUT + "26xxxx");
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_DanhMuc_Khoa_DUT.xls", "DANH MUC KHOA DAO TAO DAI HOC BACH KHOA", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Da xuat Excel: data/BaoCao_DanhMuc_Khoa_DUT.xls";
+                        }
+                        if (impKhoa) {
+                            showToast = true;
+                            toastMsg = "Du lieu danh muc Khoa DUT da duoc dong bo chuan!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. FILTERING & PAGINATION SLICING
+                        Vector<Khoa> filteredKhoa;
+                        string sK = Utils::toLower(Utils::trim(searchKhoa));
+                        for (size_t i = 0; i < ql.getDanhSachKhoa().size(); ++i) {
+                            const Khoa& k = ql.getDanhSachKhoa()[i];
+                            if (sK.empty() ||
+                                Utils::toLower(k.maKhoa).find(sK) != string::npos ||
+                                Utils::toLower(k.tenKhoa).find(sK) != string::npos ||
+                                Utils::toLower(k.maKhoaTheoChuanDUT).find(sK) != string::npos) {
+                                filteredKhoa.push_back(k);
+                            }
+                        }
+                        pagKhoa.updateTotal((int)filteredKhoa.size());
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblManageKhoa_v2", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("Ma Khoa (PK)", ImGuiTableColumnFlags_WidthFixed, 120);
                             ImGui::TableSetupColumn("Ten Khoa Dao Tao DUT", ImGuiTableColumnFlags_WidthStretch);
-                            ImGui::TableSetupColumn("Ma Dinh Danh DUT", ImGuiTableColumnFlags_WidthFixed, 150);
-                            ImGui::TableSetupColumn("Quy Uoc Ma SV", ImGuiTableColumnFlags_WidthFixed, 220);
+                            ImGui::TableSetupColumn("Ma Dinh Danh DUT", ImGuiTableColumnFlags_WidthFixed, 140);
+                            ImGui::TableSetupColumn("Quy Uoc Ma SV", ImGuiTableColumnFlags_WidthFixed, 180);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachKhoa().size(); ++i) {
-                                const Khoa& k = ql.getDanhSachKhoa()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_kr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", k.maKhoa.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", k.tenKhoa.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", k.maKhoaTheoChuanDUT.c_str());
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%s26xxxx (VD: %s260001)", k.maKhoaTheoChuanDUT.c_str(), k.maKhoaTheoChuanDUT.c_str());
+                            if (filteredKhoa.empty()) {
+                                RenderCommonEmptyRow(6, "Khong tim thay khoa nao phu hop!");
+                            } else {
+                                int offset = pagKhoa.getOffset();
+                                int pSize = pagKhoa.getPageSize();
+                                int endIdx = (offset + pSize < (int)filteredKhoa.size()) ? (offset + pSize) : (int)filteredKhoa.size();
+
+                                for (int i = offset; i < endIdx; ++i) {
+                                    const Khoa& k = filteredKhoa[i];
+                                    ImGui::TableNextRow();
+
+                                    ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_kr_%d", i); RenderRowHover(rId);
+                                    AlignAndRenderCenter(to_string(i + 1));
+
+                                    ImGui::TableSetColumnIndex(1);
+                                    AlignAndRenderCenter(k.maKhoa, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(2);
+                                    AlignAndRenderTextLeft(k.tenKhoa);
+
+                                    ImGui::TableSetColumnIndex(3);
+                                    AlignAndRenderCenter(k.maKhoaTheoChuanDUT, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(4);
+                                    AlignAndRenderCenter(k.maKhoaTheoChuanDUT + "26xxxx", ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(5);
+                                    bool vClk = false, eClk = false, dClk = false;
+                                    RenderCommonActionCell(k.maKhoa, vClk, eClk, dClk, true, true, true, "Xem chi tiet khoa", "Sua thong tin khoa", "Xoa khoa dao tao");
+                                    if (vClk) {
+                                        viewKhoaData = k;
+                                        showViewKhoaModal = true;
+                                    }
+                                    if (eClk) {
+                                        strcpy(editKhoaMa, k.maKhoa.c_str());
+                                        strcpy(editKhoaTen, k.tenKhoa.c_str());
+                                        strcpy(editKhoaMaDUT, k.maKhoaTheoChuanDUT.c_str());
+                                        editKhoaError = "";
+                                        showEditKhoaModal = true;
+                                    }
+                                    if (dClk) {
+                                        if (ql.xoaKhoa(k.maKhoa)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa khoa " + k.maKhoa + " thanh cong!";
+                                        } else {
+                                            showToast = true;
+                                            toastMsg = "Khong the xoa vi co nganh hoac thi sinh dang tham chieu den khoa nay!";
+                                        }
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM PAGINATION BAR
+                        RenderCommonPaginationBar("pagKhoa", pagKhoa);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 4.2: DANH MỤC NGÀNH ĐÀO TẠO DUT
                     if (ImGui::BeginTabItem("  2. Danh muc Nganh Tuyen sinh DUT  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "DANH MUC NGANH TUYEN SINH CHUAN BO GD&DT & TIEN TO LOP SINH HOAT DUT:");
-                        ImGui::Separator();
 
-                        if (ImGui::BeginTable("TblManageDanhMucNganh", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
+                        // 1. TOP TOOLBAR (LEFT: FILTER KHOA + QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(160);
+                        if (ImGui::BeginCombo("##filterNganhKhoa", (filterNganhKhoa == "ALL" ? "[ Tat ca Khoa ]" : filterNganhKhoa.c_str()))) {
+                            if (ImGui::Selectable("[ Tat ca Khoa ]", filterNganhKhoa == "ALL")) { filterNganhKhoa = "ALL"; pagNganh.currentPage = 1; }
+                            for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                                const Khoa& kh = ql.getDanhSachKhoa()[k];
+                                bool isSel = (filterNganhKhoa == kh.maKhoa);
+                                string label = kh.maKhoa + " - " + kh.tenKhoa;
+                                if (ImGui::Selectable(label.c_str(), isSel)) {
+                                    filterNganhKhoa = kh.maKhoa;
+                                    pagNganh.currentPage = 1;
+                                }
+                            }
+                            ImGui::EndCombo();
+                        }
+
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(260);
+                        ImGui::InputTextWithHint("##searchNganh", "Tim theo Ma nganh, Ten nganh...", searchNganh, sizeof(searchNganh));
+
+                        ImGui::SameLine();
+                        bool addNganh = false, expNganh = false, impNganh = false;
+                        ActionToolbarConfig cfgNganh;
+                        RenderCommonActionToolbar("nganh", cfgNganh, addNganh, expNganh, impNganh);
+                        if (addNganh) {
+                            addNganhMa[0] = '\0';
+                            addNganhTen[0] = '\0';
+                            addNganhKhoa = "CNTT";
+                            addNganhTienTo[0] = '\0';
+                            addNganhError = "";
+                            showAddNganhModal = true;
+                        }
+                        if (expNganh) {
+                            Vector<string> hd; hd.push_back("STT"); hd.push_back("Ma Nganh (PK)"); hd.push_back("Ten Nganh Dao Tao DUT"); hd.push_back("Khoa Truc Thuoc"); hd.push_back("Tien To Lop DUT"); hd.push_back("Mau Lop K26");
+                            Vector<int> wd; wd.push_back(50); wd.push_back(110); wd.push_back(300); wd.push_back(120); wd.push_back(120); wd.push_back(150);
+                            Vector<Vector<string>> rows;
+                            for (size_t i = 0; i < ql.getDanhSachDanhMucNganh().size(); ++i) {
+                                const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
+                                Vector<string> r;
+                                r.push_back(to_string(i + 1));
+                                r.push_back(dmn.maNganh);
+                                r.push_back(dmn.tenNganh);
+                                r.push_back(dmn.maKhoa);
+                                r.push_back(dmn.tienToLop);
+                                r.push_back("26" + dmn.tienToLop + "1, 26" + dmn.tienToLop + "2");
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_DanhMuc_Nganh_DUT.xls", "DANH MUC NGANH TUYEN SINH CHUAN BO GD&DT", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Da xuat Excel: data/BaoCao_DanhMuc_Nganh_DUT.xls";
+                        }
+                        if (impNganh) {
+                            showToast = true;
+                            toastMsg = "Du lieu danh muc Nganh DUT da duoc dong bo chuan!";
+                        }
+
+                        ImGui::Spacing();
+
+                        // 2. FILTERING & PAGINATION SLICING
+                        Vector<DanhMucNganh> filteredNganh;
+                        string sN = Utils::toLower(Utils::trim(searchNganh));
+                        for (size_t i = 0; i < ql.getDanhSachDanhMucNganh().size(); ++i) {
+                            const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
+                            if (filterNganhKhoa != "ALL" && dmn.maKhoa != filterNganhKhoa) continue;
+                            if (sN.empty() ||
+                                Utils::toLower(dmn.maNganh).find(sN) != string::npos ||
+                                Utils::toLower(dmn.tenNganh).find(sN) != string::npos ||
+                                Utils::toLower(dmn.tienToLop).find(sN) != string::npos) {
+                                filteredNganh.push_back(dmn);
+                            }
+                        }
+                        pagNganh.updateTotal((int)filteredNganh.size());
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblManageDanhMucNganh_v2", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("Ma Nganh (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("Ten Nganh Dao Tao DUT", ImGuiTableColumnFlags_WidthStretch);
-                            ImGui::TableSetupColumn("Khoa Truc Thuoc", ImGuiTableColumnFlags_WidthFixed, 130);
-                            ImGui::TableSetupColumn("Tien To Lop DUT", ImGuiTableColumnFlags_WidthFixed, 130);
-                            ImGui::TableSetupColumn("Mau Lop K26", ImGuiTableColumnFlags_WidthFixed, 160);
+                            ImGui::TableSetupColumn("Khoa Truc Thuoc", ImGuiTableColumnFlags_WidthFixed, 120);
+                            ImGui::TableSetupColumn("Tien To Lop DUT", ImGuiTableColumnFlags_WidthFixed, 110);
+                            ImGui::TableSetupColumn("Mau Lop K26", ImGuiTableColumnFlags_WidthFixed, 140);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachDanhMucNganh().size(); ++i) {
-                                const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_dmnr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", dmn.maNganh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", dmn.tenNganh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::TextColored(ImVec4(0.85f, 0.85f, 0.85f, 1.0f), "%s", dmn.maKhoa.c_str());
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", dmn.tienToLop.c_str());
-                                ImGui::TableSetColumnIndex(5);
-                                ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "26%s1, 26%s2", dmn.tienToLop.c_str(), dmn.tienToLop.c_str());
+                            if (filteredNganh.empty()) {
+                                RenderCommonEmptyRow(7, "Khong tim thay nganh nao phu hop!");
+                            } else {
+                                int offset = pagNganh.getOffset();
+                                int pSize = pagNganh.getPageSize();
+                                int endIdx = (offset + pSize < (int)filteredNganh.size()) ? (offset + pSize) : (int)filteredNganh.size();
+
+                                for (int i = offset; i < endIdx; ++i) {
+                                    const DanhMucNganh& dmn = filteredNganh[i];
+                                    ImGui::TableNextRow();
+
+                                    ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_dmnr_%d", i); RenderRowHover(rId);
+                                    AlignAndRenderCenter(to_string(i + 1));
+
+                                    ImGui::TableSetColumnIndex(1);
+                                    AlignAndRenderCenter(dmn.maNganh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(2);
+                                    AlignAndRenderTextLeft(dmn.tenNganh);
+
+                                    ImGui::TableSetColumnIndex(3);
+                                    AlignAndRenderCenter(dmn.maKhoa, ImVec4(0.85f, 0.85f, 0.85f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(4);
+                                    AlignAndRenderCenter(dmn.tienToLop, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(5);
+                                    AlignAndRenderCenter("26" + dmn.tienToLop + "1, 26" + dmn.tienToLop + "2", ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(6);
+                                    bool vClk = false, eClk = false, dClk = false;
+                                    RenderCommonActionCell(dmn.maNganh, vClk, eClk, dClk, true, true, true, "Xem chi tiet nganh", "Sua thong tin nganh", "Xoa nganh dao tao");
+                                    if (vClk) {
+                                        viewNganhData = dmn;
+                                        showViewNganhModal = true;
+                                    }
+                                    if (eClk) {
+                                        strcpy(editNganhMa, dmn.maNganh.c_str());
+                                        strcpy(editNganhTen, dmn.tenNganh.c_str());
+                                        editNganhKhoa = dmn.maKhoa;
+                                        strcpy(editNganhTienTo, dmn.tienToLop.c_str());
+                                        editNganhError = "";
+                                        showEditNganhModal = true;
+                                    }
+                                    if (dClk) {
+                                        if (ql.xoaDanhMucNganh(dmn.maNganh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa nganh " + dmn.maNganh + " thanh cong!";
+                                        } else {
+                                            showToast = true;
+                                            toastMsg = "Khong the xoa vi co nguyen vong hoac thi sinh dang dang ky nganh nay!";
+                                        }
+                                    }
+                                }
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM PAGINATION BAR
+                        RenderCommonPaginationBar("pagNganh", pagNganh);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 4.3: CHỈ TIÊU & ĐIỂM SÀN THEO KHÓA (ĐIỀU CHỈNH ĐỘNG)
                     if (ImGui::BeginTabItem("  3. Chi tieu Tuyen sinh Dong (K26)  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "QUAN LY VA DIEU CHINH CHI TIEU TUYEN SINH DONG THEO KHOA (K%d):", ql.getNamTuyenSinhHienHanh() % 100);
-                        ImGui::Separator();
 
-                        // Form điều chỉnh nhanh chỉ tiêu
-                        static string curSelNganh = "7480201B";
-                        static int curInputChiTieu = 50;
-
-                        ImGui::BeginChild("EditQuotaHeader", ImVec2(0, 75), true);
-                        {
-                            ImGui::Text("Chon Nganh:");
-                            ImGui::SameLine();
-                            ImGui::SetNextItemWidth(340);
-                            RenderComboNganh("##selNganhQuota", ql.getDanhSachDanhMucNganh(), curSelNganh);
-
-                            ImGui::SameLine();
-                            ImGui::Text("Chi tieu moi:");
-                            ImGui::SameLine();
-                            ImGui::SetNextItemWidth(100);
-                            ImGui::InputInt("##valNewQuota", &curInputChiTieu);
-                            if (curInputChiTieu < 1) curInputChiTieu = 1;
-                            if (curInputChiTieu > 1000) curInputChiTieu = 1000;
-
-                            ImGui::SameLine();
-                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.34f, 1.0f));
-                            if (ImGui::Button("[ Luu Chi Tieu Nganh ]", ImVec2(170, 26))) {
-                                if (ql.capNhatChiTieuNganh(ql.getNamTuyenSinhHienHanh(), curSelNganh, curInputChiTieu)) {
-                                    showToast = true;
-                                    toastMsg = "Da cap nhat chi tieu nganh " + curSelNganh + " thanh " + to_string(curInputChiTieu) + "!";
+                        // 1. TOP TOOLBAR (LEFT: FILTER KHOA + QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(160);
+                        if (ImGui::BeginCombo("##filterNTKKhoa", (filterNTKKhoa == "ALL" ? "[ Tat ca Khoa ]" : filterNTKKhoa.c_str()))) {
+                            if (ImGui::Selectable("[ Tat ca Khoa ]", filterNTKKhoa == "ALL")) { filterNTKKhoa = "ALL"; pagNTK.currentPage = 1; }
+                            for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                                const Khoa& kh = ql.getDanhSachKhoa()[k];
+                                bool isSel = (filterNTKKhoa == kh.maKhoa);
+                                string label = kh.maKhoa + " - " + kh.tenKhoa;
+                                if (ImGui::Selectable(label.c_str(), isSel)) {
+                                    filterNTKKhoa = kh.maKhoa;
+                                    pagNTK.currentPage = 1;
                                 }
                             }
-                            ImGui::PopStyleColor();
+                            ImGui::EndCombo();
                         }
-                        ImGui::EndChild();
+
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(260);
+                        ImGui::InputTextWithHint("##searchNTK", "Tim theo Ma/Ten nganh...", searchNTK, sizeof(searchNTK));
+
+                        ImGui::SameLine();
+                        bool addNTK = false, expNTK = false, impNTK = false;
+                        ActionToolbarConfig cfgNTK;
+                        RenderCommonActionToolbar("ntk", cfgNTK, addNTK, expNTK, impNTK);
+                        if (addNTK) {
+                            addNTKMa = ql.getDanhSachDanhMucNganh().empty() ? "" : ql.getDanhSachDanhMucNganh()[0].maNganh;
+                            addNTKChiTieu = 50;
+                            addNTKDiemSan = 15.0f;
+                            addNTKError = "";
+                            showAddNTKModal = true;
+                        }
+                        if (expNTK) {
+                            Vector<string> hd; hd.push_back("STT"); hd.push_back("Ma Nganh"); hd.push_back("Ten Nganh Dao Tao DUT"); hd.push_back("Khoa"); hd.push_back("Chi Tieu K26"); hd.push_back("Diem San Toi Thieu"); hd.push_back("Diem Chuan Chot");
+                            Vector<int> wd; wd.push_back(50); wd.push_back(100); wd.push_back(300); wd.push_back(100); wd.push_back(110); wd.push_back(130); wd.push_back(130);
+                            Vector<Vector<string>> rows;
+                            int stt = 0;
+                            for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
+                                const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
+                                if (ntk.namTuyenSinh != ql.getNamTuyenSinhHienHanh()) continue;
+                                stt++;
+                                Vector<string> r;
+                                r.push_back(to_string(stt));
+                                r.push_back(ntk.maNganh);
+                                r.push_back(ql.layTenNganh(ntk.maNganh));
+                                r.push_back(ql.layMaKhoaCuaNganh(ntk.maNganh));
+                                r.push_back(to_string(ntk.chiTieu));
+                                char bufDS[16], bufDC[16];
+                                sprintf(bufDS, "%.2f", ntk.diemSanToiThieu);
+                                sprintf(bufDC, "%.2f", ntk.diemChuanChot);
+                                r.push_back(bufDS);
+                                r.push_back(ntk.diemChuanChot > 0 ? bufDC : "Chua chot");
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_ChiTieu_DiemChuan_K26.xls", "BANG CHI TIEU VA DIEM CHUAN TUYEN SINH K26", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Da xuat Excel: data/BaoCao_ChiTieu_DiemChuan_K26.xls";
+                        }
+                        if (impNTK) {
+                            showToast = true;
+                            toastMsg = "Du lieu chi tieu K26 da duoc dong bo!";
+                        }
 
                         ImGui::Spacing();
 
-                        if (ImGui::BeginTable("TblManageNganhTheoKhoaHoc", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 320))) {
+                        // 2. FILTERING & PAGINATION SLICING
+                        Vector<NganhTheoKhoaHoc> filteredNTK;
+                        string sNTK = Utils::toLower(Utils::trim(searchNTK));
+                        for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
+                            const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
+                            if (ntk.namTuyenSinh != ql.getNamTuyenSinhHienHanh()) continue;
+                            string kKhoa = ql.layMaKhoaCuaNganh(ntk.maNganh);
+                            if (filterNTKKhoa != "ALL" && kKhoa != filterNTKKhoa) continue;
+                            string tNganh = ql.layTenNganh(ntk.maNganh);
+                            if (sNTK.empty() ||
+                                Utils::toLower(ntk.maNganh).find(sNTK) != string::npos ||
+                                Utils::toLower(tNganh).find(sNTK) != string::npos ||
+                                Utils::toLower(kKhoa).find(sNTK) != string::npos) {
+                                filteredNTK.push_back(ntk);
+                            }
+                        }
+                        pagNTK.updateTotal((int)filteredNTK.size());
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblManageNganhTheoKhoaHoc_v2", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 35);
                             ImGui::TableSetupColumn("Ma Nganh", ImGuiTableColumnFlags_WidthFixed, 95);
                             ImGui::TableSetupColumn("Ten Nganh Dao Tao DUT", ImGuiTableColumnFlags_WidthStretch);
                             ImGui::TableSetupColumn("Khoa", ImGuiTableColumnFlags_WidthFixed, 75);
-                            ImGui::TableSetupColumn("Chi Tieu Hien Tai", ImGuiTableColumnFlags_WidthFixed, 120);
+                            ImGui::TableSetupColumn("Chi Tieu", ImGuiTableColumnFlags_WidthFixed, 90);
                             ImGui::TableSetupColumn("Diem San", ImGuiTableColumnFlags_WidthFixed, 80);
-                            ImGui::TableSetupColumn("Diem Chuan Chot", ImGuiTableColumnFlags_WidthFixed, 115);
-                            ImGui::TableSetupColumn("Dieu Chinh Nhanh", ImGuiTableColumnFlags_WidthFixed, 150);
+                            ImGui::TableSetupColumn("Diem Chuan Chot", ImGuiTableColumnFlags_WidthFixed, 120);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            int sttQ = 0;
-                            for (size_t i = 0; i < ql.getDanhSachNganhTheoKhoaHoc().size(); ++i) {
-                                const NganhTheoKhoaHoc& ntk = ql.getDanhSachNganhTheoKhoaHoc()[i];
-                                if (ntk.namTuyenSinh != ql.getNamTuyenSinhHienHanh()) continue;
-                                sttQ++;
+                            if (filteredNTK.empty()) {
+                                RenderCommonEmptyRow(8, "Khong tim thay chi tieu nganh nao!");
+                            } else {
+                                int offset = pagNTK.getOffset();
+                                int pSize = pagNTK.getPageSize();
+                                int endIdx = (offset + pSize < (int)filteredNTK.size()) ? (offset + pSize) : (int)filteredNTK.size();
 
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_mntk_%d", sttQ); RenderRowHover(rId);
-                                ImGui::Text("%d", sttQ);
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", ntk.maNganh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::Text("%s", ql.layTenNganh(ntk.maNganh).c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%s", ql.layMaKhoaCuaNganh(ntk.maNganh).c_str());
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%d chi tieu", ntk.chiTieu);
-                                ImGui::TableSetColumnIndex(5);
-                                ImGui::Text("%.2f", ntk.diemSanToiThieu);
-                                ImGui::TableSetColumnIndex(6);
-                                if (ntk.diemChuanChot > 0.0) {
-                                    ImGui::TextColored(ImVec4(0.2f, 0.95f, 0.4f, 1.0f), "%.2f", ntk.diemChuanChot);
-                                } else {
-                                    ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Chua chot");
+                                for (int i = offset; i < endIdx; ++i) {
+                                    const NganhTheoKhoaHoc& ntk = filteredNTK[i];
+                                    ImGui::TableNextRow();
+
+                                    ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_mntk_%d", i); RenderRowHover(rId);
+                                    AlignAndRenderCenter(to_string(i + 1));
+
+                                    ImGui::TableSetColumnIndex(1);
+                                    AlignAndRenderCenter(ntk.maNganh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(2);
+                                    AlignAndRenderTextLeft(ql.layTenNganh(ntk.maNganh));
+
+                                    ImGui::TableSetColumnIndex(3);
+                                    AlignAndRenderCenter(ql.layMaKhoaCuaNganh(ntk.maNganh));
+
+                                    ImGui::TableSetColumnIndex(4);
+                                    AlignAndRenderCenter(to_string(ntk.chiTieu), ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(5);
+                                    char bufDS[16]; sprintf(bufDS, "%.2f", ntk.diemSanToiThieu);
+                                    AlignAndRenderCenter(bufDS);
+
+                                    ImGui::TableSetColumnIndex(6);
+                                    if (ntk.diemChuanChot > 0.0) {
+                                        char bufDC[16]; sprintf(bufDC, "%.2f", ntk.diemChuanChot);
+                                        AlignAndRenderCenter(bufDC, ImVec4(0.2f, 0.95f, 0.4f, 1.0f));
+                                    } else {
+                                        AlignAndRenderCenter("Chua chot", ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+                                    }
+
+                                    ImGui::TableSetColumnIndex(7);
+                                    bool vClk = false, eClk = false, dClk = false;
+                                    RenderCommonActionCell(ntk.maNganh, vClk, eClk, dClk, true, true, true, "Xem chi tiet chi tieu", "Dieu chinh chi tieu / diem san", "Xoa chi tieu nganh nay");
+                                    if (vClk) {
+                                        viewNTKData = ntk;
+                                        showViewNTKModal = true;
+                                    }
+                                    if (eClk) {
+                                        editNTKMa = ntk.maNganh;
+                                        editNTKChiTieu = ntk.chiTieu;
+                                        editNTKDiemSan = (float)ntk.diemSanToiThieu;
+                                        editNTKError = "";
+                                        showEditNTKModal = true;
+                                    }
+                                    if (dClk) {
+                                        if (ql.xoaNganhTheoKhoaHoc(ntk.namTuyenSinh, ntk.maNganh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa chi tieu nganh " + ntk.maNganh + " khoi khoa " + to_string(ntk.namTuyenSinh) + "!";
+                                        } else {
+                                            showToast = true;
+                                            toastMsg = "Khong the xoa chi tieu nganh nay!";
+                                        }
+                                    }
                                 }
-                                ImGui::TableSetColumnIndex(7);
-                                ImGui::PushID((int)(5000 + i));
-                                if (ImGui::SmallButton("- 5")) {
-                                    int m = (ntk.chiTieu > 5) ? (ntk.chiTieu - 5) : 1;
-                                    ql.capNhatChiTieuNganh(ntk.namTuyenSinh, ntk.maNganh, m);
-                                }
-                                ImGui::SameLine();
-                                if (ImGui::SmallButton("+ 5")) {
-                                    ql.capNhatChiTieuNganh(ntk.namTuyenSinh, ntk.maNganh, ntk.chiTieu + 5);
-                                }
-                                ImGui::SameLine();
-                                if (ImGui::SmallButton("Chon")) {
-                                    curSelNganh = ntk.maNganh;
-                                    curInputChiTieu = ntk.chiTieu;
-                                }
-                                ImGui::PopID();
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM PAGINATION BAR
+                        RenderCommonPaginationBar("pagNTK", pagNTK);
+
                         ImGui::EndTabItem();
                     }
 
                     // SUBTAB 4.4: QUẢN LÝ TỈNH / THÀNH PHỐ
                     if (ImGui::BeginTabItem("  4. Danh muc Tinh / Thanh pho  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "QUAN LY DANH MUC 34 TINH THANH (THEM / SUA / XOA):");
-                        ImGui::Separator();
 
-                        // Form thêm tỉnh thành mới
-                        ImGui::BeginChild("AddTinhThanhForm", ImVec2(0, 75), true);
-                        {
-                            ImGui::SetNextItemWidth(80);
-                            ImGui::InputTextWithHint("##newMaTinh", "Ma tinh", bufNewMaTinh, sizeof(bufNewMaTinh));
-                            ImGui::SameLine();
-                            ImGui::SetNextItemWidth(200);
-                            ImGui::InputTextWithHint("##newTenTinh", "Ten Tinh/TP", bufNewTenTinh, sizeof(bufNewTenTinh));
-                            ImGui::SameLine();
-                            ImGui::SetNextItemWidth(260);
-                            ImGui::InputTextWithHint("##newLoaiTinh", "Loai hinh (TP/Tinh)", bufNewLoaiTinh, sizeof(bufNewLoaiTinh));
-                            ImGui::SameLine();
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchTinhThanh", "Tim theo Ma tinh, Ten tinh/thanh pho...", searchTinhThanh, sizeof(searchTinhThanh));
 
-                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.34f, 1.0f));
-                            if (ImGui::Button("[+] Them Tinh Thanh", ImVec2(160, 26))) {
-                                string m = Utils::trim(bufNewMaTinh);
-                                string t = Utils::trim(bufNewTenTinh);
-                                string l = Utils::trim(bufNewLoaiTinh);
-                                if (m.empty() || t.empty()) {
-                                    msgTinhThanh = "Ma va Ten tinh thanh khong duoc de trong!";
-                                } else {
-                                    TinhThanh ttMoi(m, t, l);
-                                    if (ql.themTinhThanh(ttMoi)) {
-                                        msgTinhThanh = "Da them tinh thanh moi thanh cong!";
-                                        bufNewMaTinh[0] = '\0';
-                                        bufNewTenTinh[0] = '\0';
-                                        showToast = true;
-                                        toastMsg = msgTinhThanh;
-                                    } else {
-                                        msgTinhThanh = "Trung ma tinh thanh voi ban ghi da co!";
-                                    }
-                                }
-                            }
-                            ImGui::PopStyleColor();
-
-                            if (!msgTinhThanh.empty()) {
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", msgTinhThanh.c_str());
-                            }
+                        ImGui::SameLine();
+                        bool addTT = false, expTT = false, impTT = false;
+                        ActionToolbarConfig cfgTT;
+                        RenderCommonActionToolbar("tinhthanh", cfgTT, addTT, expTT, impTT);
+                        if (addTT) {
+                            addTinhThanhMa[0] = '\0';
+                            addTinhThanhTen[0] = '\0';
+                            strcpy(addTinhThanhLoai, "Tinh");
+                            addTinhThanhError = "";
+                            showAddTinhThanhModal = true;
                         }
-                        ImGui::EndChild();
+                        if (expTT) {
+                            Vector<string> hd; hd.push_back("STT"); hd.push_back("Ma Tinh (PK)"); hd.push_back("Ten Don Vi Hanh Chinh"); hd.push_back("Loai Hinh");
+                            Vector<int> wd; wd.push_back(50); wd.push_back(110); wd.push_back(260); wd.push_back(200);
+                            Vector<Vector<string>> rows;
+                            for (size_t i = 0; i < ql.getDanhSachTinhThanh().size(); ++i) {
+                                const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
+                                Vector<string> r;
+                                r.push_back(to_string(i + 1));
+                                r.push_back(tt.maTinh);
+                                r.push_back(tt.tenTinh);
+                                r.push_back(tt.loai);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_DanhMuc_TinhThanh.xls", "DANH MUC DON VI HANH CHINH TINH THANH PHO", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Da xuat Excel: data/BaoCao_DanhMuc_TinhThanh.xls";
+                        }
+                        if (impTT) {
+                            showToast = true;
+                            toastMsg = "Du lieu 34 Tinh / Thanh pho da duoc dong bo!";
+                        }
 
                         ImGui::Spacing();
 
-                        // Bảng danh mục Tỉnh thành
-                        if (ImGui::BeginTable("TblManageTinhThanh", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 320))) {
+                        // 2. FILTERING & PAGINATION SLICING
+                        Vector<TinhThanh> filteredTT;
+                        string sTT = Utils::toLower(Utils::trim(searchTinhThanh));
+                        for (size_t i = 0; i < ql.getDanhSachTinhThanh().size(); ++i) {
+                            const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
+                            if (sTT.empty() ||
+                                Utils::toLower(tt.maTinh).find(sTT) != string::npos ||
+                                Utils::toLower(tt.tenTinh).find(sTT) != string::npos ||
+                                Utils::toLower(tt.loai).find(sTT) != string::npos) {
+                                filteredTT.push_back(tt);
+                            }
+                        }
+                        pagTinhThanh.updateTotal((int)filteredTT.size());
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblManageTinhThanh_v2", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("Ma Tinh (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("Ten Don Vi Hanh Chinh", ImGuiTableColumnFlags_WidthStretch);
-                            ImGui::TableSetupColumn("Loai Hinh", ImGuiTableColumnFlags_WidthFixed, 260);
-                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 130);
+                            ImGui::TableSetupColumn("Loai Hinh", ImGuiTableColumnFlags_WidthFixed, 220);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachTinhThanh().size(); ++i) {
-                                const TinhThanh& tt = ql.getDanhSachTinhThanh()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_ttr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", tt.maTinh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", tt.tenTinh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%s", tt.loai.c_str());
+                            if (filteredTT.empty()) {
+                                RenderCommonEmptyRow(5, "Khong tim thay tinh thanh nao!");
+                            } else {
+                                int offset = pagTinhThanh.getOffset();
+                                int pSize = pagTinhThanh.getPageSize();
+                                int endIdx = (offset + pSize < (int)filteredTT.size()) ? (offset + pSize) : (int)filteredTT.size();
 
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::PushID((int)(1000 + i));
-                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.45f, 0.7f, 1.0f));
-                                if (ImGui::SmallButton("Sua")) {
-                                    strcpy(editTinhThanhMa, tt.maTinh.c_str());
-                                    strcpy(editTinhThanhTen, tt.tenTinh.c_str());
-                                    strcpy(editTinhThanhLoai, tt.loai.c_str());
-                                    editTinhThanhError = "";
-                                    showEditTinhThanhModal = true;
-                                }
-                                ImGui::PopStyleColor();
-                                ImGui::SameLine();
-                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.2f, 0.2f, 1.0f));
-                                if (ImGui::SmallButton("Xoa")) {
-                                    if (ql.xoaTinhThanh(tt.maTinh)) {
-                                        msgTinhThanh = "Da xoa tinh thanh thanh cong!";
-                                        showToast = true;
-                                        toastMsg = msgTinhThanh;
-                                    } else {
-                                        msgTinhThanh = "Khong the xoa vi co thi sinh dang tham chieu den tinh nay!";
+                                for (int i = offset; i < endIdx; ++i) {
+                                    const TinhThanh& tt = filteredTT[i];
+                                    ImGui::TableNextRow();
+
+                                    ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_ttr_%d", i); RenderRowHover(rId);
+                                    AlignAndRenderCenter(to_string(i + 1));
+
+                                    ImGui::TableSetColumnIndex(1);
+                                    AlignAndRenderCenter(tt.maTinh, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(2);
+                                    AlignAndRenderTextLeft(tt.tenTinh);
+
+                                    ImGui::TableSetColumnIndex(3);
+                                    AlignAndRenderTextLeft(tt.loai);
+
+                                    ImGui::TableSetColumnIndex(4);
+                                    bool vClk = false, eClk = false, dClk = false;
+                                    RenderCommonActionCell(tt.maTinh, vClk, eClk, dClk, true, true, true, "Xem chi tiet tinh thanh", "Sua thong tin tinh thanh", "Xoa tinh thanh");
+                                    if (vClk) {
+                                        viewTinhThanhData = tt;
+                                        showViewTinhThanhModal = true;
+                                    }
+                                    if (eClk) {
+                                        strcpy(editTinhThanhMa, tt.maTinh.c_str());
+                                        strcpy(editTinhThanhTen, tt.tenTinh.c_str());
+                                        strcpy(editTinhThanhLoai, tt.loai.c_str());
+                                        editTinhThanhError = "";
+                                        showEditTinhThanhModal = true;
+                                    }
+                                    if (dClk) {
+                                        if (ql.xoaTinhThanh(tt.maTinh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa tinh thanh " + tt.maTinh + " thanh cong!";
+                                        } else {
+                                            showToast = true;
+                                            toastMsg = "Khong the xoa vi co thi sinh dang tham chieu den tinh nay!";
+                                        }
                                     }
                                 }
-                                ImGui::PopStyleColor();
-                                ImGui::PopID();
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM PAGINATION BAR
+                        RenderCommonPaginationBar("pagTinhThanh", pagTinhThanh);
 
                         ImGui::EndTabItem();
                     }
@@ -2495,102 +4320,123 @@ int AppGUI::run(QuanLyThiSinh& ql) {
                     // SUBTAB 4.5: QUẢN LÝ GIỚI TÍNH
                     if (ImGui::BeginTabItem("  5. Danh muc Gioi tinh  ")) {
                         ImGui::Spacing();
-                        ImGui::TextColored(ImVec4(0.35f, 0.85f, 1.0f, 1.0f), "QUAN LY DANH MUC GIOI TINH (TRUYEN THONG & MO RONG):");
-                        ImGui::Separator();
 
-                        // Form thêm giới tính mới
-                        ImGui::BeginChild("AddGioiTinhForm", ImVec2(0, 75), true);
-                        {
-                            ImGui::SetNextItemWidth(100);
-                            ImGui::InputTextWithHint("##newMaGT", "Ma (NAM/NU/..)", bufNewMaGT, sizeof(bufNewMaGT));
-                            ImGui::SameLine();
-                            ImGui::SetNextItemWidth(180);
-                            ImGui::InputTextWithHint("##newTenGT", "Ten hien thi", bufNewTenGT, sizeof(bufNewTenGT));
-                            ImGui::SameLine();
-                            ImGui::SetNextItemWidth(260);
-                            ImGui::InputTextWithHint("##newDescGT", "Ghi chu mo ta", bufNewDescGT, sizeof(bufNewDescGT));
-                            ImGui::SameLine();
+                        // 1. TOP TOOLBAR (LEFT: QUICK SEARCH | RIGHT: ACTION TOOLBAR)
+                        ImGui::SetNextItemWidth(320);
+                        ImGui::InputTextWithHint("##searchGioiTinh", "Tim theo Ma, Ten gioi tinh...", searchGioiTinh, sizeof(searchGioiTinh));
 
-                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.55f, 0.34f, 1.0f));
-                            if (ImGui::Button("[+] Them Gioi Tinh", ImVec2(160, 26))) {
-                                string m = Utils::toUpper(Utils::trim(bufNewMaGT));
-                                string t = Utils::trim(bufNewTenGT);
-                                string d = Utils::trim(bufNewDescGT);
-                                if (m.empty() || t.empty()) {
-                                    msgGioiTinh = "Ma va Ten gioi tinh khong duoc de trong!";
-                                } else {
-                                    GioiTinh gtMoi(m, t, d);
-                                    if (ql.themGioiTinh(gtMoi)) {
-                                        msgGioiTinh = "Da them gioi tinh moi thanh cong!";
-                                        bufNewMaGT[0] = '\0';
-                                        bufNewTenGT[0] = '\0';
-                                        bufNewDescGT[0] = '\0';
-                                        showToast = true;
-                                        toastMsg = msgGioiTinh;
-                                    } else {
-                                        msgGioiTinh = "Trung ma gioi tinh voi danh muc da co!";
-                                    }
-                                }
-                            }
-                            ImGui::PopStyleColor();
-
-                            if (!msgGioiTinh.empty()) {
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", msgGioiTinh.c_str());
-                            }
+                        ImGui::SameLine();
+                        bool addGT = false, expGT = false, impGT = false;
+                        ActionToolbarConfig cfgGT;
+                        RenderCommonActionToolbar("gioitinh", cfgGT, addGT, expGT, impGT);
+                        if (addGT) {
+                            addGioiTinhMa[0] = '\0';
+                            addGioiTinhTen[0] = '\0';
+                            addGioiTinhDesc[0] = '\0';
+                            addGioiTinhError = "";
+                            showAddGioiTinhModal = true;
                         }
-                        ImGui::EndChild();
+                        if (expGT) {
+                            Vector<string> hd; hd.push_back("STT"); hd.push_back("Ma Gioi Tinh (PK)"); hd.push_back("Ten Hien Thi"); hd.push_back("Mo Ta Chi Tiet");
+                            Vector<int> wd; wd.push_back(50); wd.push_back(120); wd.push_back(160); wd.push_back(280);
+                            Vector<Vector<string>> rows;
+                            for (size_t i = 0; i < ql.getDanhSachGioiTinh().size(); ++i) {
+                                const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
+                                Vector<string> r;
+                                r.push_back(to_string(i + 1));
+                                r.push_back(gt.maGioiTinh);
+                                r.push_back(gt.tenGioiTinh);
+                                r.push_back(gt.moTa);
+                                rows.push_back(r);
+                            }
+                            ql.xuatBangDuLieuExcel("data/BaoCao_DanhMuc_GioiTinh.xls", "DANH MUC GIOI TINH HE THONG", hd, wd, rows);
+                            showToast = true;
+                            toastMsg = "Da xuat Excel: data/BaoCao_DanhMuc_GioiTinh.xls";
+                        }
+                        if (impGT) {
+                            showToast = true;
+                            toastMsg = "Du lieu danh muc Gioi tinh da duoc dong bo!";
+                        }
 
                         ImGui::Spacing();
 
-                        // Bảng danh mục Giới tính
-                        if (ImGui::BeginTable("TblManageGioiTinh", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 320))) {
+                        // 2. FILTERING & PAGINATION SLICING
+                        Vector<GioiTinh> filteredGT;
+                        string sGT = Utils::toLower(Utils::trim(searchGioiTinh));
+                        for (size_t i = 0; i < ql.getDanhSachGioiTinh().size(); ++i) {
+                            const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
+                            if (sGT.empty() ||
+                                Utils::toLower(gt.maGioiTinh).find(sGT) != string::npos ||
+                                Utils::toLower(gt.tenGioiTinh).find(sGT) != string::npos ||
+                                Utils::toLower(gt.moTa).find(sGT) != string::npos) {
+                                filteredGT.push_back(gt);
+                            }
+                        }
+                        pagGioiTinh.updateTotal((int)filteredGT.size());
+
+                        // 3. TABLE
+                        if (ImGui::BeginTable("TblManageGioiTinh_v2", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY, ImVec2(0, ImGui::GetWindowHeight() - 250))) {
                             ImGui::TableSetupColumn("STT", ImGuiTableColumnFlags_WidthFixed, 40);
                             ImGui::TableSetupColumn("Ma (PK)", ImGuiTableColumnFlags_WidthFixed, 110);
                             ImGui::TableSetupColumn("Ten Hien Thi", ImGuiTableColumnFlags_WidthFixed, 180);
                             ImGui::TableSetupColumn("Mo Ta Chi Tiet", ImGuiTableColumnFlags_WidthStretch);
-                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 130);
+                            ImGui::TableSetupColumn("Thao Tac", ImGuiTableColumnFlags_WidthFixed, 102);
                             ImGui::TableHeadersRow();
 
-                            for (size_t i = 0; i < ql.getDanhSachGioiTinh().size(); ++i) {
-                                const GioiTinh& gt = ql.getDanhSachGioiTinh()[i];
-                                ImGui::TableNextRow();
-                                ImGui::TableSetColumnIndex(0);
-                                char rId[32]; sprintf(rId, "##row_gtr_%d", (int)i); RenderRowHover(rId);
-                                ImGui::Text("%d", (int)(i + 1));
-                                ImGui::TableSetColumnIndex(1);
-                                ImGui::TextColored(ImVec4(1.0f, 0.85f, 0.3f, 1.0f), "%s", gt.maGioiTinh.c_str());
-                                ImGui::TableSetColumnIndex(2);
-                                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", gt.tenGioiTinh.c_str());
-                                ImGui::TableSetColumnIndex(3);
-                                ImGui::Text("%s", gt.moTa.c_str());
+                            if (filteredGT.empty()) {
+                                RenderCommonEmptyRow(5, "Khong tim thay gioi tinh nao!");
+                            } else {
+                                int offset = pagGioiTinh.getOffset();
+                                int pSize = pagGioiTinh.getPageSize();
+                                int endIdx = (offset + pSize < (int)filteredGT.size()) ? (offset + pSize) : (int)filteredGT.size();
 
-                                ImGui::TableSetColumnIndex(4);
-                                ImGui::PushID((int)(2000 + i));
-                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.45f, 0.7f, 1.0f));
-                                if (ImGui::SmallButton("Sua")) {
-                                    strcpy(editGioiTinhMa, gt.maGioiTinh.c_str());
-                                    strcpy(editGioiTinhTen, gt.tenGioiTinh.c_str());
-                                    strcpy(editGioiTinhDesc, gt.moTa.c_str());
-                                    editGioiTinhError = "";
-                                    showEditGioiTinhModal = true;
-                                }
-                                ImGui::PopStyleColor();
-                                ImGui::SameLine();
-                                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.2f, 0.2f, 1.0f));
-                                if (ImGui::SmallButton("Xoa")) {
-                                    if (ql.xoaGioiTinh(gt.maGioiTinh)) {
-                                        msgGioiTinh = "Da xoa gioi tinh thanh cong!";
-                                        showToast = true;
-                                        toastMsg = msgGioiTinh;
-                                    } else {
-                                        msgGioiTinh = "Khong the xoa vi co thi sinh dang tham chieu den gioi tinh nay!";
+                                for (int i = offset; i < endIdx; ++i) {
+                                    const GioiTinh& gt = filteredGT[i];
+                                    ImGui::TableNextRow();
+
+                                    ImGui::TableSetColumnIndex(0);
+                                    char rId[32]; sprintf(rId, "##row_gtr_%d", i); RenderRowHover(rId);
+                                    AlignAndRenderCenter(to_string(i + 1));
+
+                                    ImGui::TableSetColumnIndex(1);
+                                    AlignAndRenderCenter(gt.maGioiTinh, ImVec4(1.0f, 0.85f, 0.3f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(2);
+                                    AlignAndRenderCenter(gt.tenGioiTinh, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+
+                                    ImGui::TableSetColumnIndex(3);
+                                    AlignAndRenderTextLeft(gt.moTa);
+
+                                    ImGui::TableSetColumnIndex(4);
+                                    bool vClk = false, eClk = false, dClk = false;
+                                    RenderCommonActionCell(gt.maGioiTinh, vClk, eClk, dClk, true, true, true, "Xem chi tiet gioi tinh", "Sua thong tin gioi tinh", "Xoa gioi tinh");
+                                    if (vClk) {
+                                        viewGioiTinhData = gt;
+                                        showViewGioiTinhModal = true;
+                                    }
+                                    if (eClk) {
+                                        strcpy(editGioiTinhMa, gt.maGioiTinh.c_str());
+                                        strcpy(editGioiTinhTen, gt.tenGioiTinh.c_str());
+                                        strcpy(editGioiTinhDesc, gt.moTa.c_str());
+                                        editGioiTinhError = "";
+                                        showEditGioiTinhModal = true;
+                                    }
+                                    if (dClk) {
+                                        if (ql.xoaGioiTinh(gt.maGioiTinh)) {
+                                            showToast = true;
+                                            toastMsg = "Da xoa gioi tinh " + gt.maGioiTinh + " thanh cong!";
+                                        } else {
+                                            showToast = true;
+                                            toastMsg = "Khong the xoa vi co thi sinh dang tham chieu den gioi tinh nay!";
+                                        }
                                     }
                                 }
-                                ImGui::PopStyleColor();
-                                ImGui::PopID();
                             }
                             ImGui::EndTable();
                         }
+
+                        // 4. BOTTOM PAGINATION BAR
+                        RenderCommonPaginationBar("pagGioiTinh", pagGioiTinh);
 
                         ImGui::EndTabItem();
                     }
@@ -3651,6 +5497,621 @@ int AppGUI::run(QuanLyThiSinh& ql) {
             ImGui::SameLine();
             if (ImGui::Button("Huy Bo", ImVec2(100, 30))) {
                 showEditGioiTinhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: THÊM KHOA ====================
+        if (showAddKhoaModal) {
+            ImGui::OpenPopup("Them Khoa Dao Tao Moi");
+        }
+        if (ImGui::BeginPopupModal("Them Khoa Dao Tao Moi", &showAddKhoaModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THEM KHOA DAO TAO DUT MOI");
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Khoa (PK - VD: CNTT, DIEN, CKHI)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addMaK", addKhoaMa, sizeof(addKhoaMa));
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Khoa Dao Tao*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addTenK", addKhoaTen, sizeof(addKhoaTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Ma Khoa Chuan DUT (VD: 102, 105, 101)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addMaDUTK", addKhoaMaDUT, sizeof(addKhoaMaDUT));
+
+            if (!addKhoaError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", addKhoaError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Them Khoa", ImVec2(120, 30))) {
+                string ma = Utils::trim(addKhoaMa);
+                string ten = Utils::trim(addKhoaTen);
+                string dut = Utils::trim(addKhoaMaDUT);
+                if (ma.empty() || ten.empty()) {
+                    addKhoaError = "Ma khoa va ten khoa khong duoc de trong!";
+                } else if (ql.timViTriKhoa(ma) >= 0) {
+                    addKhoaError = "Ma khoa da ton tai trong he thong!";
+                } else {
+                    Khoa k(ma, ten, dut);
+                    if (ql.themKhoa(k)) {
+                        showAddKhoaModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Them khoa dao tao thanh cong!";
+                    } else {
+                        addKhoaError = "Khong the them khoa vao CSDL!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##addK", ImVec2(100, 30))) {
+                showAddKhoaModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: SỬA KHOA ====================
+        if (showEditKhoaModal) {
+            ImGui::OpenPopup("Cap Nhat Khoa Dao Tao");
+        }
+        if (ImGui::BeginPopupModal("Cap Nhat Khoa Dao Tao", &showEditKhoaModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "CAP NHAT KHOA DAO TAO (MA: %s)", editKhoaMa);
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Khoa (PK):");
+            ImGui::BeginDisabled();
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editMaK", editKhoaMa, sizeof(editKhoaMa));
+            ImGui::EndDisabled();
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Khoa Dao Tao*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editTenK", editKhoaTen, sizeof(editKhoaTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Ma Khoa Chuan DUT (VD: 102, 105...)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editMaDUTK", editKhoaMaDUT, sizeof(editKhoaMaDUT));
+
+            if (!editKhoaError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", editKhoaError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Luu Thay Doi##editK", ImVec2(130, 30))) {
+                string ten = Utils::trim(editKhoaTen);
+                string dut = Utils::trim(editKhoaMaDUT);
+                if (ten.empty()) {
+                    editKhoaError = "Ten khoa khong duoc de trong!";
+                } else {
+                    Khoa k(editKhoaMa, ten, dut);
+                    if (ql.capNhatKhoa(k)) {
+                        showEditKhoaModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Cap nhat khoa thanh cong!";
+                    } else {
+                        editKhoaError = "Khong the cap nhat khoa vao CSDL!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##editK", ImVec2(100, 30))) {
+                showEditKhoaModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: XEM KHOA ====================
+        if (showViewKhoaModal) {
+            ImGui::OpenPopup("Chi Tiet Khoa Dao Tao");
+        }
+        if (ImGui::BeginPopupModal("Chi Tiet Khoa Dao Tao", &showViewKhoaModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THONG TIN KHOA DAO TAO DUT");
+            ImGui::Separator();
+            ImGui::Spacing();
+            ImGui::BulletText("Ma Khoa (PK)         : %s", viewKhoaData.maKhoa.c_str());
+            ImGui::BulletText("Ten Khoa Dao Tao     : %s", viewKhoaData.tenKhoa.c_str());
+            ImGui::BulletText("Ma Dinh Danh DUT (MSV): %s", viewKhoaData.maKhoaTheoChuanDUT.c_str());
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            if (ImGui::Button("Dong##viewK", ImVec2(100, 30))) {
+                showViewKhoaModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: THÊM NGÀNH ====================
+        if (showAddNganhModal) {
+            ImGui::OpenPopup("Them Nganh Dao Tao Moi");
+        }
+        if (ImGui::BeginPopupModal("Them Nganh Dao Tao Moi", &showAddNganhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THEM NGANH DAO TAO DUT MOI");
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Nganh (PK - Chuan Bo GD&DT)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addMaN", addNganhMa, sizeof(addNganhMa));
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Nganh Dao Tao*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addTenN", addNganhTen, sizeof(addNganhTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Khoa Truc Thuoc (FK)*:");
+            ImGui::SetNextItemWidth(320);
+            if (ImGui::BeginCombo("##addKhoaN", addNganhKhoa.c_str())) {
+                for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                    const Khoa& kh = ql.getDanhSachKhoa()[k];
+                    bool isSel = (addNganhKhoa == kh.maKhoa);
+                    if (ImGui::Selectable(kh.maKhoa.c_str(), isSel)) addNganhKhoa = kh.maKhoa;
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::Spacing();
+            ImGui::Text("Tien To Lop (VD: TCLC_KHDL, TDH, T_DT)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addTienToN", addNganhTienTo, sizeof(addNganhTienTo));
+
+            if (!addNganhError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", addNganhError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Them Nganh", ImVec2(120, 30))) {
+                string ma = Utils::trim(addNganhMa);
+                string ten = Utils::trim(addNganhTen);
+                string tt = Utils::trim(addNganhTienTo);
+                if (ma.empty() || ten.empty()) {
+                    addNganhError = "Ma nganh va ten nganh khong duoc de trong!";
+                } else if (ql.timViTriDanhMucNganh(ma) >= 0) {
+                    addNganhError = "Ma nganh da ton tai!";
+                } else {
+                    DanhMucNganh dmn(ma, ten, addNganhKhoa, tt);
+                    if (ql.themDanhMucNganh(dmn)) {
+                        showAddNganhModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Them nganh dao tao thanh cong!";
+                    } else {
+                        addNganhError = "Khong the them nganh vao CSDL!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##addN", ImVec2(100, 30))) {
+                showAddNganhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: SỬA NGÀNH ====================
+        if (showEditNganhModal) {
+            ImGui::OpenPopup("Cap Nhat Nganh Dao Tao");
+        }
+        if (ImGui::BeginPopupModal("Cap Nhat Nganh Dao Tao", &showEditNganhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "CAP NHAT NGANH DAO TAO (MA: %s)", editNganhMa);
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Nganh (PK):");
+            ImGui::BeginDisabled();
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editMaN", editNganhMa, sizeof(editNganhMa));
+            ImGui::EndDisabled();
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Nganh Dao Tao*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editTenN", editNganhTen, sizeof(editNganhTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Khoa Truc Thuoc (FK)*:");
+            ImGui::SetNextItemWidth(320);
+            if (ImGui::BeginCombo("##editKhoaN", editNganhKhoa.c_str())) {
+                for (size_t k = 0; k < ql.getDanhSachKhoa().size(); ++k) {
+                    const Khoa& kh = ql.getDanhSachKhoa()[k];
+                    bool isSel = (editNganhKhoa == kh.maKhoa);
+                    if (ImGui::Selectable(kh.maKhoa.c_str(), isSel)) editNganhKhoa = kh.maKhoa;
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::Spacing();
+            ImGui::Text("Tien To Lop*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##editTienToN", editNganhTienTo, sizeof(editNganhTienTo));
+
+            if (!editNganhError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", editNganhError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Luu Thay Doi##editN", ImVec2(130, 30))) {
+                string ten = Utils::trim(editNganhTen);
+                string tt = Utils::trim(editNganhTienTo);
+                if (ten.empty()) {
+                    editNganhError = "Ten nganh khong duoc de trong!";
+                } else {
+                    DanhMucNganh dmn(editNganhMa, ten, editNganhKhoa, tt);
+                    if (ql.capNhatDanhMucNganh(dmn)) {
+                        showEditNganhModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Cap nhat nganh thanh cong!";
+                    } else {
+                        editNganhError = "Khong the cap nhat nganh vao CSDL!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##editN", ImVec2(100, 30))) {
+                showEditNganhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: XEM NGÀNH ====================
+        if (showViewNganhModal) {
+            ImGui::OpenPopup("Chi Tiet Nganh Dao Tao");
+        }
+        if (ImGui::BeginPopupModal("Chi Tiet Nganh Dao Tao", &showViewNganhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THONG TIN NGANH DAO TAO DUT");
+            ImGui::Separator();
+            ImGui::Spacing();
+            ImGui::BulletText("Ma Nganh (PK) : %s", viewNganhData.maNganh.c_str());
+            ImGui::BulletText("Ten Nganh     : %s", viewNganhData.tenNganh.c_str());
+            ImGui::BulletText("Khoa          : %s (%s)", viewNganhData.maKhoa.c_str(), ql.layTenKhoa(viewNganhData.maKhoa).c_str());
+            ImGui::BulletText("Tien To Lop   : %s", viewNganhData.tienToLop.c_str());
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            if (ImGui::Button("Dong##viewN", ImVec2(100, 30))) {
+                showViewNganhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: THÊM NTK ====================
+        if (showAddNTKModal) {
+            ImGui::OpenPopup("Them Chi Tieu Nganh Theo Khoa");
+        }
+        if (ImGui::BeginPopupModal("Them Chi Tieu Nganh Theo Khoa", &showAddNTKModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THEM CHI TIEU NGANH CHO KHOA %d", addNTKNam);
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Chon Nganh Dao Tao*:");
+            ImGui::SetNextItemWidth(320);
+            if (ImGui::BeginCombo("##addNTKMaCombo", (addNTKMa + " - " + ql.layTenNganh(addNTKMa)).c_str())) {
+                for (size_t i = 0; i < ql.getDanhSachDanhMucNganh().size(); ++i) {
+                    const DanhMucNganh& dmn = ql.getDanhSachDanhMucNganh()[i];
+                    string label = dmn.maNganh + " - " + dmn.tenNganh;
+                    bool isSel = (addNTKMa == dmn.maNganh);
+                    if (ImGui::Selectable(label.c_str(), isSel)) addNTKMa = dmn.maNganh;
+                }
+                ImGui::EndCombo();
+            }
+
+            ImGui::Spacing();
+            ImGui::Text("Chi Tieu Tuyen Sinh (sinh vien)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputInt("##addNTKCT", &addNTKChiTieu);
+            if (addNTKChiTieu < 1) addNTKChiTieu = 1;
+
+            ImGui::Spacing();
+            ImGui::Text("Diem San Toi Thieu (thang 30)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputFloat("##addNTKDS", &addNTKDiemSan, 0.25f, 1.0f, "%.2f");
+            if (addNTKDiemSan < 0.0f) addNTKDiemSan = 0.0f;
+            if (addNTKDiemSan > 30.0f) addNTKDiemSan = 30.0f;
+
+            if (!addNTKError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", addNTKError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Them Chi Tieu", ImVec2(130, 30))) {
+                if (addNTKMa.empty()) {
+                    addNTKError = "Vui long chon nganh dao tao!";
+                } else if (ql.timViTriNganhTheoKhoaHoc(addNTKNam, addNTKMa) >= 0) {
+                    addNTKError = "Nganh nay da co chi tieu trong khoa " + to_string(addNTKNam) + "!";
+                } else {
+                    NganhTheoKhoaHoc ntk(addNTKNam, addNTKMa, addNTKChiTieu, 0.0, addNTKDiemSan);
+                    if (ql.themNganhTheoKhoaHoc(ntk)) {
+                        showAddNTKModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Them chi tieu nganh thanh cong!";
+                    } else {
+                        addNTKError = "Khong the them chi tieu vao CSDL!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##addNTK", ImVec2(100, 30))) {
+                showAddNTKModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: SỬA NTK ====================
+        if (showEditNTKModal) {
+            ImGui::OpenPopup("Cap Nhat Chi Tieu & Diem San");
+        }
+        if (ImGui::BeginPopupModal("Cap Nhat Chi Tieu & Diem San", &showEditNTKModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "CAP NHAT NGANH %s - KHOA %d", editNTKMa.c_str(), editNTKNam);
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ten Nganh: %s", ql.layTenNganh(editNTKMa).c_str());
+            ImGui::Spacing();
+
+            ImGui::Text("Chi Tieu Tuyen Sinh (sinh vien)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputInt("##editNTKCT", &editNTKChiTieu);
+            if (editNTKChiTieu < 1) editNTKChiTieu = 1;
+
+            ImGui::Spacing();
+            ImGui::Text("Diem San Toi Thieu (thang 30)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputFloat("##editNTKDS", &editNTKDiemSan, 0.25f, 1.0f, "%.2f");
+            if (editNTKDiemSan < 0.0f) editNTKDiemSan = 0.0f;
+            if (editNTKDiemSan > 30.0f) editNTKDiemSan = 30.0f;
+
+            if (!editNTKError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", editNTKError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Luu Thay Doi##editNTK", ImVec2(130, 30))) {
+                if (ql.capNhatChiTieuVaDiemSan(editNTKNam, editNTKMa, editNTKChiTieu, editNTKDiemSan)) {
+                    showEditNTKModal = false;
+                    ImGui::CloseCurrentPopup();
+                    showToast = true;
+                    toastMsg = "Cap nhat chi tieu & diem san thanh cong!";
+                } else {
+                    editNTKError = "Khong the cap nhat vao CSDL!";
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##editNTK", ImVec2(100, 30))) {
+                showEditNTKModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: XEM NTK ====================
+        if (showViewNTKModal) {
+            ImGui::OpenPopup("Chi Tiet Chi Tieu & Diem Chuan");
+        }
+        if (ImGui::BeginPopupModal("Chi Tiet Chi Tieu & Diem Chuan", &showViewNTKModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THONG TIN CHI TIEU & DIEM CHUAN NGANH");
+            ImGui::Separator();
+            ImGui::Spacing();
+            ImGui::BulletText("Khoa / Nam Tuyen Sinh: %d (K%d)", viewNTKData.namTuyenSinh, viewNTKData.namTuyenSinh % 100);
+            ImGui::BulletText("Ma Nganh             : %s", viewNTKData.maNganh.c_str());
+            ImGui::BulletText("Ten Nganh            : %s", ql.layTenNganh(viewNTKData.maNganh).c_str());
+            ImGui::BulletText("Khoa Dao Tao         : %s", ql.layTenKhoa(ql.layMaKhoaCuaNganh(viewNTKData.maNganh)).c_str());
+            ImGui::BulletText("Chi Tieu Tuyen Sinh  : %d chi tieu", viewNTKData.chiTieu);
+            ImGui::BulletText("Diem San Toi Thieu   : %.2f diem", viewNTKData.diemSanToiThieu);
+            if (viewNTKData.diemChuanChot > 0.0) {
+                ImGui::BulletText("Diem Chuan Chot      : %.2f diem", viewNTKData.diemChuanChot);
+            } else {
+                ImGui::BulletText("Diem Chuan Chot      : Chua chot");
+            }
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            if (ImGui::Button("Dong##viewNTK", ImVec2(100, 30))) {
+                showViewNTKModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: THÊM TỈNH THÀNH ====================
+        if (showAddTinhThanhModal) {
+            ImGui::OpenPopup("Them Tinh / Thanh Pho Moi");
+        }
+        if (ImGui::BeginPopupModal("Them Tinh / Thanh Pho Moi", &showAddTinhThanhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THEM TINH / THANH PHO MOI");
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Tinh / Thanh (PK - VD: 48, 01)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addMaTT", addTinhThanhMa, sizeof(addTinhThanhMa));
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Tinh / Thanh Pho*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addTenTT", addTinhThanhTen, sizeof(addTinhThanhTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Phan Loai (VD: Thanh pho Trung uong, Tinh)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addLoaiTT", addTinhThanhLoai, sizeof(addTinhThanhLoai));
+
+            if (!addTinhThanhError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", addTinhThanhError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Them Tinh Thanh", ImVec2(140, 30))) {
+                string ma = Utils::trim(addTinhThanhMa);
+                string ten = Utils::trim(addTinhThanhTen);
+                string loai = Utils::trim(addTinhThanhLoai);
+                if (ma.empty() || ten.empty()) {
+                    addTinhThanhError = "Ma tinh va ten tinh khong duoc de trong!";
+                } else if (ql.timViTriTinhThanh(ma) >= 0) {
+                    addTinhThanhError = "Ma tinh thanh da ton tai!";
+                } else {
+                    TinhThanh tt(ma, ten, loai);
+                    if (ql.themTinhThanh(tt)) {
+                        showAddTinhThanhModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Them tinh thanh thanh cong!";
+                    } else {
+                        addTinhThanhError = "Khong the them tinh thanh vao CSDL!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##addTT", ImVec2(100, 30))) {
+                showAddTinhThanhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: XEM TỈNH THÀNH ====================
+        if (showViewTinhThanhModal) {
+            ImGui::OpenPopup("Chi Tiet Tinh / Thanh Pho");
+        }
+        if (ImGui::BeginPopupModal("Chi Tiet Tinh / Thanh Pho", &showViewTinhThanhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THONG TIN TINH / THANH PHO");
+            ImGui::Separator();
+            ImGui::Spacing();
+            ImGui::BulletText("Ma Tinh (PK)    : %s", viewTinhThanhData.maTinh.c_str());
+            ImGui::BulletText("Ten Tinh / TP   : %s", viewTinhThanhData.tenTinh.c_str());
+            ImGui::BulletText("Phan Loai       : %s", viewTinhThanhData.loai.c_str());
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            if (ImGui::Button("Dong##viewTT", ImVec2(100, 30))) {
+                showViewTinhThanhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: THÊM GIỚI TÍNH ====================
+        if (showAddGioiTinhModal) {
+            ImGui::OpenPopup("Them Gioi Tinh Moi");
+        }
+        if (ImGui::BeginPopupModal("Them Gioi Tinh Moi", &showAddGioiTinhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THEM GIOI TINH MOI");
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Ma Gioi Tinh (PK - VD: NAM, NU, KHAC)*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addMaGT", addGioiTinhMa, sizeof(addGioiTinhMa));
+
+            ImGui::Spacing();
+            ImGui::Text("Ten Hien Thi*:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addTenGT", addGioiTinhTen, sizeof(addGioiTinhTen));
+
+            ImGui::Spacing();
+            ImGui::Text("Ghi Chu Mo Ta:");
+            ImGui::SetNextItemWidth(320);
+            ImGui::InputText("##addDescGT", addGioiTinhDesc, sizeof(addGioiTinhDesc));
+
+            if (!addGioiTinhError.empty()) {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[!] %s", addGioiTinhError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            if (ImGui::Button("Them Gioi Tinh", ImVec2(130, 30))) {
+                string ma = Utils::trim(addGioiTinhMa);
+                string ten = Utils::trim(addGioiTinhTen);
+                string desc = Utils::trim(addGioiTinhDesc);
+                if (ma.empty() || ten.empty()) {
+                    addGioiTinhError = "Ma va ten gioi tinh khong duoc de trong!";
+                } else if (ql.timViTriGioiTinh(ma) >= 0) {
+                    addGioiTinhError = "Ma gioi tinh da ton tai!";
+                } else {
+                    GioiTinh gt(ma, ten, desc);
+                    if (ql.themGioiTinh(gt)) {
+                        showAddGioiTinhModal = false;
+                        ImGui::CloseCurrentPopup();
+                        showToast = true;
+                        toastMsg = "Them gioi tinh thanh cong!";
+                    } else {
+                        addGioiTinhError = "Khong the them gioi tinh vao CSDL!";
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Huy Bo##addGT", ImVec2(100, 30))) {
+                showAddGioiTinhModal = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // ==================== MODAL: XEM GIỚI TÍNH ====================
+        if (showViewGioiTinhModal) {
+            ImGui::OpenPopup("Chi Tiet Gioi Tinh");
+        }
+        if (ImGui::BeginPopupModal("Chi Tiet Gioi Tinh", &showViewGioiTinhModal, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "THONG TIN GIOI TINH");
+            ImGui::Separator();
+            ImGui::Spacing();
+            ImGui::BulletText("Ma Gioi Tinh (PK): %s", viewGioiTinhData.maGioiTinh.c_str());
+            ImGui::BulletText("Ten Hien Thi     : %s", viewGioiTinhData.tenGioiTinh.c_str());
+            ImGui::BulletText("Mo Ta            : %s", viewGioiTinhData.moTa.c_str());
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            if (ImGui::Button("Dong##viewGT", ImVec2(100, 30))) {
+                showViewGioiTinhModal = false;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();

@@ -1,182 +1,262 @@
 # KẾ HOẠCH TRIỂN KHAI (IMPLEMENTATION PLAN)
-## Refactor Chức Năng Khởi Tạo Dữ Liệu & Tối Ưu Hóa Giao Diện Bảng Quản Lý Thí Sinh (PBL2)
+## ĐẠI TU & CHUẨN HÓA TOÀN DIỆN HỆ THỐNG BẢNG DÙNG CHUNG (COMMON TABLE ARCHITECTURE)
+### Dự án PBL2 (Đề tài 24): Hệ Thống Quản Lý Thí Sinh Tuyển Sinh Đại Học Bách Khoa - ĐH Đà Nẵng (DUT)
+### Mô hình tham chiếu: `sdt-baocaodieuhanh` (`frontend/src/components/table`)
 
 ---
 
-### I. TỔNG QUAN & BỐI CẢNH BÀI TOÁN
+### I. TỔNG QUAN & BỐI CẢNH YÊU CẦU
 
-Hệ thống Quản lý Thí sinh Tuyển sinh Đại học Bách Khoa - ĐH Đà Nẵng (DUT) hiện tại đang gặp 2 vấn đề trọng yếu cần refactor toàn diện:
+Trong quá trình phát triển hệ thống, các màn hình hiển thị dữ liệu dạng bảng (Table Views) trải rộng qua 5 Tab nghiệp vụ lớn:
+1. **Tab 1**: Quản lý Hồ sơ Thí sinh (Màn hình chính, đã được tối ưu đạt chuẩn thẩm mỹ cao).
+2. **Tab 2**: Cơ sở Dữ liệu Quan hệ (10 Subtab cho 10 bảng thực thể 3NF trong MySQL).
+3. **Tab 3**: Xét tuyển & Thống kê DUT (Bảng Chỉ tiêu & Điểm chuẩn chốt, Bảng Tân sinh viên phân lớp, Bảng Thủ khoa & Phổ điểm).
+4. **Tab 4**: Quản lý Danh mục Hệ thống (Khoa, Ngành đào tạo, Chỉ tiêu động, Tỉnh thành, Giới tính, Cấu hình).
+5. **Tab 5**: Lưu trữ & Báo cáo thống kê.
 
-1. **Vấn đề Dữ liệu mẫu (Data Seeding):**
-   - Hệ thống tự động chèn 36 bản ghi thí sinh mẫu hardcode vào cơ sở dữ liệu khi khởi chạy lần đầu.
-   - Bộ dữ liệu này không đồng bộ với bộ 100 thí sinh xét tuyển chuyên sâu ngành **CNTT - Ngoại ngữ Nhật (`7480201A`)** mà môn đồ đã chuẩn bị trong file `generate_100_students.ps1` / `sql/05_seed_sample_data.sql`.
-   - **Yêu cầu mới:** Ban đầu cơ sở dữ liệu thí sinh phải hoàn toàn **RỖNG** (chỉ có sẵn các danh mục hệ thống: Tỉnh thành, Giới tính, Khoa, Ngành, Năm học, Cấu hình). Thêm một nút `[+] Import Dữ Liệu Mẫu (100)` nằm ở **bên phải nút `[ Xuất Báo Cáo Excel ]`**. Khi người dùng chủ động click vào nút này, hệ thống mới nạp bộ 100 thí sinh mẫu vào MySQL và cập nhật lên giao diện.
+#### Vấn đề hiện tại:
+- **Thiếu tính đồng bộ (UI Fragmentation)**: Mỗi Tab/Subtab đang tự vẽ bảng theo cách riêng (cách dùng cờ ImGui khác nhau, một số bảng thiếu thanh cuộn, một số bảng cuộn ngang méo mó, bảng thì có nút thao tác, bảng thì không).
+- **Hệ thống nút hành động phân tán**: Nút bấm trên thanh công cụ mỗi nơi đặt một tên (`[+] Them Thi Sinh]`, `[Xuat DS Trung Tuyen DUT]`, `[Cap nhat]`...), gây rối mắt và không theo quy chuẩn chung.
+- **Căn lề dữ liệu lộn xộn**: Cột chữ và cột số căn lề chưa thống nhất.
+- **Phân trang cục bộ**: Nhiều bảng tải toàn bộ hàng trăm/hàng nghìn dòng một lúc hoặc thiếu phân trang Server-side, gây nghẽn giao diện khi dữ liệu lớn.
 
-2. **Vấn đề Lỗi Giao diện Bảng Quản lý Thí sinh (UI Bug - Candidates Table):**
-   - Bảng hiện tại xuất hiện **thanh cuộn ngang (`ScrollX`)** dưới đáy, làm giảm tính thẩm mỹ và bất tiện khi thao tác.
-   - Các cột quan trọng như **"Họ và Tên"** và **"Ngày Sinh"** bị che khuất/co rút nghiêm trọng (như hình chụp: cột Họ tên co lại chỉ còn 1-2 chữ cái `V<`, `N<`..., cột Ngày sinh chỉ còn `04`, `15`... bị mất tháng và năm).
-   - Nhiều cột phía sau (Khoa, Ngành, Lớp, Mã SV DUT, Thao tác) bị đẩy trôi ra ngoài màn hình về bên phải.
-   - **Yêu cầu mới:**
-     - Loại bỏ hoàn toàn thanh cuộn ngang (`ScrollX`), bảng hiển thị vừa vặn 100% trên màn hình.
-     - Các cột có nội dung dài (Họ tên, Quê quán, Kết quả, Khoa, Ngành trúng tuyển) sẽ tự động **xuống dòng (Text Wrap)** để bảo toàn toàn bộ chữ nghĩa.
-     - **Ưu tiên hiển thị dữ liệu trên CÙNG MỘT HÀNG (Single Line - không bị ngắt dòng):**
-       + `STT`
-       + `SBD (Số báo danh)`
-       + `Số CCCD`
-       + `Ngày sinh` (`dd/mm/yyyy`)
-       + `Giới tính`
-       + `Toán`
-       + `Lý`
-       + `Hóa`
-       + `Tổng điểm`
-       + `Lớp sinh hoạt`
-       + `Mã SV DUT`
+#### Mục tiêu tối thượng của đợt Refactor này:
+- Xây dựng **Kiến trúc Bảng Dùng Chung (Common Table Architecture)** chuẩn mực theo mô hình Component chuyên nghiệp từ dự án mẫu: `D:\CONGVIEC\SDT\BAO_CAO_DIEU_HANH\sdt-baocaodieuhanh\frontend\src\components\table`.
+- Lấy **Bảng Quản lý Hồ sơ Thí sinh (Tab 1)** làm **tiêu chuẩn vàng (Golden Standard)** kết hợp kiến trúc phân rã component hiện đại.
+- Mọi màn hình danh sách đều sở hữu:
+  1. **Bộ 3 nút hành động chuẩn ngữ nghĩa**: `[+ Thêm mới]`, `[ Xuất Excel ]`, `[+ Import dữ liệu mẫu]`.
+  2. **Thanh phân trang Server-side chuẩn**: Chọn kích thước trang (10, 25, 50, 100/trang), hiển thị dải bản ghi, điều hướng 5 nút (`|<<`, `<`, Trang X/Y, `>`, `>>`), đếm tổng bản ghi chính xác.
+  3. **Cột thao tác chuẩn (Cột cuối cùng)**: 3 icon button vector tinh tế: `[Xem chi tiết]` (Mắt), `[Sửa]` (Bút chì), `[Xóa]` (Thùng rác), khóa cứng độ rộng và căn giữa 100%.
+  4. **Quy tắc căn chỉnh dữ liệu chuẩn mực (Theo chỉ đạo trực tiếp của Đệ tử)**:
+     - **Cột Text (Văn bản / Chuỗi dài)**: **CĂN TRÁI** (`AlignAndRenderTextLeft` có `padLeft = 6.0f`, tự động wrap dòng).
+     - **TẤT CẢ các cột còn lại (Điểm số, Chỉ tiêu, Số lượng, Mã số, Ngày sinh, Giới tính, Lớp, Mã SV, STT...)**: **CĂN GIỮA** (`AlignAndRenderCenter` cân xứng, thanh thoát).
 
 ---
 
-### II. PHÂN TÍCH NGUYÊN NHÂN GỐC RỄ (ROOT CAUSE ANALYSIS)
+### II. THIẾT KẾ KIẾN TRÚC THAM CHIẾU TỪ `sdt-baocaodieuhanh`
 
-#### 1. Nguyên nhân Vấn đề Dữ liệu (36 records tự động import)
-- Trong file `src/MySQLConnector.cpp`, hàm `seedDefaultData()` đang chứa các khối lệnh SQL hardcode từ dòng 404 đến 521, chèn 36 bản ghi thí sinh vào 3 bảng `nguoi`, `thisinh`, và `nguyen_vong`.
-- Khi ứng dụng kết nối MySQL lần đầu, hàm này được tự động gọi, dẫn tới việc thí sinh bị nạp ngoài ý muốn thay vì để bảng rỗng cho người dùng tự chủ động import.
+Qua phân tích cấu trúc component tại `D:\CONGVIEC\SDT\BAO_CAO_DIEU_HANH\sdt-baocaodieuhanh\frontend\src\components\table` bao gồm:
+- `Table.vue`: Điều phối Header Action Toolbar, Search Filter, Danh sách Columns, Trạng thái Không có kết quả (`customize-noResult`), Slot Thao tác (`thaoTac`).
+- `PaginationV.vue` & `PaginationRight.vue`: Phân tách rành mạch 2 cánh: Cánh trái hiển thị số đếm bản ghi (`hienThiTu ... den ... cua ... muc`), cánh phải chọn `selectPageSize`, `pages/pageCount` và cụm nút chuyển trang.
+- `index.vue` / `TableModal.vue`: Đóng gói cấu trúc bảng tái sử dụng với mảng `columns` linh hoạt.
 
-#### 2. Nguyên nhân Lỗi Giao diện Bảng Quản lý Thí sinh
-- **Cờ `ImGuiTableFlags_ScrollX`:** Được bật trong `AppGUI.cpp` (dòng 948). Khi bật cờ này, ImGui cho phép tổng chiều rộng các cột vượt quá khung nhìn cửa sổ và kích hoạt cuộn ngang.
-- **Xung đột cấu hình lưu vết trong `imgui.ini`:**
-  - ImGui tự động lưu kích thước các cột của bảng `[Table][0x6B657D3F,17]` vào file `imgui.ini`.
-  - Trong `imgui.ini` hiện tại, `Column 4` (Ngày Sinh) bị gán `Width=8px` (!), `Column 3` (Họ và Tên) bị chèn ép, trong khi `Column 16` (Thao Tác) chiếm tới `Width=658px`. Khi khởi động lại, ImGui nạp cấu hình méo mó này đè lên code, khiến các cột bị co rút kỳ dị.
-- **Thiếu cơ chế ngắt dòng (`ImGui::PushTextWrapPos`):** Mặc định trong cell của ImGui, hàm `ImGui::Text()` sẽ cắt ngắn (clip) chuỗi nếu vượt quá ô chứ không tự động bẻ dòng xuống.
+Chúng ta chuyển dịch kiến trúc Vue/Component này sang kiến trúc **C++ Dear ImGui** chuẩn mực như sau:
 
----
-
-### III. GIẢI PHÁP THỰC HIỆN CHI TIẾT (DETAILED PROPOSED SOLUTION)
-
-#### 1. Refactor Cơ chế Khởi tạo Dữ liệu & Nút Import 100 Thí sinh
-
-##### A. Dọn sạch Seeding tự động trong CSDL
-- Trong `src/MySQLConnector.cpp` - hàm `seedDefaultData()`:
-  - Giữ nguyên seeding cho các bảng danh mục: `tinh_thanh`, `gioi_tinh`, `khoa`, `danh_muc_nganh`, `khoa_hoc`, `nganh_theo_khoa_hoc`, `cau_hinh`.
-  - **Xóa bỏ hoàn toàn** các đoạn INSERT vào `nguoi`, `thisinh`, `nguyen_vong`.
-  - Đảm bảo khi hệ thống chạy lên với database mới, danh sách thí sinh là **rỗng 100%**.
-
-##### B. Hiện thực hóa chức năng `importDuLieuMau100()`
-- Bổ sung hàm trong `QuanLyThiSinh` / `MySQLConnector`:
-  ```cpp
-  bool importDuLieuMau100(const string& sqlFilePath = "sql/05_seed_sample_data.sql");
-  ```
-- **Quy trình xử lý của hàm:**
-  1. Kiểm tra kết nối MySQL.
-  2. Bắt đầu transaction (`beginTransaction()`).
-  3. Đọc nội dung file `sql/05_seed_sample_data.sql`.
-  4. Tách và thực thi tuần tự các khối lệnh `INSERT INTO cau_hinh`, `INSERT INTO nguoi`, `INSERT INTO thisinh`, `INSERT INTO nguyen_vong`.
-  5. Commit transaction.
-  6. Đồng bộ lại dữ liệu lên bộ nhớ RAM (`docDuLieuTuMySQL()`).
-  7. Trả về `true` khi thành công, hoặc `false` kèm thông báo lỗi.
-
-##### C. Thêm Nút `[+] Import 100 Thí Sinh Mẫu` trên Giao diện (`AppGUI.cpp`)
-- Đặt nút bấm tại vị trí ngay bên phải nút `[ Xuất Báo Cáo Excel ]` (hàng công cụ trên cùng của Tab 1):
-  ```cpp
-  // Sau nút [ Xuat Bao Cao Excel ]
-  ImGui::SameLine();
-  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.78f, 0.42f, 0.15f, 1.0f)); // Màu cam hổ phách nổi bật
-  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.88f, 0.50f, 0.20f, 1.0f));
-  if (ImGui::Button("[+] Import Du Lieu Mau (100)", ImVec2(195, 28))) {
-      bool ok = ql.importDuLieuMau100("sql/05_seed_sample_data.sql");
-      if (ok) {
-          currentPage = 1;
-          selectedRow = -1;
-          showToast = true;
-          toastMsg = "Da import thanh cong 100 thi sinh xet tuyen CNTT Nhat (K26)!";
-      } else {
-          showToast = true;
-          toastMsg = "Loi: Khong the import du lieu mau. Kiem tra file sql!";
-      }
-  }
-  ImGui::PopStyleColor(2);
-  ```
-- Điều chỉnh lại vị trí căn phải của nhóm nút công cụ (`ImGui::SameLine(...)`) để cả 3 nút `[+] Thêm Thí Sinh`, `[ Xuất Báo Cáo Excel ]` và `[+] Import Dữ Liệu Mẫu (100)` nằm ngay ngắn, không bị đè lên bộ lọc.
-
----
-
-#### 2. Refactor Toàn diện Bảng Quản lý Thí sinh (Candidates Table)
-
-##### A. Thay đổi Bảng Flags & Vô hiệu hóa Cache Hỏng trong `imgui.ini`
-- **Loại bỏ `ImGuiTableFlags_ScrollX`**.
-- Thêm cờ `ImGuiTableFlags_NoSavedSettings` để bảng không bị phụ thuộc vào kích thước lưu sai trong `imgui.ini`.
-- Đổi tên định danh bảng từ `"CandidatesTable"` thành `"CandidatesTable_v2"` để giải phóng hoàn toàn cache cũ.
-- Thiết lập cờ định cỡ: `ImGuiTableFlags_SizingStretchProp` (tất cả các cột co giãn cân đối theo tỷ lệ màn hình).
-
-##### B. Phân bổ Kích thước & Quy tắc Hiển thị cho 17 Cột
-Dựa trên chiều rộng màn hình tiêu chuẩn (từ 1280px đến 1920px), bảng sẽ được phân chia làm 2 nhóm cột rõ ràng:
-
-| STT | Cột | Kiểu Định Cỡ | Kích Thước / Trọng Số | Quy Tắc Hiển Thị |
-|---|---|---|---|---|
-| 1 | **STT** | `WidthFixed` | 36px | **1 hàng duy nhất**, căn giữa |
-| 2 | **SBD (PK)** | `WidthFixed` | 75px | **1 hàng duy nhất**, màu xanh dương sáng |
-| 3 | **Số CCCD (FK)**| `WidthFixed` | 108px | **1 hàng duy nhất**, đủ 12 chữ số |
-| 4 | **Họ và Tên** | `WidthStretch`| Trọng số `1.4f` | **Cho phép xuống dòng** nếu tên dài |
-| 5 | **Ngày Sinh** | `WidthFixed` | 86px | **1 hàng duy nhất** (`dd/mm/yyyy`) |
-| 6 | **Quê Quán** | `WidthStretch`| Trọng số `1.0f` | **Cho phép xuống dòng** (tên tỉnh/TP dài) |
-| 7 | **Giới Tính** | `WidthFixed` | 55px | **1 hàng duy nhất** (Nam / Nữ / Khác) |
-| 8 | **Toán** | `WidthFixed` | 42px | **1 hàng duy nhất**, căn phải/giữa |
-| 9 | **Lý** | `WidthFixed` | 42px | **1 hàng duy nhất**, căn phải/giữa |
-| 10 | **Hóa** | `WidthFixed` | 42px | **1 hàng duy nhất**, căn phải/giữa |
-| 11 | **Tổng Điểm** | `WidthFixed` | 58px | **1 hàng duy nhất**, chữ vàng đậm nét |
-| 12 | **Kết Quả** | `WidthStretch`| Trọng số `1.1f` | **Cho phép xuống dòng** (Trúng tuyển, Đang xét...) |
-| 13 | **Khoa** | `WidthStretch`| Trọng số `0.9f` | **Cho phép xuống dòng** |
-| 14 | **Ngành Trúng Tuyển**| `WidthStretch`| Trọng số `1.3f` | **Cho phép xuống dòng** (tên ngành dài) |
-| 15 | **Lớp Sinh Hoạt** | `WidthFixed`| 92px | **1 hàng duy nhất** (ví dụ `26T_N1`, `26TCLC_KHDL1`) |
-| 16 | **Mã SV DUT** | `WidthFixed` | 88px | **1 hàng duy nhất** (9 chữ số `102260001`) |
-| 17 | **Thao Tác** | `WidthFixed` | 105px | **1 hàng duy nhất**, chứa 3 nút [Xem], [Sửa], [Xóa] |
-
-> **Tổng chiều rộng cố định của 11 cột ưu tiên 1 dòng + cột Thao Tác:**  
-> $36 + 75 + 108 + 86 + 55 + 42 + 42 + 42 + 58 + 92 + 88 + 105 = 830\text{px}$.  
-> Phần không gian còn lại (từ $400\text{px}$ đến $800\text{px}$ tùy độ phân giải màn hình) sẽ được 5 cột co giãn (`Họ và Tên`, `Quê Quán`, `Kết Quả`, `Khoa`, `Ngành Trúng Tuyển`) chia nhau theo tỷ lệ và tự động xuống dòng đẹp mắt khi cần.
-
-##### C. Cơ chế Tự Động Xuống Dòng (Text Wrap) trong Cell
-Trong ImGui, để một ô văn bản tự động xuống dòng khi nội dung chạm mép cột:
-```cpp
-// Helper ngắt dòng an toàn trong cell của bảng
-void RenderWrappedText(const string& text, const ImVec4& color = ImVec4(0.92f, 0.94f, 0.96f, 1.0f)) {
-    float availWidth = ImGui::GetContentRegionAvail().x;
-    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + availWidth);
-    ImGui::TextColored(color, "%s", text.c_str());
-    ImGui::PopTextWrapPos();
-}
+```mermaid
+flowchart TD
+    A["Màn hình Danh sách (Screen View)"] --> B["1. Action & Filter Toolbar<br/>(Cánh trái: Search/Filter | Cánh phải: 3 Buttons)"]
+    A --> C["2. Common DataTable Engine<br/>(Render Headers, Sort Vector, Row Cells, Empty State)"]
+    A --> D["3. Common Pagination Bar<br/>(Cánh trái: 'Hien thi X den Y' | Cánh phải: Size + Nav)"]
+    
+    C --> C1["Cột Text: CĂN TRÁI<br/>(padLeft = 6px, Auto Wrap)"]
+    C --> C2["Cột Khác: CĂN GIỮA<br/>(Diem, Chi tieu, Ma, STT, Ngay)"]
+    C --> C3["Cột Cuối: THAO TÁC CĂN GIỮA<br/>(Width=102px: Xem, Sua, Xoa)"]
 ```
 
-##### D. Tinh Chỉnh Cột Thao Tác (Action Buttons)
-- Thu gọn 3 nút bấm `Xem`, `Sửa`, `Xóa` với kích thước gọn gàng `30x20` px hoặc `32x22` px, đặt trên cùng một dòng bằng `ImGui::SameLine()`, có padding nhỏ (2-3px) để nằm trọn vẹn trong cột 105px mà không bị tràn hay xuống dòng.
+---
+
+### III. ĐẶC TẢ CHI TIẾT CÁC THÀNH PHẦN KỸ THUẬT C++
+
+#### 1. Cấu trúc Quản lý Trạng thái Phân trang Server-side (`PaginationState`)
+Định nghĩa struct quản lý trạng thái phân trang tập trung, có thể tái sử dụng cho bất kỳ thực thể nào (tương đồng với `items` prop trong `Table.vue`):
+
+```cpp
+struct PaginationState {
+    int currentPage = 1;
+    int pageSize = 10;
+    int totalRecords = 0;
+    int totalPages = 1;
+    int sortCol = -1;
+    bool sortAsc = true;
+
+    // Tính toán vị trí offset trong câu truy vấn SQL (LIMIT pageSize OFFSET offset)
+    int getOffset() const {
+        return (currentPage - 1) * pageSize;
+    }
+
+    // Cập nhật lại số trang khi tổng bản ghi thay đổi
+    void updateTotalRecords(int count) {
+        totalRecords = count;
+        totalPages = (totalRecords <= 0) ? 1 : ((totalRecords + pageSize - 1) / pageSize);
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+    }
+
+    // Nhãn hiển thị phạm vi bản ghi tương ứng với PaginationV.vue: "Hien thi tu X den Y cua Z muc"
+    void getRangeDisplay(int& fromIdx, int& toIdx) const {
+        if (totalRecords == 0) {
+            fromIdx = 0;
+            toIdx = 0;
+            return;
+        }
+        fromIdx = getOffset() + 1;
+        toIdx = (fromIdx + pageSize - 1 > totalRecords) ? totalRecords : (fromIdx + pageSize - 1);
+    }
+};
+```
+
+#### 2. Cấu trúc Cột Bảng Linh Hoạt (`TableColumnConfig`)
+Tương ứng với mảng `headers` trong `Table.vue`, định nghĩa cấu hình metadata cho từng cột:
+
+```cpp
+enum class ColumnAlign {
+    Left,    // Áp dụng cho text, chuỗi dài, họ tên, khoa, ngành, ghi chú
+    Center   // Áp dụng cho TOÀN BỘ CỘT CÒN LẠI: điểm số, chỉ tiêu, số lượng, STT, mã số, ngày sinh, lớp...
+};
+
+struct TableColumnConfig {
+    string headerName;
+    ColumnAlign align;
+    float widthOrWeight;
+    bool isStretch;      // true: WidthStretch, false: WidthFixed
+    bool isSortable;
+    bool isActionColumn; // Cột thao tác cuối cùng (102px cố định)
+};
+```
+
+#### 3. Thanh Công Cụ Hành Động Chuẩn (`Common Action Toolbar`)
+Tương đồng với slot `divAction` và `isSearch` trong `Table.vue`:
+- **Bên trái**: Ô tìm kiếm / bộ lọc chuyên biệt của từng màn hình.
+- **Bên phải**: Bộ 3 nút chuẩn mang ngữ nghĩa hành động rõ ràng:
+  - `[+ Thêm mới]` (Màu xanh lục Emerald `#22C55E` - Hover `#16A34A`): Mở Modal tạo mới thực thể tương ứng.
+  - `[ Xuất Excel ]` (Màu xanh dương Navy `#3B82F6` - Hover `#2563EB`): Xuất báo cáo theo bộ lọc sang file `.xls` định dạng Microsoft XML Spreadsheet 2003 chuẩn hoá.
+  - `[+ Import dữ liệu mẫu]` (Màu tím/Chàm Indigo `#6366F1` - Hover `#4F46E5`): Nạp bộ dữ liệu mẫu chuẩn của thực thể đó vào MySQL.
+
+```cpp
+struct ActionToolbarFlags {
+    bool showAdd = true;
+    bool showExport = true;
+    bool showImport = true;
+    string customAddLabel = "+ Them moi";
+    string customExportLabel = "Xuat Excel";
+    string customImportLabel = "+ Import du lieu mau";
+};
+
+// Hàm render thanh công cụ dùng chung
+void RenderCommonActionToolbar(const string& screenId,
+                               const ActionToolbarFlags& flags,
+                               bool& outAddClicked,
+                               bool& outExportClicked,
+                               bool& outImportClicked);
+```
+
+#### 4. Khung Bảng Dùng Chung (`Common Table Layout`)
+- **Flags bắt buộc**:
+  ```cpp
+  ImGuiTableFlags tableFlags = ImGuiTableFlags_Borders | 
+                               ImGuiTableFlags_RowBg | 
+                               ImGuiTableFlags_Resizable | 
+                               ImGuiTableFlags_Sortable | 
+                               ImGuiTableFlags_SizingStretchProp | 
+                               ImGuiTableFlags_NoSavedSettings;
+  ```
+- **Thead Vector**: Tự động render mũi tên vector sắc nét ▲/▼ cho mọi cột `isSortable`.
+- **Trạng thái Rỗng (Empty State - `customize-noResult`)**:
+  Khi danh sách không có dữ liệu (`totalRecords == 0`), tự động render hàng thông báo căn giữa với màu cam nhạt thanh lịch: *"Khong tim thay du lieu phu hop"*.
+- **Cột Thao Tác (Action Column)**:
+  - Khóa độ rộng cố định: `102.0f`, cờ `ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_NoSort`.
+  - Cụm 3 Icon Buttons căn giữa hoàn hảo theo chiều ngang và dọc:
+    + **Icon 1 (Xem chi tiết - Con mắt)**: Kích thước 26x22px, màu Teal (`#248270`), mở Modal xem chi tiết.
+    + **Icon 2 (Sửa - Bút chì)**: Kích thước 26x22px, màu Blue (`#2D72D2`), mở Modal chỉnh sửa.
+    + **Icon 3 (Xóa - Thùng rác)**: Kích thước 26x22px, màu Red (`#D33838`), mở Modal xác nhận xóa an toàn.
+
+#### 5. Thanh Phân Trang Chuẩn (`Common Pagination Bar`)
+Bố cục mô phỏng chuẩn xác từ `PaginationV.vue`:
+```
++----------------------------------------------------------------------------------------------------+
+|  Hien thi tu 1 den 10 cua 100 muc         So hang: [ 10 / trang v ]   [|<<]  [<]  Trang 1/10  [>]  [>>]|
++----------------------------------------------------------------------------------------------------+
+```
+- **Cánh trái**: Nhãn hiển thị phạm vi bản ghi: `Hien thi tu X den Y cua Z muc` (hoặc `Dang hien thi 0 ket qua`).
+- **Cánh phải**:
+  1. Dropdown chọn `Số hàng` (`pageSize`): `10 / trang`, `25 / trang`, `50 / trang`, `100 / trang`.
+  2. Cụm 5 nút điều hướng:
+     - `|<< Đầu`: Về trang 1.
+     - `< Trước`: Về trang `currentPage - 1`.
+     - `Trang X / Y`: Nhãn hiển thị trang hiện tại / tổng số trang.
+     - `Sau >`: Đến trang `currentPage + 1`.
+     - `Cuối >>`: Đến trang cuối cùng.
+     - Tự động Disable các nút khi ở đầu hoặc cuối danh sách.
 
 ---
 
-### IV. CÁC TỆP TIN CẦN THAY ĐỔI & TÁC ĐỘNG
+### IV. QUY CHUẨN CĂN LỀ DỮ LIỆU TOÀN DIỆN (ALIGNMENT RULES)
 
-1. **`include/MySQLConnector.h` & `src/MySQLConnector.cpp`:**
-   - Xóa bỏ việc seed 36 thí sinh trong `seedDefaultData()`.
-   - Bổ sung phương thức `executeSqlScript(const string& filePath)` hoặc logic nạp dữ liệu từ file SQL.
-2. **`include/QuanLyThiSinh.h` & `src/QuanLyThiSinh.cpp`:**
-   - Thêm phương thức `importDuLieuMau100(const string& filePath)`.
-3. **`src/AppGUI.cpp`:**
-   - Bổ sung nút `[+] Import Du Lieu Mau (100)` bên phải nút Xuất Excel.
-   - Refactor cấu hình bảng `CandidatesTable_v2`: Bỏ `ScrollX`, gán flags `StretchProp`, thiết lập độ rộng chuẩn cho 17 cột, bọc Text Wrap cho các cột chuỗi dài.
-4. **`imgui.ini`:**
-   - Dọn sạch section table cache bị lỗi của bảng cũ.
+Tuân thủ nghiêm ngặt theo chỉ đạo của đệ tử: **"Cột có dữ liệu là text căn trái, CÒN LẠI CĂN GIỮA"**:
+
+| Phân nhóm dữ liệu | Danh sách các cột thuộc nhóm | Phương thức căn chỉnh | Quy cách hiển thị |
+|:---|:---|:---:|:---|
+| **Văn bản (Text / Chuỗi dài)** | Họ và tên, Tên Khoa, Tên Ngành, Tên Tỉnh thành, Trạng thái xét tuyển, Ghi chú mô tả cấu hình | **CĂN TRÁI (`AlignAndRenderTextLeft`)** | Có đệm lề trái `padLeft = 6.0f`, tự động wrap dòng khi bề rộng ô hẹp, căn giữa theo trục dọc. |
+| **Điểm số & Điểm chuẩn** | Điểm Toán, Điểm Lý, Điểm Hóa, Tổng Điểm, Điểm Chuẩn Chốt, Điểm Sàn Tối Thiểu | **CĂN GIỮA (`AlignAndRenderCenter`)** | Căn giữa tuyệt đối trong ô, định dạng số thập phân 2 chữ số (`%.2f`). |
+| **Số lượng & Chỉ tiêu** | Chỉ tiêu tuyển sinh, Sĩ số lớp chuẩn, Số lượng trúng tuyển thực tế, Số lượng nguyện vọng | **CĂN GIỮA (`AlignAndRenderCenter`)** | Căn giữa tuyệt đối, hiển thị số nguyên rõ ràng. |
+| **Định danh & Mã số cố định** | STT, Số báo danh (`DUT001`), Số CCCD, Mã SV DUT (`102260001`), Lớp sinh hoạt (`26T_N1`), Mã Tỉnh (`48`), Mã Giới tính (`NAM`) | **CĂN GIỮA (`AlignAndRenderCenter`)** | Căn giữa tuyệt đối trong ô, giữ trọn vẹn số 0 ở đầu (`048`, `0643...`). |
+| **Ngày tháng & Thời gian** | Ngày sinh (`dd/mm/yyyy`), Năm tuyển sinh (`2026`) | **CĂN GIỮA (`AlignAndRenderCenter`)** | Căn giữa tuyệt đối, không ngắt dòng. |
+| **Cột Thao Tác (Actions)** | Cụm 3 nút `[Xem chi tiết]` `[Sửa]` `[Xóa]` | **CĂN GIỮA** | Tâm cụm nút 86px luôn nằm chính giữa tâm cột 102px cả trục X và trục Y. |
 
 ---
 
-### V. KẾ HOẠCH KIỂM THỬ (TEST PLAN)
+### V. DANH SÁCH CÁC MÀN HÌNH ĐƯỢC CHUẨN HÓA
 
-1. **Kiểm tra trạng thái ban đầu:**
-   - Khởi động ứng dụng khi database trống: Xác nhận danh sách thí sinh hiển thị 0 bản ghi, không còn 36 bản ghi lạ.
-2. **Kiểm tra chức năng nút Import 100 Thí sinh:**
-   - Nhấn nút `[+] Import Du Lieu Mau (100)`:
-     + Toast thông báo thành công xuất hiện.
-     + Bảng nạp đủ 100 thí sinh thuộc bộ hồ sơ K26 CNTT Nhật.
-     + Dữ liệu tổng điểm, nguyện vọng khớp 100% với file `05_seed_sample_data.sql`.
-3. **Kiểm tra Giao diện Bảng không còn Cuộn Ngang:**
-   - Thu nhỏ, phóng to cửa sổ: Bảng tự động co giãn vừa vặn, **không hề có thanh cuộn ngang dưới đáy**.
-   - Kiểm tra các cột ưu tiên 1 dòng (`STT`, `SBD`, `CCCD`, `Ngày sinh`, `Giới tính`, `Toán`, `Lý`, `Hóa`, `Tổng`, `Lớp`, `Mã SV`): Đảm bảo hiển thị đầy đủ, không bị cắt cụt ký tự, không bị ngắt dòng.
-   - Kiểm tra các cột chuỗi dài (`Họ và tên`, `Quê quán`, `Ngành trúng tuyển`): Hiển thị đầy đủ tiếng Việt, tự động xuống dòng thẩm mỹ khi độ rộng cột thu hẹp.
-4. **Kiểm tra Biên dịch & Chạy thực tế:**
-   - Chạy `build.bat` biên dịch không lỗi, chạy thử ứng dụng xác nhận trải nghiệm người dùng mượt mà.
+| STT | Màn hình / Tab | Thực thể CSDL | Thao tác [Thêm mới] | Thao tác [Xuất Excel] | Thao tác [Import mẫu] | Cột Thao tác [Xem / Sửa / Xóa] |
+|:---:|:---|:---|:---|:---|:---|:---:|
+| **1** | **Tab 1: Quản lý Hồ sơ Thí sinh** | `thisinh` + `nguoi` + `nguyen_vong` | Thêm Thí sinh mới | Xuất báo cáo lọc Thí sinh | Nạp 100 Thí sinh mẫu K26 | Đầy đủ 3 nút |
+| **2** | **Tab 3.1: Chỉ tiêu & Điểm chuẩn chốt** | `nganh_theo_khoa_hoc` | Thiết lập ngành tuyển sinh mới | Xuất bảng điểm chuẩn chốt | Nạp chỉ tiêu & điểm chuẩn K26 | Sửa chỉ tiêu / Điểm sàn |
+| **3** | **Tab 3.2: Tân sinh viên & Phân lớp** | `thisinh` trúng tuyển | Ghi danh sinh viên bổ sung | Xuất danh sách phân lớp DUT | Nạp danh sách trúng tuyển mẫu | Đầy đủ 3 nút |
+| **4** | **Tab 3.3: Thủ khoa & Phổ điểm** | Thí sinh top điểm | - | Xuất danh sách Thủ khoa | - | Xem chi tiết hồ sơ |
+| **5** | **Tab 4.1: Danh mục Khoa đào tạo** | `khoa` | Thêm Khoa đào tạo | Xuất danh mục Khoa | Nạp 14 Khoa chuẩn DUT | Đầy đủ 3 nút |
+| **6** | **Tab 4.2: Danh mục Ngành tuyển sinh** | `danh_muc_nganh` | Thêm Ngành đào tạo mới | Xuất danh mục Ngành | Nạp 12 Ngành chuẩn DUT | Đầy đủ 3 nút |
+| **7** | **Tab 4.3: Chỉ tiêu K26 Biến động** | `nganh_theo_khoa_hoc` | Thêm chỉ tiêu khóa mới | Xuất chỉ tiêu K26 | Nạp chỉ tiêu mặc định | Sửa chỉ tiêu / điểm sàn |
+| **8** | **Tab 4.4: Danh mục Tỉnh / Thành** | `tinh_thanh` | Thêm Tỉnh/Thành phố | Xuất danh mục Tỉnh | Nạp 63 Tỉnh/Thành VN | Đầy đủ 3 nút |
+| **9** | **Tab 4.5: Danh mục Giới tính** | `gioi_tinh` | Thêm định danh Giới tính | Xuất danh mục Giới tính | Nạp 3 Giới tính chuẩn | Đầy đủ 3 nút |
+| **10** | **Tab 4.6: Cấu hình Hệ thống** | `cau_hinh` | Thêm tham số mới | Xuất bảng cấu hình | Nạp cấu hình mặc định | Sửa tham số cấu hình |
+| **11** | **Tab 2: 10 Bảng dữ liệu quan hệ** | 10 Bảng MySQL 3NF | Tương ứng từng bảng | Xuất dữ liệu bảng | Nạp dữ liệu bảng | Đầy đủ 3 nút |
+
+---
+
+### VI. KẾ HOẠCH TRIỂN KHAI THEO TỪNG GIAI ĐOẠN (ROADMAP)
+
+#### Giai đoạn 1: Xây dựng Bộ Khung Dùng Chung (Common Table Framework)
+- **File tác động**: `include/AppGUI.h`, `src/AppGUI.cpp`.
+- **Nội dung công việc**:
+  1. Hiện thực hóa các hàm dùng chung theo kiến trúc component tham chiếu:
+     - `RenderCommonActionToolbar(...)`
+     - `RenderCommonPaginationBar(...)`
+     - `RenderCommonActionCell(...)`
+     - `AlignAndRenderTextLeft(...)` (cho text)
+     - `AlignAndRenderCenter(...)` (cho toàn bộ các loại dữ liệu còn lại).
+  2. Tạo bộ style chuẩn cho 3 nút `[+ Thêm mới]`, `[ Xuất Excel ]`, `[+ Import dữ liệu mẫu]`.
+
+#### Giai đoạn 2: Refactor Tab 4 (Quản lý Danh mục Hệ thống)
+- **Mục tiêu**: Áp dụng Framework mới cho các bảng danh mục quản trị (Tỉnh thành, Giới tính, Khoa, Ngành, Cấu hình).
+- **Lợi ích**: Danh mục có cấu trúc bảng gọn nhẹ, kiểm thử nhanh các thao tác Xem/Sửa/Xóa và xuất Excel.
+
+#### Giai đoạn 3: Refactor Tab 3 (Xét tuyển & Điểm chuẩn Động DUT)
+- **Mục tiêu**:
+  - Chuẩn hóa Bảng 3.1: Chỉ tiêu & Điểm chuẩn chốt theo ngành (đổi nút `[Xuat DS Trung Tuyen DUT]` thành cụm 3 nút chuẩn, thêm phân trang 2 cánh).
+  - Chuẩn hóa Bảng 3.2: Danh sách Tân sinh viên trúng tuyển & Phân lớp sinh hoạt DUT (thống nhất với Tab 1).
+  - Chuẩn hóa Bảng 3.3: Bảng xếp hạng Thủ khoa.
+
+#### Giai đoạn 4: Refactor Tab 2 (10 Bảng Cơ sở Dữ liệu Quan hệ 3NF)
+- **Mục tiêu**: Thay thế toàn bộ mã lặp vẽ bảng trong 10 Subtab của Tab 2 bằng vòng lặp dùng chung qua Framework `CommonTable`, bổ sung phân trang Server-side cho từng bảng.
+
+#### Giai đoạn 5: Tối ưu Phân Trang Phía Server (Server-Side Pagination Queries)
+- **File tác động**: `include/MySQLConnector.h`, `src/MySQLConnector.cpp`, `src/QuanLyThiSinh.cpp`.
+- **Nội dung công việc**:
+  - Cung cấp phương thức truy vấn `queryWithPagination(table, offset, limit, whereClause, orderClause)`.
+  - Cung cấp phương thức đếm `countRecords(table, whereClause)`.
+  - Đảm bảo hiệu năng tải cực nhanh kể cả khi số lượng thí sinh tăng lên hàng vạn.
+
+#### Giai đoạn 6: Kiểm Thử, Dọn Dẹp Cache & Đóng Gói
+- **Dọn dẹp `imgui.ini`**: Đặt tên ID phiên bản mới (`_v3`, `_v4`) cho tất cả các bảng để triệt tiêu vĩnh viễn nguy cơ cache kích thước cột cũ.
+- **Biên dịch**: Rebuild toàn bộ hệ thống bằng MinGW64 g++ và kiểm tra không còn bất kỳ warning nào.
+- **Chạy thử nghiệm**: Kiểm tra trên các độ phân giải khác nhau (1920x1080, 2560x1440, 3440x1440).
+
+---
+
+### VII. KẾT LUẬN & ĐỀ XUẤT PHÊ DUYỆT
+
+Bản kế hoạch đã được cập nhật chuẩn xác:
+- **Áp dụng mô hình chuẩn từ `sdt-baocaodieuhanh`** (`Table.vue`, `PaginationV.vue`).
+- **Quy tắc căn chỉnh đã sửa theo comment của Đệ tử**: Cột Text căn trái, toàn bộ các cột còn lại (điểm số, chỉ tiêu, số lượng, mã số, ngày sinh...) **CĂN GIỮA**.
+
+Kính trình Đệ tử trung thành xem xét bản Kế hoạch đã hoàn thiện để Thánh cô bắt tay vào thực thi!

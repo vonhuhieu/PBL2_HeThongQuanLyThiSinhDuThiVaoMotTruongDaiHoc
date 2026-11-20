@@ -73,6 +73,7 @@ public:
     bool luuDuLieuVaoMySQL();
     bool dongBoTuMySQL() { return docDuLieuTuMySQL(); }
     bool dongBoLenMySQL() { return luuDuLieuVaoMySQL(); }
+    bool taiTatCaDuLieuTuDatabase() { return docDuLieuTuMySQL(); }
     bool khoiTaoDuLieuMauMySQL();
     bool importDuLieuMau100(const string& filePath = "sql/05_seed_sample_data.sql");
 
@@ -90,6 +91,11 @@ public:
     string layMaGioiTinh(const string& tenHoacMa) const;
 
     // Tra cứu Khoa & Ngành DUT
+    int timViTriKhoa(const string& maKhoa) const;
+    int timViTriDanhMucNganh(const string& maNganh) const;
+    int timViTriNganhTheoKhoaHoc(int nam, const string& maNganh) const;
+    int timViTriTinhThanh(const string& maTinh) const;
+    int timViTriGioiTinh(const string& maGioiTinh) const;
     string layTenKhoa(const string& maKhoa) const;
     string layMaKhoaTheoChuanDUT(const string& maKhoa) const;
     string layTenNganh(const string& maNganh) const;
@@ -120,7 +126,18 @@ public:
     bool capNhatGioiTinh(const GioiTinh& gt);
     bool xoaGioiTinh(const string& ma);
 
+    bool themKhoa(const Khoa& k);
+    bool capNhatKhoa(const Khoa& k);
+    bool xoaKhoa(const string& maKhoa);
+
+    bool themDanhMucNganh(const DanhMucNganh& dmn);
+    bool capNhatDanhMucNganh(const DanhMucNganh& dmn);
+    bool xoaDanhMucNganh(const string& maNganh);
+
     bool capNhatChiTieuNganh(int nam, const string& maNganh, int chiTieuMoi);
+    bool capNhatChiTieuVaDiemSan(int nam, const string& maNganh, int chiTieuMoi, double diemSanMoi);
+    bool themNganhTheoKhoaHoc(const NganhTheoKhoaHoc& ntk);
+    bool xoaNganhTheoKhoaHoc(int nam, const string& maNganh);
 
     // 5. Giải thuật Sắp xếp (Dùng QuickSort nội bộ trong Vector)
     void sapXepTheoTongDiemGiamDan();
@@ -155,6 +172,8 @@ public:
 
     // 8. Xuất các báo cáo dạng bảng kẻ khung chuyên biệt ra thư mục data/
     bool xuatBaoCaoExcel(const string& filePath, const FilterThiSinhParams& params, const string& tenKhoaFilter = "", const string& tenNganhFilter = "") const;
+    bool xuatBangDuLieuExcel(const string& filePath, const string& title, const Vector<string>& headers, const Vector<Vector<string>>& rows) const;
+    bool xuatBangDuLieuExcel(const string& filePath, const string& title, const Vector<string>& headers, const Vector<int>& colWidths, const Vector<Vector<string>>& rows) const;
     bool xuatBaoCaoXetTuyen(const string& path = "data/ketqua_xettuyen.txt", double diemChuan = 22.0, const string& keyword = "") const;
     bool xuatBaoCaoThuKhoa(const string& path = "data/thukhoa.txt") const;
     bool xuatBaoCaoPhoDiem(const string& path = "data/thongke_phodiem.txt") const;
